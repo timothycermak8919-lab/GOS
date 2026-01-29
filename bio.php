@@ -156,9 +156,8 @@ $result = mysqli_stmt_get_result($result);
 
 if ($classes['0'] == 0) $is_creator = 1; else $is_creator = 0;
 
-// ADD / REMOVE FRIENDS
-
-if ($_GET['set_s'] && !$is_same) {
+// ADD / REMOVE FRIENDS - Only allow users to manage their own friends list
+if ($_GET['set_s'] && $is_same) {
     function delete_ele($array, $ele)
     {
         $new_array = array();
@@ -179,8 +178,8 @@ if ($_GET['set_s'] && !$is_same) {
     mysqli_query($db, "UPDATE Users_data SET friends='" . serialize($friends) . "' WHERE id=" . $charother['id']);
 }
 
-// TRANSFER ORG LEADERSHIP
-if ($_GET['transfer'] && $char['society'] == $charother['society'] && strtolower($societyo['leader']) == strtolower($charother['name']) && strtolower($societyo['leaderlast']) == strtolower($charother['lastname'])) {
+// TRANSFER ORG LEADERSHIP - Only current leader can transfer to themselves
+if ($_GET['transfer'] && $is_same && $char['society'] == $charother['society'] && strtolower($societyo['leader']) == strtolower($charother['name']) && strtolower($societyo['leaderlast']) == strtolower($charother['lastname'])) {
     $query = "UPDATE Soc SET leader='$bioName', leaderlast='$bioLastName' WHERE name='" . $char['society'] . "'";
     $result = mysqli_query($db, $query);
     $message = $char['society'] . " leadership transfered";

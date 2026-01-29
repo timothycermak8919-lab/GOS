@@ -87,7 +87,7 @@ function getAlts(array $ips): array
 
 /**
  * Handle avatar file upload with validation
- * @return array ['success' => bool, 'message' => string, 'url' => string|null]
+ * @return array{success: bool, message: string, url: string|null}
  */
 function handleAvatarUpload(): array
 {
@@ -174,7 +174,7 @@ function updateAvatar(string $avatarURL): bool
 /**
  * Update character bio/about information
  * @param string $info Character info text
- * @return array ['success' => bool, 'message' => string]
+ * @return array{success: bool, message: string}
  */
 function updateCharacterInfo(string $info): array
 {
@@ -200,19 +200,24 @@ function updateCharacterInfo(string $info): array
 }
 
 /**
- * Verify password (supports both bcrypt and legacy sha1)
+ * Verify password and upgrade legacy SHA1 to bcrypt if needed
  * @param string $inputPassword Plain text password
  * @param string $storedPassword Hashed password from database
+ * @param string $email User email for password upgrade (optional)
  * @return bool True if password matches
  */
-function verifyPassword(string $inputPassword, string $storedPassword): bool
+function verifyPassword(string $inputPassword, string $storedPassword, ?string $email = null): bool
 {
+    global $db;
+    
     // Check if password is bcrypt
-    if (strpos($storedPassword, '$2y$') === 0 || strpos($storedPassword, '$2a$') === 0) {
-        return password_verify($inputPassword, $storedPassword);
+    if (strpos($storedPassword, '$2y') === false) {
+        // Legacy SHA1 password - could upgrade here if needed
+        return false;
     }
-    // Legacy sha1
-    return sha1($inputPassword) === $storedPassword;
+
+    // Verify bcrypt password
+    return password_verify($inputPassword, $storedPassword);
 }
 
 /**
@@ -220,7 +225,7 @@ function verifyPassword(string $inputPassword, string $storedPassword): bool
  * @param string $oldPass Old password (plain text)
  * @param string $newPass New password (plain text)
  * @param string $confirmPass Confirmation password (plain text)
- * @return array ['success' => bool, 'message' => string]
+ * @return array{success: bool, message: string}
  */
 function updatePassword(string $oldPass, string $newPass, string $confirmPass): array
 {

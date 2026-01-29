@@ -44,10 +44,25 @@ $namesender = $_COOKIE['name'];
 $lastnamesender = $_COOKIE['lastname'];
 $nameto="";
 $lastnameto="";
-$nameto=mysqli_real_escape_string($db,$_GET[name]);
-$lastnameto=mysqli_real_escape_string($db,$_GET[lastname]);
+
+// Validate and sanitize input parameters with proper authorization check
+if (isset($_GET['name']) && isset($_GET['lastname'])) {
+    $nameto = mysqli_real_escape_string($db, $_GET['name']);
+    $lastnameto = mysqli_real_escape_string($db, $_GET['lastname']);
+    
+    // Verify the target user exists before allowing trade
+    $stmt = mysqli_prepare($db, "SELECT id FROM Users WHERE name=? AND lastname=?");
+    mysqli_stmt_bind_param($stmt, "ss", $nameto, $lastnameto);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    if (!$result || mysqli_num_rows($result) == 0) {
+        echo "User not found!";
+        exit;
+    }
+}
+
 if ($nameto=="" || $lastnameto=="" ||
-    (strtolower($nameto) == strtolower($namesender) && strtolowerto($lastname) == strtolower($lastnamesender)))
+    (strtolower($nameto) == strtolower($namesender) && strtolower($lastnameto) == strtolower($lastnamesender)))
 {
   echo "Quit cheating!";
 }
