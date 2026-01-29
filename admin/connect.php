@@ -22,21 +22,26 @@ $maxsocalts = 99;
 date_default_timezone_set('America/Los_Angeles');
 
 
-$id = $_COOKIE['id'];
-$name = $_COOKIE['name'];
-$lastname = $_COOKIE['lastname'];
-$email  = $_COOKIE['email'];
-$password = $_COOKIE['password'];
-$mode = $_COOKIE['mode'];
+$id = $_COOKIE['id'] ?? null;
+$name = $_COOKIE['name'] ?? null;
+$lastname = $_COOKIE['lastname'] ?? null;
+$session = $_COOKIE['session'] ?? null;
+$mode = $_COOKIE['mode'] ?? null;
 
 
-if ($email && $password) {
-    $stmt = mysqli_prepare($db, "SELECT * From Accounts WHERE email=? AND password=?");
-    mysqli_stmt_bind_param($stmt, "ss", $email, $password);
+if ($session) {
+    // Validate session token
+    $stmt = mysqli_prepare($db, "SELECT * From Accounts WHERE session_token=? AND session_expires > ?");
+    $currentTime = time();
+    mysqli_stmt_bind_param($stmt, "si", $session, $currentTime);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
-    if (mysqli_num_rows($result) != 0) {
-        if ($id){
+    $account = mysqli_fetch_array($result);
+    
+    if ($account) {
+        $email = $account['email'];
+        
+        if ($id) {
             $stmt = mysqli_prepare($db, "SELECT * From Users WHERE email=? AND id=?");
             mysqli_stmt_bind_param($stmt, "si", $email, $id);
             mysqli_stmt_execute($stmt);
@@ -44,31 +49,30 @@ if ($email && $password) {
             if (mysqli_num_rows($result) == 0) {
                 $id = null;
                 $email = null;
-                $password = null;
+                $session = null;
                 $name = null;
                 $lastname = null;
                 setcookie("id", "", time()-3600, "/");
                 setcookie("name", "", time()-3600, "/");
                 setcookie("lastname", "", time()-3600, "/");
-                setcookie("email", "", time()-3600, "/");
-                setcookie("password", "", time()-3600, "/");
+                setcookie("session", "", time()-3600, "/");
                 if (!headers_sent()) {
                     $time = time();
                     header("Location: $server_name/index2.php?time=$time"); exit;
                 }
             }
         }
-    }else{
+    } else {
+        // Invalid or expired session
         $id = null;
         $email = null;
-        $password = null;
+        $session = null;
         $name = null;
         $lastname = null;
         setcookie("id", "", time()-3600, "/");
         setcookie("name", "", time()-3600, "/");
         setcookie("lastname", "", time()-3600, "/");
-        setcookie("email", "", time()-3600, "/");
-        setcookie("password", "", time()-3600, "/");
+        setcookie("session", "", time()-3600, "/");
         if (!headers_sent()) {
             $time = time();
             header("Location: $server_name/index2.php?time=$time"); exit;

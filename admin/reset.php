@@ -44,7 +44,11 @@ $result = mysqli_query($db,$query);
 // Create New Table
 $query = "CREATE TABLE IF NOT EXISTS `Accounts` (
   `email` text NOT NULL,
-  `password` char(40) DEFAULT NULL
+  `password` char(40) DEFAULT NULL,
+  `session_token` varchar(64) DEFAULT NULL,
+  `session_expires` int(11) DEFAULT NULL,
+  KEY `session_token` (`session_token`),
+  KEY `session_expires` (`session_expires`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1";
 $result = mysqli_query($db,$query);
 
@@ -277,6 +281,12 @@ $query = "CREATE TABLE IF NOT EXISTS `Users_stats` (
   `loc_ji22` float NOT NULL DEFAULT '0',
   `loc_ji23` float NOT NULL DEFAULT '0',
   `loc_ji24` float NOT NULL DEFAULT '0',
+  `loc_ji25` float NOT NULL DEFAULT '0',
+  `loc_ji26` float NOT NULL DEFAULT '0',
+  `loc_ji27` float NOT NULL DEFAULT '0',
+  `loc_ji28` float NOT NULL DEFAULT '0',
+  `loc_ji29` float NOT NULL DEFAULT '0',
+  `loc_ji30` float NOT NULL DEFAULT '0',
   `achieved` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1";

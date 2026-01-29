@@ -54,9 +54,31 @@ if (!is_null($result) && $account = mysqli_fetch_array($result))
         $mode = 0;
         if ($_POST["mode"]) $mode = mysqli_real_escape_string($db,$_POST["mode"]);
 
-        setcookie("email", $email, time()+99999999, "/");
-        setcookie("password", $newHash ?? $storedPassword, time()+99999999, "/");
-        setcookie("mode", $mode, time()+99999999, "/");
+        // Generate secure session token
+        $sessionToken = bin2hex(random_bytes(32));
+        
+        // Store session token in database
+        $updateSessionQuery = "UPDATE Accounts SET session_token = ?, session_expires = ? WHERE email = ?";
+        $updateSessionStmt = mysqli_prepare($db, $updateSessionQuery);
+        $expires = time() + 3600; // 1 hour expiry
+        mysqli_stmt_bind_param($updateSessionStmt, "sis", $sessionToken, $expires, $email);
+        mysqli_stmt_execute($updateSessionStmt);
+        
+        // Set secure cookies with proper flags
+        setcookie("session", $sessionToken, [
+            'expires' => time() + 3600,
+            'path' => '/',
+            'secure' => true,
+            'httponly' => true,
+            'samesite' => 'Strict'
+        ]);
+        setcookie("mode", $mode, [
+            'expires' => time() + 3600,
+            'path' => '/',
+            'secure' => true,
+            'httponly' => true,
+            'samesite' => 'Strict'
+        ]);
 
 
         $query = "SELECT * FROM Users WHERE email = ?";
@@ -72,9 +94,27 @@ if (!is_null($result) && $account = mysqli_fetch_array($result))
             $id = $char['id'];
             $user = $char['name'];
             $lastname = $char['lastname'];
-            setcookie("id", $id, time()+99999999, "/");
-            setcookie("name", $user, time()+99999999, "/");
-            setcookie("lastname", $lastname, time()+99999999, "/");
+            setcookie("id", $id, [
+                'expires' => time() + 3600,
+                'path' => '/',
+                'secure' => true,
+                'httponly' => true,
+                'samesite' => 'Strict'
+            ]);
+            setcookie("name", $user, [
+                'expires' => time() + 3600,
+                'path' => '/',
+                'secure' => true,
+                'httponly' => true,
+                'samesite' => 'Strict'
+            ]);
+            setcookie("lastname", $lastname, [
+                'expires' => time() + 3600,
+                'path' => '/',
+                'secure' => true,
+                'httponly' => true,
+                'samesite' => 'Strict'
+            ]);
                 
             header("Location: $server_name/bio.php?time=$time");
             exit;

