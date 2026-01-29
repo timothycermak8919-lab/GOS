@@ -1,9 +1,9 @@
 <?php
-error_reporting(E_ERROR | E_PARSE);
+error_reporting(E_ERROR);
 
 // URL
 $subfile = "";
-$server_name = "http://".$_SERVER['SERVER_NAME'];
+$server_name = "http://" . ($_SERVER['SERVER_NAME'] ?? 'localhost');
 
 include("credentials.php");
 
@@ -14,12 +14,12 @@ $admin_password = "";
 
 include("connect.php");
 // User stuff stored in cookies
-$id = $_COOKIE['id'];
-$name = $_COOKIE['name'];
-$lastname = $_COOKIE['lastname'];
-$email  = $_COOKIE['email'];
-$password = $_COOKIE['password'];
-$mode = $_COOKIE['mode'];
+$id = $_COOKIE['id'] ?? null;
+$name = $_COOKIE['name'] ?? null;
+$lastname = $_COOKIE['lastname'] ?? null;
+$email  = $_COOKIE['email'] ?? null;
+$password = $_COOKIE['password'] ?? null;
+$mode = $_COOKIE['mode'] ?? null;
 
 
 if ($email && $password) {

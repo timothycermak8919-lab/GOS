@@ -326,13 +326,13 @@ include('header.php');
           </table>
 
           <input type="hidden" name="action" value="0">
-          <a data-href="javascript:submitFormVault('1');" data-toggle="confirmation" data-placement="top" title="Withdraw selected items?" class="btn btn-primary btn-sm btn-wrap">Withdraw Selected</a>
-          <a data-href="javascript:submitFormVault('2');" data-toggle="confirmation" data-placement="top" title="Return selected items?" class="btn btn-danger btn-sm btn-wrap">Return Selected</a>
+          <a href="#" onclick="if(confirm('Withdraw selected items?')) `javascript:submitFormVault('1');; return false;" class="btn btn-primary btn-sm btn-wrap">Withdraw Selected</a>
+          <a href="#" onclick="if(confirm('Return selected items?')) `javascript:submitFormVault('2');; return false;" class="btn btn-danger btn-sm btn-wrap">Return Selected</a>
 <?php
   if ($b != 0)
   {
 ?>
-          <a data-href="javascript:submitFormVault('3');" data-toggle="confirmation" data-placement="top" title="Sell selected items?" class="btn btn-success btn-sm btn-wrap">Sell Selected</a>
+          <a href="#" onclick="if(confirm('Sell selected items?')) `javascript:submitFormVault('3');; return false;" class="btn btn-success btn-sm btn-wrap">Sell Selected</a>
 <?php
   }
 ?>
@@ -351,3 +351,4 @@ include('header.php');
 <?php
   include('footer.htm');
 ?>
+

@@ -432,9 +432,9 @@ $style="style='border-width: 0px; border-bottom: 1px solid #333333'";
       <tr>
         <td colspan='7' align=center>            
           <input type="hidden" name="action" value="0"/>
-          <a data-href="javascript:submitFormItem(1);" data-toggle="confirmation" data-placement="top" title="Repair selected items?" class="btn btn-success btn-sm btn-wrap">Repair Selected</a>
-          <a data-href="javascript:submitFormItem(2);" data-toggle="confirmation" data-placement="top" title="Repair equipped items?" class="btn btn-info btn-sm btn-wrap">Repair Equipped</a>
-          <a data-href="javascript:submitFormItem(3);" data-toggle="confirmation" data-placement="top" title="Repair unequipped items?" class="btn btn-primary btn-sm btn-wrap">Repair Unequipped</a>
+          <a href="#" onclick="if(confirm('Repair selected items?')) `javascript:submitFormItem(1);; return false;" class="btn btn-success btn-sm btn-wrap">Repair Selected</a>
+          <a href="#" onclick="if(confirm('Repair equipped items?')) `javascript:submitFormItem(2);; return false;" class="btn btn-info btn-sm btn-wrap">Repair Equipped</a>
+          <a href="#" onclick="if(confirm('Repair unequipped items?')) `javascript:submitFormItem(3);; return false;" class="btn btn-primary btn-sm btn-wrap">Repair Unequipped</a>
         </td>
       </tr>
     </table>
@@ -462,3 +462,4 @@ else
 <?php
 include('footer.htm');
 ?>
+

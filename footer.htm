@@ -8,23 +8,16 @@
   <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
 <!--     <script src="jquery.snow.min.1.0.js"></script>-->
   <script src="./gosbootstrap/bootstrap.min.js"></script>
-  <script src="./gosbootstrap/bootstrap-confirmations.js"></script>
   <script src="gos_cmn.js"></script>
   <script>
-	$('[data-toggle="confirmation"]').confirmation();
-	$('.confirmation-callback').confirmation({
-		onConfirm: function() { alert('confirm') },
-		onCancel: function() { alert('cancel') }
-	});
-	
 	$(document).ready(function(){
 	    $("[data-toggle='popover']").popover();
 	                });
-	                
+
 	$('.btn').click(function(){
 	    $('.btn').not(this).popover('hide');
 	});
-	              
+
   </script>
 
 </body>

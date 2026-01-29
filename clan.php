@@ -645,7 +645,7 @@ window.onload=intitializeChat;
                   </p>
                 </div>
               </div>
-              <a data-href='clanleave.php?doit=1&<?= uniqid() ?>' data-toggle="confirmation" data-placement="top" title="Are you sure you want to leave this clan?" class="btn btn-danger btn-sm btn-wrap">Leave Clan</a>        
+              <a href="clanleave.php?doit=1&<?= uniqid() ?>" onclick="if(!confirm('Are you sure you want to leave this clan?')) return false;" class="btn btn-danger btn-sm btn-wrap">Leave Clan</a>        
             </div>
           </div>
           <div class="tab-pane <?php if ($tab == 2) echo 'active';?>" id="cities_tab">
@@ -1139,6 +1139,7 @@ window.onload=intitializeChat;
 <?php
 include('footer.htm');
 ?>
+
 
 
 

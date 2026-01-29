@@ -822,7 +822,7 @@ if ($myEstate)
                     </table>    
                     <input type="hidden" name="action" value="0"/>
                     <input type="hidden" name="tab" value="1"/>
-                    <a data-href="javascript:submitFormItem(1);" data-toggle="confirmation" data-placement="top" title="Take selected items?" class="btn btn-warning btn-sm btn-wrap">Take Selected</a>
+                    <a href="#" onclick="if(confirm('Take selected items?')) `javascript:submitFormItem(1);; return false;" class="btn btn-warning btn-sm btn-wrap">Take Selected</a>
 
                   </form>
                 </div>
@@ -1130,6 +1130,7 @@ if ($myEstate)
 }
 include("footer.htm");
 ?>
+
 
 
 

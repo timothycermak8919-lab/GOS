@@ -1670,7 +1670,7 @@ else // Items Quests part 1
       <tr>
         <td colspan='7' align=center>            
           <input type="hidden" name="action" value="0">
-          <a data-href="javascript:submitFormItem(<?php echo $submitted;?>);" data-toggle="confirmation" data-placement="top" title="Submit selected items?" class="btn btn-success btn-sm btn-wrap">Submit for Quest</a>
+          <a href="#" onclick="if(confirm('Submit selected items?')) `javascript:submitFormItem(<?php echo $submitted;?>);; return false;" class="btn btn-success btn-sm btn-wrap">Submit for Quest</a>
         </td>
       </tr>
 
@@ -1813,6 +1813,7 @@ else // Items Quests part 1
 include('footer.htm');
 
 ?>
+
 
 
 

@@ -408,9 +408,9 @@ include('header.php');
               ?>
               </div>
               <input type="hidden" name="ifsubmitted" value="1"/>
-              <a data-href="javascript:submitFormDelIn();" data-toggle="confirmation" data-placement="top" title="Discard selected messages from your inbox?" class="btn btn-danger btn-sm btn-wrap">Discard Checked</a>
+              <a href="#" onclick="if(confirm('Discard selected messages from your inbox?')) `javascript:submitFormDelIn();; return false;" class="btn btn-danger btn-sm btn-wrap">Discard Checked</a>
               <input type="hidden" id='trashall' name="trashall" value="0"/>
-              <a data-href="javascript:submitFormDelAllIn();" data-toggle="confirmation" data-placement="top" title="Discard all messages in your inbox?" class="btn btn-danger btn-sm btn-wrap">Discard All</a>
+              <a href="#" onclick="if(confirm('Discard all messages in your inbox?')) `javascript:submitFormDelAllIn();; return false;" class="btn btn-danger btn-sm btn-wrap">Discard All</a>
             </form>
           <?php
             }
@@ -470,9 +470,9 @@ include('header.php');
               ?>
               </div>
               <input type="hidden" name="ifoutsubmitted" value="1"/>
-              <a data-href="javascript:submitFormDelOut();" data-toggle="confirmation" data-placement="top" title="Discard selected messages from your outbox?" class="btn btn-danger btn-sm btn-wrap">Discard Checked</a>
+              <a href="#" onclick="if(confirm('Discard selected messages from your outbox?')) `javascript:submitFormDelOut();; return false;" class="btn btn-danger btn-sm btn-wrap">Discard Checked</a>
               <input type="hidden" name="trashallout" value="0"/>
-              <a data-href="javascript:submitFormDelAllOut();" data-toggle="confirmation" data-placement="top" title="Discard all messages in your outbox?" class="btn btn-danger btn-sm btn-wrap">Discard All</a>
+              <a href="#" onclick="if(confirm('Discard all messages in your outbox?')) `javascript:submitFormDelAllOut();; return false;" class="btn btn-danger btn-sm btn-wrap">Discard All</a>
             </form>
           <?php
             }
@@ -646,5 +646,6 @@ include('header.php');
 <?php
 include('footer.htm');
 ?>
+
 
 

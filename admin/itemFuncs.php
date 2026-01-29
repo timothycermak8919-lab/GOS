@@ -749,7 +749,7 @@ $tali_list = array (
 );
 
 // COMPUTE WEAVE STATS
-function weaveStats ($sname, $skills)
+function weaveStats(string $sname, string $skills): string
 {
   $c_skills = cparse($skills,0);
   
@@ -869,7 +869,7 @@ function weaveStats ($sname, $skills)
 }
 
 // COMPUTE WEAVE STATS
-function getWeaves ($item_list,$item_base,$skills)
+function getWeaves(array $item_list, array $item_base, string $skills): array
 {
   $c_skills = cparse($skills,0);
   $weaves[0] = [];
@@ -904,7 +904,7 @@ function getWeaves ($item_list,$item_base,$skills)
   return $weaves;
 }
 
-function calcWeaveParts($stat, $p, $def=0)
+function calcWeaveParts(string $stat, int $p, int $def = 0): string
 {
   $stats='';
   $ad=array("A","B");
@@ -953,7 +953,7 @@ function calcWeaveParts($stat, $p, $def=0)
 
 
 // ITEM NAME GENERATOR FUNCTION
-function iname($item)
+function iname(array $item): string
 {
   $name = ucwords($item['prefix']);
   if ($name) $name .= " ";
@@ -963,7 +963,7 @@ function iname($item)
 }
 
 // ITEM NAME GENERATOR FUNCTION
-function iname_list($item,$itmlist)
+function iname_list(int $item, array $itmlist): string
 {
   $name = ucwords($itmlist[$item][1]);
   if ($name) $name .= " ";
@@ -972,7 +972,7 @@ function iname_list($item,$itmlist)
   return $name;
 }
 
-function getConditionMod($type, $cond)
+function getConditionMod(int $type, int $cond): string
 {
   $string = "";
   if ($type >= 7)
@@ -983,7 +983,7 @@ function getConditionMod($type, $cond)
   return $string;
 }
 
-function getTerMod($ter_bonuses,$type,$prefix,$suffix,$base="")
+function getTerMod(array $ter_bonuses, int $type, string $prefix, string $suffix, string $base = ""): string
 {
   $string = '';
   if ($type < 12)
@@ -1004,7 +1004,7 @@ function getTerMod($ter_bonuses,$type,$prefix,$suffix,$base="")
   return $string;
 }
 
-function iparse($itm, $item_base, $item_ix, $ter_bonuses)
+function iparse(array $itm, array $item_base, array $item_ix, array $ter_bonuses): string
 {
   $string = $item_base[$itm['base']][0]." ".$item_ix[$itm['prefix']]." ".$item_ix[$itm['suffix']];
   $string .= getConditionMod($itm['type'], $itm['cond']);
@@ -1014,7 +1014,7 @@ function iparse($itm, $item_base, $item_ix, $ter_bonuses)
 }
 
 // ITEM STRING REDUCER FUNCTION
-function itp($string,$type,$cond=100)
+function itp(string $string, int $type, int $cond = 100): string
 {
   $string .= getConditionMod($type, $cond);
   
@@ -1023,7 +1023,7 @@ function itp($string,$type,$cond=100)
 }
 
 // COMBINE LIKE BATTLE COMMANDS
-function clbc($string)
+function clbc(string $string): string
 {
   $array = cparse($string,0);
   $return_string = "";
@@ -1035,14 +1035,14 @@ function clbc($string)
 }
 
 // ITEM VALUE PRODUCER
-function item_val($string)
+function item_val(string $string): int
 {
   $worth = round(pow(lvl_req($string,100),2)/3);
   if ($worth < 0) $worth = 0;
   return $worth;
 }
 
-function lvl_req($string, $mod) 
+function lvl_req(string $string, int $mod): int 
 {
 	if(!empty($string)){
 		
@@ -1060,7 +1060,7 @@ function lvl_req($string, $mod)
 	}
 }
 
-function getIstats($myitm, $skills)
+function getIstats(array $myitm, string $skills): string
 {
 
   $estats=[];
@@ -1075,7 +1075,7 @@ function getIstats($myitm, $skills)
   return $estats;
 }
 
-function getstats($myitm1,$myitm2,$myitm3,$myitm4,$myitm5,$skills='')
+function getstats(array $myitm1, array $myitm2, array $myitm3, array $myitm4, array $myitm5, string $skills = ''): array
 {
   $estats = [];
   $estats[0] = [];

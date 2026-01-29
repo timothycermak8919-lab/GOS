@@ -20,7 +20,7 @@ $quest_type = array(
 30 => "Tutorial", // Complete specific achievements
 );
 
-function show_quest_reqs($reqs_stats)
+function show_quest_reqs(array $reqs_stats): string
 {
   $reqs="";
   if ($reqs_stats['L']) $reqs .= "Level ".$reqs_stats['L']."<br>";
@@ -29,7 +29,7 @@ function show_quest_reqs($reqs_stats)
   return str_replace(" ", "&nbsp;", $reqs);
 }
 
-function check_quest_reqs($reqs_stats, $char)
+function check_quest_reqs(array $reqs_stats, array $char): int
 {
   $reqs_met = 1;
   $myquests= unserialize($char['quests']);
@@ -53,7 +53,7 @@ function check_quest_reqs($reqs_stats, $char)
   return $reqs_met;
 }
 
-function show_quest_goals($align, $goals, $type, $offerer, $specials)
+function show_quest_goals(int $align, array $goals, int $type, string $offerer, string $specials): string
 {
   global $item_base, $item_type_pl, $enemy_list, $horde_types, $npc_plural, $npc_nation_data, $quest_type_num, $achievements;
   
@@ -233,7 +233,7 @@ function show_quest_goals($align, $goals, $type, $offerer, $specials)
   return $rval;
 }
 
-function check_inventory_items ($item, $inventory, $type=-1, $item_base='')
+function check_inventory_items(array $item, array $inventory, int $type = -1, string $item_base = ''): int
 {
   $count = 0;
   $itm = $item;
@@ -280,7 +280,7 @@ function check_inventory_items ($item, $inventory, $type=-1, $item_base='')
   return $count;
 }
 
-function take_quest_items ($goal, $inventory)
+function take_quest_items(string $goal, string $inventory): string
 {
     global $db;
   $goals = unserialize($goal);
@@ -320,7 +320,7 @@ function take_quest_items ($goal, $inventory)
 
 // $users - array of all characters currently in quest town
 // $loc = location
-function generate_random_quest($loc,$qalign="")
+function generate_random_quest(string $loc, string $qalign = ""): string
 {
   global $db,$map_data, $item_type_pl, $horde_types, $npc_plural, $loc_npc_nations, $npc_nation_names, $npc_nation_data, $enemy_list, $quest_type_num;
   $special = [];
@@ -476,7 +476,7 @@ function generate_random_quest($loc,$qalign="")
 }
 
 
-function getQuestInfo ($quest, $goodevil=0)
+function getQuestInfo(array $quest, int $goodevil = 0): string
 {
   global $quest_type, $item_base, $item_type, $item_type_pl, $enemy_list, $npc_nation_data;
   

@@ -345,25 +345,25 @@ include('header.php');
         if ($stance[str_replace(" ","_",$soc_name)] != 1) 
         {
     ?>
-      <a data-href='joinclan.php?stance=1&name=<?php echo $soc_name; ?>' data-toggle="confirmation" data-placement="top" title="Send alliance request?" class="btn btn-success btn-sm btn-wrap">Ally</a>
+      <a href="joinclan.php?stance=1&name=<?php echo $soc_name; ?>" onclick="if(!confirm('Send alliance request?')) return false;" class="btn btn-success btn-sm btn-wrap">Ally</a>
     <?php
         }
         else
         {
     ?>
-      <a data-href='joinclan.php?stance=-1&name=<?php echo $soc_name; ?>' data-toggle="confirmation" data-placement="top" title="End alliance?" class="btn btn-warning btn-sm btn-wrap">Non-Ally</a>
+      <a href="joinclan.php?stance=-1&name=<?php echo $soc_name; ?>" onclick="if(!confirm('End alliance?')) return false;" class="btn btn-warning btn-sm btn-wrap">Non-Ally</a>
     <?php
         }
         if ($stance[str_replace(" ","_",$soc_name)] != 2)
         {
     ?>
-      <a data-href='joinclan.php?stance=2&name=<?php echo $soc_name; ?>' data-toggle="confirmation" data-placement="top" title="Send declaration of war?" class="btn btn-danger btn-sm btn-wrap">Enemy</a>
+      <a href="joinclan.php?stance=2&name=<?php echo $soc_name; ?>" onclick="if(!confirm('Send declaration of war?')) return false;" class="btn btn-danger btn-sm btn-wrap">Enemy</a>
     <?php
         }
         else
         {
     ?>
-      <a data-href='joinclan.php?stance=-2&name=<?php echo $soc_name; ?>' data-toggle="confirmation" data-placement="top" title="Send peace treaty?" class="btn btn-warning btn-sm btn-wrap">Non-Enemy</a>
+      <a href="joinclan.php?stance=-2&name=<?php echo $soc_name; ?>" onclick="if(!confirm('Send peace treaty?')) return false;" class="btn btn-warning btn-sm btn-wrap">Non-Enemy</a>
     <?php
         }
       }
@@ -414,3 +414,4 @@ else echo "<p class='text-info'><b>You are of the wrong alignment for this clan<
 <?php
 include('footer.htm');
 ?>
+

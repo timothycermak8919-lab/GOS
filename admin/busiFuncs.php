@@ -75,7 +75,7 @@ $pouch_cost=array(
     400000,
     400000,
   );
-  function HorseNamer()
+  function HorseNamer(): string
   {
     $first=array(
       'Cloud',

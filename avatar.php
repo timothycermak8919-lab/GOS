@@ -377,7 +377,7 @@ include('header.php');
                 <label for='killmail'>Confirm E-mail: </label>
                 <input type="text" class="form-control gos-form" name="killmail" id="killmail" />
               </div>
-              <a data-href="javascript:submitKill()" data-toggle="confirmation" data-placement="top" title="Warning! Once you do this, this character data will be lost forever! Are you sure?" class="btn btn-danger btn-sm btn-wrap">Kill Character</a>
+              <a href="#" onclick="if(confirm('Warning! Once you do this, this character data will be lost forever! Are you sure?')) `javascript:submitKill(); return false;" class="btn btn-danger btn-sm btn-wrap">Kill Character</a>
             </form>
           </div>
         </div>

@@ -101,18 +101,18 @@ array( "-pop", "Lowest Population","Ghost Town",),
 
 
 
-function getUpgradeBonuses($upgrades, $bonuses, $num)
+function getUpgradeBonuses(array $upgrades, array $bonuses, int $num): string
 {
   $upbonus = "";
-  for ($i=0; $i<$num; ++$i)
+  for ($i = 0; $i < $num; $i++)
   {
     $upbonus .= getUpgradeBonus($upgrades, $bonuses, $i);
-  }  
-  
+  }
+
   return $upbonus;
 }
 
-function getUpgradeBonus($upgrades, $bonuses, $i, $up=0)
+function getUpgradeBonus(array $upgrades, array $bonuses, int $i, int $up = 0): string
 {
   $upbonus = "";
   if(is_numeric($upgrades[$i]+$up)  && is_numeric($bonuses[$i][2]) ){
@@ -122,92 +122,95 @@ function getUpgradeBonus($upgrades, $bonuses, $i, $up=0)
 }
 
 // ITEM SORTER
-function sortItems($sortBy)
+function sortItems(int $sortBy): string
 {
-  $sort_str = "";
-  // time
-  if ($sortBy == 0 || $sortBy == 8) $sort_str= "ORDER BY last_moved";
-// type
-  elseif ($sortBy==1) $sort_str= "ORDER BY type, points, last_moved";
-// points
-  elseif ($sortBy==2) $sort_str= "ORDER BY points, last_moved";
-// istatus
-  elseif ($sortBy==3) $sort_str= "ORDER BY istatus DESC, society ASC, points ASC, last_moved ASC";
-// owner (vaults only)
-  elseif ($sortBy==4) $sort_str= "ORDER BY owner, last_moved";
-// worth
-  elseif ($sortBy==5) $sort_str= "ORDER BY points, last_moved";
-// name
-  elseif ($sortBy==6) $sort_str= "ORDER BY prefix, base, suffix, last_moved"; 
-// cond
-  elseif ($sortBy==7) $sort_str= "ORDER BY cond, points, last_moved"; 
+  $sort_str = match ($sortBy) {
+    0, 8 => "ORDER BY last_moved",
+    1 => "ORDER BY type, points, last_moved",
+    2 => "ORDER BY points, last_moved",
+    3 => "ORDER BY istatus DESC, society ASC, points ASC, last_moved ASC",
+    4 => "ORDER BY owner, last_moved",
+    5 => "ORDER BY points, last_moved",
+    6 => "ORDER BY prefix, base, suffix, last_moved",
+    7 => "ORDER BY cond, points, last_moved",
+    default => "ORDER BY last_moved",
+  };
 
   return $sort_str;
 }
 
-function displayGold ($money, $text=0)
+function displayGold(int|float $money, int $text = 0): string
 {
-  $neg = 0;
-  $rval="";
+  $neg = false;
+  $rval = "";
+
   if ($money < 0)
   {
-    $neg = 1;
-    $rval = "<font class='text-danger'>";    
+    $neg = true;
+    $rval = "<span class='text-danger'>";
     $money = abs($money);
   }
-  $crown = floor($money/10000);
-  $mark = floor(($money-$crown*10000)/100);
-  $penny = floor (($money-$crown*10000-$mark*100));
-  if ($text==0)
-    $rval .= "<img src='images/gold.gif' width='15' title='Gold Crowns' style='vertical-align:middle' alt='g:'/>".$crown."<img src='images/silver.gif' title='Silver Marks' width='15' style='vertical-align:middle' alt='s:'/>".$mark."<img src='images/copper.gif' title='Copper Pennies' width='15' style='vertical-align:middle' alt='c:'/>".$penny;
-  else
-  {
-    if ($crown != 1)$c = "crowns"; else $c = "crown";
-    if ($mark != 1)$m = "marks"; else $m = "mark";
-    if ($penny != 1)$p = "pennies"; else $p = "penny";
-    $rval .= $crown." gold ".$c.", ".$mark." silver ".$m.", and ".$penny." copper ".$p;
+
+  $crown = (int) floor($money / 10000);
+  $mark = (int) floor(($money - $crown * 10000) / 100);
+  $penny = (int) floor($money - $crown * 10000 - $mark * 100);
+
+  if ($text === 0) {
+    $rval .= "<img src='images/gold.gif' width='15' title='Gold Crowns' style='vertical-align:middle' alt='g:'/>" .
+              $crown .
+              "<img src='images/silver.gif' title='Silver Marks' width='15' style='vertical-align:middle' alt='s:'/>" .
+              $mark .
+              "<img src='images/copper.gif' title='Copper Pennies' width='15' style='vertical-align:middle' alt='c:'/>" .
+              $penny;
+  } else {
+    $c = ($crown !== 1) ? "crowns" : "crown";
+    $m = ($mark !== 1) ? "marks" : "mark";
+    $p = ($penny !== 1) ? "pennies" : "penny";
+    $rval .= $crown . " gold " . $c . ", " . $mark . " silver " . $m . ", and " . $penny . " copper " . $p;
   }
-  if ($money < 0) $rval .= "</font>";
-  
+
+  if ($money < 0) {
+    $rval .= "</span>";
+  }
+
   return $rval;
 }
 
-function displayTime ($minpast, $ago=1, $detail=0)
+function displayTime(int|float $minpast, bool $ago = true, bool $detail = false): string
 {
   $pasttime = "Seconds";
   $remainder = 0;
-  if ($minpast > 1 && $minpast < 60) $pasttime = "$minpast minutes";
-  elseif ($minpast >= 60 && $minpast < 120)
-  { 
-    $pasttime = "A hour"; 
-    $remainder = $minpast-60;
-  }
-  elseif ($minpast >= 120 && $minpast < 1440) 
-  {
-    $pasttime = intval($minpast/60)." hours";
-    $remainder = $minpast - intval($minpast/60)*60;
-  }
-  elseif ($minpast >= 1440 && $minpast < 2880) 
-  { 
+
+  if ($minpast > 1 && $minpast < 60) {
+    $pasttime = (int) $minpast . " minutes";
+  } elseif ($minpast >= 60 && $minpast < 120) {
+    $pasttime = "An hour";
+    $remainder = (int) ($minpast - 60);
+  } elseif ($minpast >= 120 && $minpast < 1440) {
+    $hours = (int) ($minpast / 60);
+    $pasttime = $hours . " hours";
+    $remainder = (int) ($minpast - $hours * 60);
+  } elseif ($minpast >= 1440 && $minpast < 2880) {
     $pasttime = "A day";
-    $remainder = $minpast - 1440;
+    $remainder = (int) ($minpast - 1440);
+  } elseif ($minpast >= 2880) {
+    $days = (int) ($minpast / 1440);
+    $pasttime = $days . " days";
+    $remainder = (int) ($minpast - $days * 1440);
   }
-  elseif ($minpast >= 2880) 
-  { 
-    $pasttime = intval($minpast/1440)." days";
-    $remainder = $minpast - intval($minpast/1440)*1440;
+
+  if ($detail && $remainder > 0) {
+    $pasttime .= " " . displayTime($remainder, false, true);
   }
-  
-  if ($detail && $remainder)
-  {
-    $pasttime .= " ".displayTime($remainder,0,1);
+
+  if ($ago) {
+    $pasttime .= " ago";
   }
-  if ($ago) $pasttime .= " ago";
-  
+
   return $pasttime;
 }
 
-function ComputeScore($list,$gtype)
+function ComputeScore(array $list, int $gtype): int
 {
   $score = 0;
   $temp_pairs = array('0','0');
@@ -256,7 +259,7 @@ function ComputeScore($list,$gtype)
   return $score;
 }
 
-function updateDice ($curr_dice, $wager, $gtype)
+function updateDice(array $curr_dice, int $wager, int $gtype): void
 {
     global $db;
   $list = [];
@@ -297,7 +300,7 @@ function updateDice ($curr_dice, $wager, $gtype)
   }
 }
 
-function wotDate ()
+function wotDate(): string
 {
   $wot_months = array( 
     1=>"Taisham",
@@ -481,7 +484,7 @@ function wotDate ()
   return $wot_months[$fmonth-1]." ".$fday;
 }
 
-function getAllJobBonuses($prolvls)
+function getAllJobBonuses(array $prolvls): string
 {
   $jobon = "A0";
   for ($i=0; $i<13; $i++)
@@ -492,7 +495,7 @@ function getAllJobBonuses($prolvls)
   return $jobon;
 }
 
-function getTownPop($upgrades,$town_pop,$build_pop)
+function getTownPop(array $upgrades, int $town_pop, array $build_pop): int
 {
   $pop=10+$town_pop;
   for ($i=0; $i < 6; $i++)
@@ -504,7 +507,7 @@ function getTownPop($upgrades,$town_pop,$build_pop)
   return $pop;
 }
 
-function getJobBonuses($pro, $plvl)
+function getJobBonuses(string $pro, int $plvl): string
 {
 $stats = '';
 $halfUp = round($plvl/2);
@@ -560,7 +563,7 @@ return $stats;
 }
 
 // PARSER FUNCTION
-function cparse($string,$resolve=0)
+function cparse(string $string, int $resolve = 0): array
 {
   // RESOLVE all common terms and place in array
   if(!is_array($string)){
@@ -592,7 +595,7 @@ function cparse($string,$resolve=0)
 }
 
 // ITEM INFO
-function show_sign1($thing) {
+function show_sign1(int|float $thing): string {
   if ($thing < 0) return $thing; else return "+".$thing;
 }
 
@@ -862,7 +865,7 @@ $stat_msg = array(
   'tW' => array(""," hours wait between Tournaments",1),
 );
 
-function display_stat($sym, $char_stats, $old_stats)
+function display_stat(string $sym, array $char_stats, array $old_stats = []): string
 {
   global $stat_msg;
   $msg = $stat_msg[$sym];
@@ -916,7 +919,7 @@ function display_stat($sym, $char_stats, $old_stats)
   return $bonus;
 }
 
-function itm_info($char_stats, $old_stats=0)
+function itm_info(array $char_stats, array $old_stats = []): string
 {
   global $stat_msg;
   $bonuses = "";
@@ -927,7 +930,7 @@ function itm_info($char_stats, $old_stats=0)
   return $bonuses;
 }
 
-function yesno ($mybool)
+function yesno(bool $mybool): string
 {
   $rval='';
   if ($mybool) $rval = "Yes"; 
@@ -936,7 +939,7 @@ function yesno ($mybool)
   return $rval;
 }
 
-function getMaxSeals($toplevel)
+function getMaxSeals(int $toplevel): int
 {
   $rval = 0;
   if ($toplevel >= 70) $rval = 7;
@@ -946,14 +949,14 @@ function getMaxSeals($toplevel)
   return $rval;
 }
 
-function getMaxHorn($toplevel)
+function getMaxHorn(int $toplevel): int
 {
   $rval = 0;
   if ($toplevel >= 20) $rval = 1;
   return $rval;
 }
 
-function pruneMsgs($msgs, $max)
+function pruneMsgs(array $msgs, int $max): array
 {
   $newMsg = [];
   $numMsgs = count($msgs);
@@ -973,7 +976,7 @@ function pruneMsgs($msgs, $max)
 }
 
 
-function getAlignment($align)
+function getAlignment(int $align): int
 {
   $rval = 0;
   
@@ -988,7 +991,7 @@ function getAlignment($align)
   return $rval;
 }
 
-function getClanAlignment($align, $members)
+function getClanAlignment(int $align, int $members): int
 {
   $rval = 0;
   
@@ -999,7 +1002,7 @@ function getClanAlignment($align, $members)
   return $rval;
 }
 
-function getAlignmentText ($alignnum)
+function getAlignmentText(int $alignnum): string
 {
   $lalign = "Neutral";
   if ($alignnum == 2) $lalign = "Light";
@@ -1010,7 +1013,7 @@ function getAlignmentText ($alignnum)
   return $lalign;
 }
 
-function inClanBattle($clan_id)
+function inClanBattle(int $clan_id): int
 {
   $inBattle = 0;
   $hour = time()/3600;
@@ -1028,7 +1031,7 @@ function inClanBattle($clan_id)
   return $inBattle;
 }
 
-function isClanLeader($achar, $soc_name, $officer, $loc_id)
+function isClanLeader(array $achar, string $soc_name, int $officer, int $loc_id): bool
 {
   if(!empty($db)){
 	  $society = mysqli_fetch_array(mysqli_query($db,"SELECT id, subleaders, subs, offices, area_score, leader, leaderlast FROM Soc WHERE name='$soc_name' "));

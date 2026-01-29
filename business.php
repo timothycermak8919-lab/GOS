@@ -1164,7 +1164,7 @@ else if ($shop == 2)
       </div>
       <div style="padding-top:15px" class='col-sm-4'>
         <!--<button class='btn btn-default btn-md btn-block' onClick="javascript:combineItems()">Combine Items</button>-->
-        <a  id='combineButton' data-href="javascript:submitTerForm();" data-toggle="confirmation" data-placement="top" title="Are you sure you want to combine these items?" class='btn btn-default btn-md btn-block'>Combine Items</a>
+        <a id='combineButton' href="#" onclick="if(confirm('Are you sure you want to combine these items?')) submitTerForm(); return false;" class='btn btn-default btn-md btn-block'>Combine Items</a>
       </div>
     </div>
   </div>
@@ -1202,7 +1202,7 @@ else if ($shop == 2)
       </div>
       <div class='col-sm-4' style="padding-top:30px">
         <!--<button class='btn btn-default btn-md btn-block' onClick="javascript:combineItems()">Combine Items</button>-->
-        <a id='combineButton'  data-href="javascript:submitDismantleForm();" data-toggle="confirmation" data-placement="top" title="Are you sure you want to dismantle these items?" class='btn btn-default btn-md btn-block'>Dismantle Item</a>
+        <a id='combineButton' href="#" onclick="if(confirm('Are you sure you want to dismantle these items?')) submitDismantleForm(); return false;" class='btn btn-default btn-md btn-block'>Dismantle Item</a>
       </div>
     </div>
   </div>
@@ -1246,7 +1246,7 @@ else if ($shop == 2)
     </div>
       <div class='col-sm-4' style="padding-top:30px">
         <!--<button class='btn btn-default btn-md btn-block' onClick="javascript:combineItems()">Combine Items</button>-->
-        <a id='combineButton'  data-href="javascript:submitBlendForm();" data-toggle="confirmation" data-placement="top" title="Are you sure you want to blend these items?" class='btn btn-default btn-md btn-block'>Blend Ter'angreals</a>
+        <a id='combineButton' href="#" onclick="if(confirm('Are you sure you want to blend these items?')) submitBlendForm(); return false;" class='btn btn-default btn-md btn-block'>Blend Ter'angreals</a>
       </div>
 </div>
 </div>
@@ -1424,3 +1424,4 @@ else
 }
 include('footer.htm');
 ?>
+

@@ -61,7 +61,6 @@ function arrayToJSObject($array, $varname, $sub = false )
 
   // Loop through each element of the array
   foreach($array as $key => $value)
-  //while (list($key, $value) = each($array)) 
   {
     $jskey = "'" . $key . "' : ";
      

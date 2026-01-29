@@ -878,21 +878,21 @@ include('header.php');
                   <?php
                   if ($location_array[$char['location']][2]) {
                   ?>
-                    <a data-href="javascript:submitFormItem(1);" data-toggle="confirmation" data-placement="top" title="Sell selected items?" class="btn btn-success btn-sm btn-wrap">Sell Selected</a>
+                    <a href="#" onclick="if(confirm('Sell selected items?')) `javascript:submitFormItem(1);; return false;" class="btn btn-success btn-sm btn-wrap">Sell Selected</a>
                   <?php
                   } else {
                   ?>
-                    <a data-href="javascript:submitFormItem(4);" data-toggle="confirmation" data-placement="top" title="Drop selected items?" class="btn btn-danger btn-sm btn-wrap">Drop Selected</a>
+                    <a href="#" onclick="if(confirm('Drop selected items?')) `javascript:submitFormItem(4);; return false;" class="btn btn-danger btn-sm btn-wrap">Drop Selected</a>
                   <?php
                   }
                   ?>
                   <input type="hidden" name="action" value="0" />
                   <input type="hidden" name="tab" value="1" />
-                  <a data-href="javascript:submitFormItem(2);" data-toggle="confirmation" data-placement="top" title="Cache/Uncache selected items?" class="btn btn-warning btn-sm btn-wrap">Cache/Uncache</a>
+                  <a href="#" onclick="if(confirm('Cache/Uncache selected items?')) `javascript:submitFormItem(2);; return false;" class="btn btn-warning btn-sm btn-wrap">Cache/Uncache</a>
                   <?php
                   if ($char['society'] != "") {
                   ?>
-                    <a data-href="javascript:submitFormItem(3);" data-toggle="confirmation" data-placement="top" title="Donate selected items to your clan's vault?" class="btn btn-primary btn-sm btn-wrap">Donate to Vault</a>
+                    <a href="#" onclick="if(confirm('Donate selected items to your clan's vault?')) `javascript:submitFormItem(3);; return false;" class="btn btn-primary btn-sm btn-wrap">Donate to Vault</a>
                   <?php
                   }
                   $myEstate = mysqli_fetch_array(mysqli_query($db, "SELECT * FROM Estates WHERE owner='$id' AND location='$char[location]'"));
@@ -902,7 +902,7 @@ include('header.php');
                     $eid = 20000 + $myEstate['id'];
                     $estinvsize = mysqli_num_rows(mysqli_query($db, "SELECT * FROM Items WHERE owner='$eid' AND type<=14"));
                   ?>
-                    <a data-href="javascript:submitFormItem(5);" data-toggle="confirmation" data-placement="top" title="Send selected items to your local Estate?" class="btn btn-info btn-sm btn-wrap">Send to Estate (<?php echo $estinvsize . "/" . $maxestinv; ?>)</a>
+                    <a href="#" onclick="if(confirm('Send selected items to your local Estate?')) submitFormItem(5); return false;" class="btn btn-info btn-sm btn-wrap">Send to Estate (<?php echo $estinvsize . "/" . $maxestinv; ?>)</a>
                   <?php
                   }
                   ?>
@@ -998,17 +998,17 @@ include('header.php');
                   <?php
                   if ($location_array[$char['location']][2]) {
                   ?>
-                    <a data-href="javascript:submitConsumeForm(1);" data-toggle="confirmation" data-placement="top" title="Sell selected items?" class="btn btn-success btn-sm btn-wrap">Sell Selected</a>
+                    <a href="#" onclick="if(confirm('Sell selected items?')) `javascript:submitConsumeForm(1);; return false;" class="btn btn-success btn-sm btn-wrap">Sell Selected</a>
                   <?php
                   } else {
                   ?>
-                    <a data-href="javascript:submitConsumeForm(2);" data-toggle="confirmation" data-placement="top" title="Drop selected items?" class="btn btn-danger btn-sm btn-wrap">Drop Selected</a>
+                    <a href="#" onclick="if(confirm('Drop selected items?')) `javascript:submitConsumeForm(2);; return false;" class="btn btn-danger btn-sm btn-wrap">Drop Selected</a>
                   <?php
                   }
                   ?>
                   <input type="hidden" name="consume" value="0" />
                   <input type="hidden" name="tab" value="3" />
-                  <a data-href="javascript:submitConsumeForm(3);" data-toggle="confirmation" data-placement="top" title="Use selected items?" class="btn btn-info btn-sm btn-wrap">Use Selected</a>
+                  <a href="#" onclick="if(confirm('Use selected items?')) `javascript:submitConsumeForm(3);; return false;" class="btn btn-info btn-sm btn-wrap">Use Selected</a>
                 </form>
               </div>
             </div>
@@ -1025,7 +1025,7 @@ include('header.php');
                 <div id='weavestats' width='95%'>
                   <?php echo "<div class='panel panel-danger'><div class='panel-heading'><h3 class='panel-title'>Weave Stats</h3></div><div class='panel-body abox'>Click on a Weave to display current stats!</div></div>"; ?>
                 </div>
-                <a data-href="javascript:submitWeaveForm('<?php echo $wEq; ?>');" data-toggle="confirmation" data-placement="top" title="Switch to use selected weave?" class="btn btn-info btn-sm btn-wrap">Switch Weave</a>
+                <a href="#" onclick="if(confirm('Switch to use selected weave?')) `javascript:submitWeaveForm('<?php echo $wEq; ?>');; return false;" class="btn btn-info btn-sm btn-wrap">Switch Weave</a>
               </div>
               <div class="col-sm-9 col-sm-pull-3">
                 <div class='row'>
@@ -1384,3 +1384,4 @@ include('header.php');
 <?php
 include('footer.htm');
 ?>
+
