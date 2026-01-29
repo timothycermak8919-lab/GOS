@@ -1,0 +1,2 @@
+[14-Aug-2020 15:53:33 UTC] PHP Warning:  require_once(ayah.php): failed to open stream: No such file or directory in /home/gameofstonestrlc/public_html/playthru/sample.php on line 2
+[14-Aug-2020 15:53:33 UTC] PHP Fatal error:  require_once(): Failed opening required 'ayah.php' (include_path='.:/opt/cpanel/ea-php72/root/usr/share/pear') in /home/gameofstonestrlc/public_html/playthru/sample.php on line 2
