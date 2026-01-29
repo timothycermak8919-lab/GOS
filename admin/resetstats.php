@@ -47,7 +47,7 @@ else
 
 }
 // Close Database
-mysql_close();
+mysqli_close($db);
 ?>
 
 <br><br>

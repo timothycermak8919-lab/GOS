@@ -43,22 +43,29 @@ if (strtolower($name) == strtolower($bioName) && strtolower($lastname) == strtol
 // copy own data to charother
 $charother = $char;
 $socnameother = $charother['society'];
-$query = "SELECT * FROM Soc WHERE name='$socnameother' ";
-$result = mysqli_query($db, $query);
+$stmt = mysqli_prepare($db, "SELECT * FROM Soc WHERE name=?");
+mysqli_stmt_bind_param($stmt, "s", $socnameother);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
 $societyo = mysqli_fetch_array($result);
 
 $friends = unserialize($charother['friends']);
 
 // get bio to be displayed
-$result = mysqli_query($db, "SELECT * FROM Users LEFT JOIN Users_data ON Users.id=Users_data.id WHERE Users.name='$bioName' AND Users.lastname='$bioLastName'");
+$stmt = mysqli_prepare($db, "SELECT * FROM Users LEFT JOIN Users_data ON Users.id=Users_data.id WHERE Users.name=? AND Users.lastname=?");
+mysqli_stmt_bind_param($stmt, "ss", $bioName, $bioLastName);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
 $char = mysqli_fetch_array($result);
 $cid = $char['id'];
 $time = time();
 $username = $char['name'] . "_" . $char['lastname'];
 
 $socname = $char['society'];
-$query = "SELECT * FROM Soc WHERE name='$socname'";
-$result = mysqli_query($db, $query);
+$stmt = mysqli_prepare($db, "SELECT * FROM Soc WHERE name=?");
+mysqli_stmt_bind_param($stmt, "s", $socname);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
 $society = mysqli_fetch_array($result);
 $classes = unserialize($char['type']);
 
@@ -87,7 +94,10 @@ if ($topNat['id'] == $char['id']) {
     $x++;
 }
 
-$resultb = mysqli_query($db, "SELECT * FROM IP_logs WHERE addy='$ipaddy'");
+$resultb = mysqli_prepare($db, "SELECT * FROM IP_logs WHERE addy=?");
+mysqli_stmt_bind_param($resultb, "s", $ipaddy);
+mysqli_stmt_execute($resultb);
+$resultb = mysqli_stmt_get_result($resultb);
 $fullname = $charother['name'] . "_" . $charother['lastname'];
 
 $charip = unserialize($charother['ip']);
@@ -115,7 +125,10 @@ if (!$found) {
 if ($char['id'] == $charother['id']) // only update IPs on your own profile
 {
     if (mysqli_fetch_row($resultb)) {
-        $result = mysqli_query($db, "SELECT * FROM IP_logs WHERE addy='$ipaddy'");
+        $result = mysqli_prepare($db, "SELECT * FROM IP_logs WHERE addy=?");
+mysqli_stmt_bind_param($result, "s", $ipaddy);
+mysqli_stmt_execute($result);
+$result = mysqli_stmt_get_result($result);
         $ip_log = mysqli_fetch_array($result);
         $ip_users = unserialize($ip_log['users']);
         $found = 0;

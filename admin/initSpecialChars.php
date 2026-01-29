@@ -13,10 +13,12 @@ createAccount("tlc@semremedy.com","0;B,mszM*<H2vxJNU^");
 function createAccount($email,$password)
 {
   global $db;
-  $actualPass = sha1($password);
-  $sql = "INSERT INTO Accounts (email, password) 
-  VALUES ('$email','$actualPass')";
-  $result = mysqli_query($db,$sql);
+  $actualPass = password_hash($password, PASSWORD_DEFAULT);
+  // Use prepared statement to prevent SQL injection
+  $sql = "INSERT INTO Accounts (email, password) VALUES (?, ?)";
+  $stmt = mysqli_prepare($db, $sql);
+  mysqli_stmt_bind_param($stmt, "ss", $email, $actualPass);
+  $result = mysqli_stmt_execute($stmt);
   echo mysqli_error($db);
 }
 

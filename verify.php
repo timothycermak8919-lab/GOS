@@ -14,78 +14,81 @@ include_once("admin/connect.php");
 
 
 $email = $_POST["email"];
-$pass = sha1($_POST["pswd"]);
+$password = $_POST["pswd"];
 $time=time();
 
 
-  
-/* SQL statement to query the database */
-//$query = "SELECT * FROM Users WHERE name = '$user' AND lastname = '$last' AND password = '$pass'";
-$query = "SELECT * FROM Accounts WHERE email = '$email' AND password = '$pass'";
-$result = mysqli_query($db,$query);
+// Use prepared statements to prevent SQL injection
+$query = "SELECT * FROM Accounts WHERE email = ?";
+$stmt = mysqli_prepare($db, $query);
+mysqli_stmt_bind_param($stmt, "s", $email);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
 
 
-/* Allow access if a matching record was found and cookies enabled, else deny access. */
+// Allow access if a matching record was found and cookies enabled, else deny access.
 if (!is_null($result) && $account = mysqli_fetch_array($result))
 {
+    // Verify password - support both password_hash and legacy sha1
+    $storedPassword = $account['password'];
+    $validPassword = false;
+    
+    // Check if it's a modern password_hash (starts with $2y$ or $2a$)
+    if (strpos($storedPassword, '$2y$') === 0 || strpos($storedPassword, '$2a$') === 0) {
+        $validPassword = password_verify($password, $storedPassword);
+    } else {
+        // Legacy support for SHA1 hashed passwords
+        $validPassword = (sha1($password) === $storedPassword);
+    }
+    
+    if ($validPassword) {
+        // Upgrade legacy SHA1 password to password_hash on successful login
+        if (strpos($storedPassword, '$2y$') !== 0 && strpos($storedPassword, '$2a$') !== 0) {
+            $newHash = password_hash($password, PASSWORD_DEFAULT);
+            $updateQuery = "UPDATE Accounts SET password = ? WHERE email = ?";
+            $updateStmt = mysqli_prepare($db, $updateQuery);
+            mysqli_stmt_bind_param($updateStmt, "ss", $newHash, $email);
+            mysqli_stmt_execute($updateStmt);
+        }
+
+        $mode = 0;
+        if ($_POST["mode"]) $mode = mysqli_real_escape_string($db,$_POST["mode"]);
+
+        setcookie("email", $email, time()+99999999, "/");
+        setcookie("password", $newHash ?? $storedPassword, time()+99999999, "/");
+        setcookie("mode", $mode, time()+99999999, "/");
 
 
-$mode = 0;
-if ($_POST["mode"]) $mode = mysqli_real_escape_string($db,$_POST["mode"]);
-
-setcookie("email", "$email", time()+99999999, "/");
-setcookie("password", "$pass", time()+99999999, "/");
-setcookie("mode", "$mode", time()+99999999, "/");
-
-
-$query = "SELECT * FROM Users WHERE email = '$email'";
-$result = mysqli_query($db,$query);
+        $query = "SELECT * FROM Users WHERE email = ?";
+        $stmt = mysqli_prepare($db, $query);
+        mysqli_stmt_bind_param($stmt, "s", $email);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
 
 
-if (mysqli_num_rows($result) > 0) {
+        if (mysqli_num_rows($result) > 0) {
 
-    $char = mysqli_fetch_array($result);
-    $id = $char['id'];
-    $user = $char['name'];
-    $lastname = $char['lastname'];
-    setcookie("id", "$id", time()+99999999, "/");
-    setcookie("name", "$user", time()+99999999, "/");
-    setcookie("lastname", "$lastname", time()+99999999, "/");
-        
-	header("Location: $server_name/bio.php?time=$time");
-	exit;
+            $char = mysqli_fetch_array($result);
+            $id = $char['id'];
+            $user = $char['name'];
+            $lastname = $char['lastname'];
+            setcookie("id", $id, time()+99999999, "/");
+            setcookie("name", $user, time()+99999999, "/");
+            setcookie("lastname", $lastname, time()+99999999, "/");
+                
+            header("Location: $server_name/bio.php?time=$time");
+            exit;
+        } else {
+            header("Location: $server_name/create.php");
+            exit;
+        }
+    } else {
+        // Invalid password - redirect to login with error
+        header("Location: $server_name/login.php?error=1");
+        exit;
+    }
 } else {
-    header("Location: $server_name/create.php");
+    // No account found
+    header("Location: $server_name/login.php?error=1");
     exit;
 }
-
-
-
-
-}
-elseif (!$_GET['enabled'])
-{
-include('header.php');
-?>
-
-<text class="littletext">
-
-<br><br>
-<?php
-echo "<center><b>Access Denied:</b> No such matching Account and Password";
-}
-else
-{
-include('headerno.htm');
-?>
-<br><br>
-<?php
-echo "<center><b>You must have cookies enabled in order to log in.</b><br><br>The fact that you are viewing this message likely means that you do not.</center>";
-?>
-<br><br><center>This website will help you to enable your cookies<br><a href="http://scholar.google.com/cookies.html">Google's Help Website on Enabling Cookies</a>
-<?php
-} 
-
-include('footer.htm');
-?>
-

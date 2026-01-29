@@ -11,15 +11,18 @@ include_once("admin/itemFuncs.php");
 
 //gather user variables from last page where inputed
 $email=mysqli_real_escape_string($db,$_POST['email']);
-$actualpass=mysqli_real_escape_string($db,$_POST['password']);
-$actualpass2=mysqli_real_escape_string($db,$_POST['pass2']);
-$password=sha1($actualpass);
+$actualpass=$_POST['password'];
+$actualpass2=$_POST['pass2'];
+$password=password_hash($actualpass, PASSWORD_DEFAULT);
 
 $skipVerify = 1;
 // clear stuff that could be transferred
 
-$query = "SELECT * FROM Accounts WHERE email = '$email'";
-$result = mysqli_query($db,$query);
+$query = "SELECT * FROM Accounts WHERE email = ?";
+$stmt = mysqli_prepare($db, $query);
+mysqli_stmt_bind_param($stmt, "s", $email);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
 
 if (mysqli_fetch_row($result)) {
   include('header.php');
@@ -60,7 +63,10 @@ else
   $users=[];
   for ($i = 0; $i < count($ips); $i++)  
   {
-    $result = mysqli_query($db,"SELECT * FROM IP_logs WHERE addy='$ips[$i]'");
+    $stmt = mysqli_prepare($db, "SELECT * FROM IP_logs WHERE addy=?");
+    mysqli_stmt_bind_param($stmt, "s", $ips[$i]);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
     $ip_log = mysqli_fetch_array($result); 
     $users= unserialize($ip_log['users']);
 	if(!empty($users)){
@@ -69,8 +75,8 @@ else
 	}
   }
   $maxnum=2;
-  
- // if ($ip_log['num']) {$maxnum = $ip_log['maxnum'];}
+   
+  // if ($ip_log['num']) {$maxnum = $ip_log['maxnum'];}
 	$maxnum = $ip_log['maxnum'];
   // DISABLE ALT LIMIT
   $limit_off = 0;
@@ -91,9 +97,10 @@ else
   {
 
 
-
-  $sql = "INSERT INTO Accounts (email, password) VALUES ('$email','$password')";
-	$result = mysqli_query($db, $sql);
+    $sql = "INSERT INTO Accounts (email, password) VALUES (?,?)";
+	$stmt = mysqli_prepare($db, $sql);
+	mysqli_stmt_bind_param($stmt, "ss", $email, $password);
+	mysqli_stmt_execute($stmt);
 
 
     setcookie("email", "$email", time()+99999999, "/");
@@ -112,7 +119,7 @@ else
 }
 
 include('header.php');
-//echo "<center><br/><br/><br/><b>This Character could not be created<br/><br/><br/><br/><table><tr><td class='littletext' align=left><b>1.</b> The first and last names must be between 3 and 10 characters in length <br/><br/><b>2.</b> The password must be between 5 and 10 characters in length<br/><br/><b>3.</b> Both parts of the name must consist only of letters (no spaces)<br/><br/><b>4.</b> The E-Mail address must not exceed 40 characters<br/><br/><b>5. <i>You must agree to the terms</i></b><br/><br/><b>6.</b> You must choose a nationality, class, and weapon focus.<br/><br/><b>7.</b> Complete the 'Are you a Human?' check.</td></tr></table></center>";
+//echo "<center><br/><br/><br/><b>This Character could not be created<br/><br/><br/><br/><table><tr><td class='littletext' align=left><b>1.</b> The first and last names must be between 3 and 10 characters in length <br/><br/><b>2.</b> The password must be between 5 and 10 characters long<br/><br/><b>3.</b> Both parts of the name must consist only of letters (no spaces)<br/><br/><b>4.</b> The E-Mail address must not exceed 40 characters<br/><br/><b>5. <i>You must agree to the terms</i></b><br/><br/><b>6.</b> You must choose a nationality, class, and weapon focus.<br/><br/><b>7.</b> Complete the 'Are you a Human?' check.</td></tr></table></center>";
 
 ?>
 
@@ -123,4 +130,3 @@ include('header.php');
 include('footer.htm');
 
 ?>
-

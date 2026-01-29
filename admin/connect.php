@@ -31,10 +31,16 @@ $mode = $_COOKIE['mode'];
 
 
 if ($email && $password) {
-    $result = mysqli_query($db,"SELECT * From Accounts WHERE email='$email' AND password='$password'");
+    $stmt = mysqli_prepare($db, "SELECT * From Accounts WHERE email=? AND password=?");
+    mysqli_stmt_bind_param($stmt, "ss", $email, $password);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
     if (mysqli_num_rows($result) != 0) {
         if ($id){
-            $result = mysqli_query($db,"SELECT * From Users WHERE email='$email' AND id='$id'");
+            $stmt = mysqli_prepare($db, "SELECT * From Users WHERE email=? AND id=?");
+            mysqli_stmt_bind_param($stmt, "si", $email, $id);
+            mysqli_stmt_execute($stmt);
+            $result = mysqli_stmt_get_result($stmt);
             if (mysqli_num_rows($result) == 0) {
                 $id = null;
                 $email = null;

@@ -1,395 +1,666 @@
 <?php
+/**
+ * Avatar and Character Settings Management
+ * 
+ * Handles:
+ * - Avatar uploads (file and URL)
+ * - Password changes
+ * - Character bio updates
+ * - Character deletion
+ * 
+ * @version 2.0 - Refactored with security improvements
+ */
 
-function array_delel($array,$del)
+// Constants
+define('AVATAR_UPLOAD_DIR', 'avatar_uploads/');
+define('ALLOWED_IMAGE_TYPES', ['jpg', 'jpeg', 'png', 'gif', 'webp', 'jfif']);
+define('MAX_AVATAR_LENGTH', 10000);
+define('MAX_INFO_LENGTH', 500);
+define('MAX_FILE_SIZE', 5242880); // 5MB
+define('MIN_PASSWORD_LENGTH', 5);
+define('MAX_PASSWORD_LENGTH', 10);
+
+// Include dependencies
+require_once 'admin/connect.php';
+require_once 'admin/userdata.php';
+
+// Initialize
+$wikilink = 'Game+Settings';
+$message = 'Edit character settings';
+
+/**
+ * Delete element from array and reindex
+ * @deprecated Use array_splice instead
+ */
+function array_delel(array $array, int $index): array
 {
-  $arraycount1=count($array);
-  $z = $del;
-  while ($z < $arraycount1) {
-    $array[$z] = $array[$z+1];
-    $z++;
-  }
-  array_pop($array);
-  return $array;
+    array_splice($array, $index, 1);
+    return $array;
 }
 
-/* establish a connection with the database */
-include_once("admin/connect.php");
-include_once("admin/userdata.php");
-
-$wikilink = "Game+Settings";
-
-$avatar=mysqli_real_escape_string($db,$_POST['newav']);
-
-$targetDirectory = 'avatar_uploads/'; // The folder where you want to save the uploaded images
-$targetFile = $targetDirectory . basename($_FILES['newavupload']['name']);
-$uploadOk = 1;
-
-
-if (isset($_FILES['newavupload']) && is_uploaded_file($_FILES['newavupload']['tmp_name'])) {
-  
-  
-  $baseURL = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]";
-
-  $first = $char['name']; 
-  $last = $char['lastname'];  
-
-  $imageFileType = strtolower(pathinfo($_FILES['newavupload']['name'], PATHINFO_EXTENSION));
-
-  // Generate the new file name
-  $newFileName = $first . '_' . $last . '.' . $imageFileType;
-
-  $targetDirectory = 'avatar_uploads/'; // The folder where you want to save the uploaded images
-  $targetFile = $targetDirectory . $newFileName;
-  $uploadOk = 1;
-
-  // Check if the file is an actual image
-  if (!in_array($imageFileType, array('jpg', 'jpeg', 'png', 'gif', 'webp', 'jfif'))) {
-      echo "Sorry, only JPG, JPEG, PNG, and GIF files are allowed.";
-  } else {
-      if (move_uploaded_file($_FILES['newavupload']['tmp_name'], $targetFile)) {
-          $avatar = $baseURL . '/' . $targetFile;
-          echo "Uploaded successfully!";
-      } else {
-          echo "Sorry, there was an error uploading your file.";
-      }
-  }
+/**
+ * Remove blank/null entries from array
+ */
+function delete_blank(array $array): array
+{
+    return array_filter($array, fn($value) => !empty($value));
 }
 
-$newtext=mysqli_real_escape_string($db,$_POST['aboutchar']);
-$id=$char['id'];
-$message="Edit character settings";
-
-// Update avatar
-
-if ($_POST['changer'])
+/**
+ * Get character alternate accounts based on IP addresses
+ * @param array $ips IP addresses to check
+ * @return array Array of alternate character names
+ */
+function getAlts(array $ips): array
 {
-  $message = "Character Info updated successfully";
-  error_reporting(1);
-  if ( $avatar && strlen($avatar) < 10000 
-  /*&& (preg_match("/jpg\Z/i", $avatar) ||
-  preg_match("/jpeg\Z/i", $avatar) ||
-  preg_match("/bmp\Z/i", $avatar) ||
-  preg_match("/webp\Z/i", $avatar) ||
-   preg_match("/gif\Z/i", $avatar)
-  || preg_match("/png\Z/i", $avatar)))*/)
-  {
-    $query = "UPDATE Users SET avatar='$avatar' WHERE id='$id'";
-    $result = mysqli_query($db,$query);
-    $char['avatar']=$avatar;
-  }
-  else 
-  {
-    if ($avatar)
-    {
-      $message = "Problem with Chosen Avatar";
+    global $db;
+    $alts = [];
+    
+    if (!is_array($ips)) {
+        return $alts;
     }
-    else
-    {
-      $char['avatar']='';
-      $query = "UPDATE Users SET avatar='' WHERE id=$id";
-      $result = mysqli_query($db,$query);
-    }
-  }
-}
-
-// KILL CHARACTER
-if ($_POST['killer'])
-{
-  $killpass = sha1($_POST['killpass']);
-  if ($_POST['killmail'] == $email && $killpass == $password)
-  {
-    // TIE UP SOCIETY STUFF
-    $soc_name = $char['society'];
-    $query = "SELECT * FROM Soc WHERE name='$char[society]' ";
-    $result = mysqli_query($db,$query);
-    $society = mysqli_fetch_array($result);
-
-    if ($society['id'])
-    {
-      // CHECK IF LEADER CHANGES
-      if (strtolower($name) == strtolower($society['leader']) && strtolower($lastname) == strtolower($society['leaderlast']) )
-      {
-        $message = $user['name'];
-        if ($society['subs']>0)
-        {
-          $subs = $society['subs'];
-          $new_id = 9999999;
-          $subleaders = unserialize($society['subleaders']);
-          foreach ($subleaders as $c_n => $c_s)
-          {
-            if ($c_n < $new_id)
-            {
-              $new_id = $c_n;
+    
+    foreach ($ips as $ip) {
+        $stmt = mysqli_prepare($db, "SELECT users FROM IP_logs WHERE addy = ?");
+        mysqli_stmt_bind_param($stmt, 's', $ip);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+        
+        if ($row = mysqli_fetch_array($result)) {
+            $users = unserialize($row['users']);
+            if (is_array($users)) {
+                foreach ($users as $user) {
+                    $alts[$user] = true;
+                }
             }
-          }
-          foreach ($subleaders as $c_n => $c_s)
-          {
-            if ($c_n == $new_id)
-            {
-              $queryb = "UPDATE Soc SET leader='$c_s[0]', leaderlast='$c_s[1]' WHERE name='$soc_name'";
-              $result = mysqli_query($db,$queryb);
-              --$subs;
-              $subleaders[$new_id][0]=0;
-              $subleaders=delete_blank($subleaders);
-  
-              if ($subs > 0)
-              {
-                $query = "UPDATE Soc SET subleaders='".serialize($subleaders)."', subs='$subs' WHERE name='".$char['society']."'";
-              }
-              else
-              {
-                $query = "UPDATE Soc SET subleaders='', subs='$subs' WHERE name='".$char['society']."'";
-              }
-              $result = mysqli_query($db,$query);
+        }
+        mysqli_stmt_close($stmt);
+    }
+    
+    return array_keys($alts);
+}
+
+/**
+ * Handle avatar file upload with validation
+ * @return array ['success' => bool, 'message' => string, 'url' => string|null]
+ */
+function handleAvatarUpload(): array
+{
+    global $char;
+    
+    if (!isset($_FILES['newavupload']) || !is_uploaded_file($_FILES['newavupload']['tmp_name'])) {
+        return ['success' => false, 'message' => '', 'url' => null];
+    }
+    
+    $file = $_FILES['newavupload'];
+    
+    // Validate file size
+    if ($file['size'] > MAX_FILE_SIZE) {
+        return ['success' => false, 'message' => 'File size exceeds 5MB limit', 'url' => null];
+    }
+    
+    // Validate file type
+    $imageFileType = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+    if (!in_array($imageFileType, ALLOWED_IMAGE_TYPES)) {
+        return ['success' => false, 'message' => 'Only JPG, JPEG, PNG, GIF, WEBP, and JFIF files are allowed', 'url' => null];
+    }
+    
+    // Validate it's actually an image
+    $imageInfo = getimagesize($file['tmp_name']);
+    if ($imageInfo === false) {
+        return ['success' => false, 'message' => 'File is not a valid image', 'url' => null];
+    }
+    
+    // Create directory if needed
+    if (!is_dir(AVATAR_UPLOAD_DIR)) {
+        mkdir(AVATAR_UPLOAD_DIR, 0755, true);
+    }
+    
+    // Generate safe filename
+    $firstName = preg_replace('/[^a-zA-Z0-9]/', '', $char['name']);
+    $lastName = preg_replace('/[^a-zA-Z0-9]/', '', $char['lastname']);
+    $newFileName = $firstName . '_' . $lastName . '.' . $imageFileType;
+    $targetFile = AVATAR_UPLOAD_DIR . $newFileName;
+    
+    // Move file
+    if (move_uploaded_file($file['tmp_name'], $targetFile)) {
+        $baseURL = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . 
+                   '://' . $_SERVER['HTTP_HOST'];
+        return ['success' => true, 'message' => 'Uploaded successfully!', 'url' => $baseURL . '/' . $targetFile];
+    }
+    
+    return ['success' => false, 'message' => 'Error uploading file', 'url' => null];
+}
+
+/**
+ * Update character avatar in database
+ * @param string $avatarURL Avatar URL or empty to clear
+ * @return bool Success status
+ */
+function updateAvatar(string $avatarURL): bool
+{
+    global $db, $char;
+    
+    if (empty($avatarURL)) {
+        $stmt = mysqli_prepare($db, "UPDATE Users SET avatar = '' WHERE id = ?");
+        mysqli_stmt_bind_param($stmt, 'i', $char['id']);
+        $result = mysqli_stmt_execute($stmt);
+        mysqli_stmt_close($stmt);
+        $char['avatar'] = '';
+        return $result;
+    }
+    
+    if (strlen($avatarURL) > MAX_AVATAR_LENGTH) {
+        return false;
+    }
+    
+    $stmt = mysqli_prepare($db, "UPDATE Users SET avatar = ? WHERE id = ?");
+    mysqli_stmt_bind_param($stmt, 'si', $avatarURL, $char['id']);
+    $result = mysqli_stmt_execute($stmt);
+    mysqli_stmt_close($stmt);
+    
+    if ($result) {
+        $char['avatar'] = $avatarURL;
+    }
+    
+    return $result;
+}
+
+/**
+ * Update character bio/about information
+ * @param string $info Character info text
+ * @return array ['success' => bool, 'message' => string]
+ */
+function updateCharacterInfo(string $info): array
+{
+    global $db, $char;
+    
+    if (strlen($info) > MAX_INFO_LENGTH) {
+        return ['success' => false, 'message' => 'Info must be a max of 500 characters'];
+    }
+    
+    $sanitizedInfo = htmlspecialchars(stripslashes($info), ENT_QUOTES);
+    
+    $stmt = mysqli_prepare($db, "UPDATE Users_data SET about = ? WHERE id = ?");
+    mysqli_stmt_bind_param($stmt, 'si', $sanitizedInfo, $char['id']);
+    $result = mysqli_stmt_execute($stmt);
+    mysqli_stmt_close($stmt);
+    
+    if ($result) {
+        $char['about'] = $sanitizedInfo;
+        return ['success' => true, 'message' => 'Character info updated successfully'];
+    }
+    
+    return ['success' => false, 'message' => 'Failed to update character info'];
+}
+
+/**
+ * Verify password (supports both bcrypt and legacy sha1)
+ * @param string $inputPassword Plain text password
+ * @param string $storedPassword Hashed password from database
+ * @return bool True if password matches
+ */
+function verifyPassword(string $inputPassword, string $storedPassword): bool
+{
+    // Check if password is bcrypt
+    if (strpos($storedPassword, '$2y$') === 0 || strpos($storedPassword, '$2a$') === 0) {
+        return password_verify($inputPassword, $storedPassword);
+    }
+    // Legacy sha1
+    return sha1($inputPassword) === $storedPassword;
+}
+
+/**
+ * Update account password
+ * @param string $oldPass Old password (plain text)
+ * @param string $newPass New password (plain text)
+ * @param string $confirmPass Confirmation password (plain text)
+ * @return array ['success' => bool, 'message' => string]
+ */
+function updatePassword(string $oldPass, string $newPass, string $confirmPass): array
+{
+    global $db, $email, $password;
+    
+    // Validate passwords match
+    if ($newPass !== $confirmPass) {
+        return ['success' => false, 'message' => 'New passwords do not match'];
+    }
+    
+    // Validate password length
+    if (strlen($newPass) < MIN_PASSWORD_LENGTH || strlen($newPass) > MAX_PASSWORD_LENGTH) {
+        return ['success' => false, 'message' => 'Password must be between 5 and 10 characters'];
+    }
+    
+    // Verify old password
+    if (!verifyPassword($oldPass, $password)) {
+        return ['success' => false, 'message' => 'Old password is incorrect'];
+    }
+    
+    // Hash new password with bcrypt
+    $newPasswordHash = password_hash($newPass, PASSWORD_BCRYPT);
+    
+    $stmt = mysqli_prepare($db, "UPDATE Accounts SET password = ? WHERE email = ?");
+    mysqli_stmt_bind_param($stmt, 'ss', $newPasswordHash, $email);
+    $result = mysqli_stmt_execute($stmt);
+    mysqli_stmt_close($stmt);
+    
+    if ($result) {
+        setcookie('password', $newPasswordHash, time() + 99999999, '/');
+        return ['success' => true, 'message' => 'Password updated successfully'];
+    }
+    
+    return ['success' => false, 'message' => 'Failed to update password'];
+}
+
+/**
+ * Delete character and all associated data
+ * @param string $confirmEmail Email for confirmation
+ * @param string $confirmPass Password for confirmation
+ * @return void (redirects or sets error message)
+ */
+function deleteCharacter(string $confirmEmail, string $confirmPass): void
+{
+    global $db, $char, $email, $password, $server_name, $message;
+    
+    // Verify credentials
+    if ($confirmEmail !== $email || !verifyPassword($confirmPass, $password)) {
+        $message = 'Invalid information given';
+        return;
+    }
+    
+    $charId = $char['id'];
+    $charName = $char['name'];
+    $charLastname = $char['lastname'];
+    $societyName = $char['society'];
+    
+    // Handle society leadership transfer
+    if (!empty($societyName)) {
+        $stmt = mysqli_prepare($db, "SELECT * FROM Soc WHERE name = ?");
+        mysqli_stmt_bind_param($stmt, 's', $societyName);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+        $society = mysqli_fetch_array($result);
+        mysqli_stmt_close($stmt);
+        
+        if ($society && $society['id']) {
+            // Check if this character is the leader
+            if (strtolower($charName) === strtolower($society['leader']) && 
+                strtolower($charLastname) === strtolower($society['leaderlast'])) {
+                
+                // Try to transfer leadership to subleader
+                if ($society['subs'] > 0) {
+                    $subleaders = unserialize($society['subleaders']);
+                    if (is_array($subleaders) && !empty($subleaders)) {
+                        reset($subleaders);
+                        $newLeaderId = key($subleaders);
+                        $newLeader = $subleaders[$newLeaderId];
+                        
+                        // Update society with new leader
+                        $stmt = mysqli_prepare($db, "UPDATE Soc SET leader = ?, leaderlast = ? WHERE name = ?");
+                        mysqli_stmt_bind_param($stmt, 'sss', $newLeader[0], $newLeader[1], $societyName);
+                        mysqli_stmt_execute($stmt);
+                        mysqli_stmt_close($stmt);
+                        
+                        // Remove new leader from subleaders
+                        unset($subleaders[$newLeaderId]);
+                        $subleaders = delete_blank($subleaders);
+                        $subs = count($subleaders);
+                        $subleadersSerialized = serialize($subleaders);
+                        
+                        $subQuery = $subs > 0 ? 
+                            "UPDATE Soc SET subleaders = ?, subs = ? WHERE name = ?" :
+                            "UPDATE Soc SET subleaders = '', subs = ? WHERE name = ?";
+                        
+                        $stmt = mysqli_prepare($db, $subQuery);
+                        if ($subs > 0) {
+                            mysqli_stmt_bind_param($stmt, 'sis', $subleadersSerialized, $subs, $societyName);
+                        } else {
+                            mysqli_stmt_bind_param($stmt, 'is', $subs, $societyName);
+                        }
+                        mysqli_stmt_execute($stmt);
+                        mysqli_stmt_close($stmt);
+                    }
+                } else {
+                    // No subleaders, find most experienced member
+                    $stmt = mysqli_prepare($db, "SELECT name, lastname FROM Users WHERE society = ? ORDER BY exp DESC LIMIT 1");
+                    mysqli_stmt_bind_param($stmt, 's', $societyName);
+                    mysqli_stmt_execute($stmt);
+                    $result = mysqli_stmt_get_result($stmt);
+                    if ($newLeader = mysqli_fetch_array($result)) {
+                        $stmt2 = mysqli_prepare($db, "UPDATE Soc SET leader = ?, leaderlast = ? WHERE name = ?");
+                        mysqli_stmt_bind_param($stmt2, 'sss', $newLeader['name'], $newLeader['lastname'], $societyName);
+                        mysqli_stmt_execute($stmt2);
+                        mysqli_stmt_close($stmt2);
+                    }
+                    mysqli_stmt_close($stmt);
+                }
             }
-          }
-        }  
-        else 
-        {
-          $user = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Users WHERE society='".$char['society']."' ORDER BY exp DESC LIMIT 1"));
-          mysqli_query($db,"UPDATE Soc SET leader='".$user['name']."', leaderlast='".$user['lastname']."' WHERE name='".$char['society']."'");
+            
+            // Return vault items
+            $vaultId = 10000 + $society['id'];
+            $stmt = mysqli_prepare($db, "SELECT id FROM Items WHERE owner = ? AND society > 0 AND society < 10000");
+            mysqli_stmt_bind_param($stmt, 'i', $charId);
+            mysqli_stmt_execute($stmt);
+            $result = mysqli_stmt_get_result($stmt);
+            
+            $currentTime = time();
+            while ($item = mysqli_fetch_array($result)) {
+                $stmt2 = mysqli_prepare($db, "UPDATE Items SET owner = ?, last_moved = ?, istatus = 0 WHERE id = ?");
+                mysqli_stmt_bind_param($stmt2, 'iii', $vaultId, $currentTime, $item['id']);
+                mysqli_stmt_execute($stmt2);
+                mysqli_stmt_close($stmt2);
+            }
+            mysqli_stmt_close($stmt);
+            
+            // Update member count
+            $memberCount = max(0, $society['members'] - 1);
+            $stmt = mysqli_prepare($db, "UPDATE Soc SET members = ? WHERE name = ?");
+            mysqli_stmt_bind_param($stmt, 'is', $memberCount, $societyName);
+            mysqli_stmt_execute($stmt);
+            mysqli_stmt_close($stmt);
+            
+            // Delete society if no members left
+            if ($memberCount <= 0) {
+                $stance = unserialize($society['stance']);
+                if (is_array($stance)) {
+                    foreach ($stance as $otherSocName => $stanceValue) {
+                        if ($stanceValue != 0) {
+                            $otherSocNameSpaced = str_replace('_', ' ', $otherSocName);
+                            $stmt = mysqli_prepare($db, "SELECT stance FROM Soc WHERE name = ?");
+                            mysqli_stmt_bind_param($stmt, 's', $otherSocNameSpaced);
+                            mysqli_stmt_execute($stmt);
+                            $result = mysqli_stmt_get_result($stmt);
+                            
+                            if ($otherSoc = mysqli_fetch_array($result)) {
+                                $otherStance = unserialize($otherSoc['stance']);
+                                $otherStance[str_replace(' ', '_', $societyName)] = 0;
+                                $otherStanceSerialized = serialize($otherStance);
+                                
+                                $stmt2 = mysqli_prepare($db, "UPDATE Soc SET stance = ? WHERE name = ?");
+                                mysqli_stmt_bind_param($stmt2, 'ss', $otherStanceSerialized, $otherSocNameSpaced);
+                                mysqli_stmt_execute($stmt2);
+                                mysqli_stmt_close($stmt2);
+                            }
+                            mysqli_stmt_close($stmt);
+                        }
+                    }
+                }
+                
+                $stmt = mysqli_prepare($db, "DELETE FROM Soc WHERE name = ?");
+                mysqli_stmt_bind_param($stmt, 's', $societyName);
+                mysqli_stmt_execute($stmt);
+                mysqli_stmt_close($stmt);
+            }
         }
-      }  
-      // return all vault items
-      $vid = 10000+$society['id'];
-      $vresult = mysqli_query($db,"SELECT id, owner, society FROM Items WHERE owner='$char[id]' AND society > '0' AND society < '10000'");
-      while ($sitem=mysqli_fetch_array($vresult))
-      {
-        $result = mysqli_query($db,"UPDATE Items SET owner='".$vid."', last_moved='".time()."', istatus='0' WHERE id='".$sitem['id']."'");
-      }    
-
-      // ADD TO NUMBER OF MEMBERS
-      $memnumb = $society['members'] - 1;
-      $query = "UPDATE Soc SET members='$memnumb' WHERE name='$soc_name' ";
-      $result = mysqli_query($db,$query);
-
-      if ($memnumb <= 0)
-      {
-        // IF THERE IS NO ONE LEFT IN THE CLAN THEN DELETE IT
-        $stance = unserialize($society['stance']);
-        foreach ($stance as $c_n => $c_s)
-        {
-          if ($c_s != 0)
-          {
-            $soc_name2 = str_replace("_"," ",$c_n);
-            $society2 = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Soc WHERE name='$soc_name2' "));
-            $stance2 = unserialize($society2['stance']);
-            $stance2[str_replace(" ","_",$soc_name)] = 0;
-            $changed_stance2 = serialize($stance2);
-            mysqli_query($db,"UPDATE Soc SET stance='$changed_stance2' WHERE name='$society2[name]' ");
-          }
+    }
+    
+    // Delete businesses and estates
+    $stmt = mysqli_prepare($db, "DELETE FROM Profs WHERE owner = ?");
+    mysqli_stmt_bind_param($stmt, 'i', $charId);
+    mysqli_stmt_execute($stmt);
+    mysqli_stmt_close($stmt);
+    
+    $stmt = mysqli_prepare($db, "DELETE FROM Estates WHERE owner = ?");
+    mysqli_stmt_bind_param($stmt, 'i', $charId);
+    mysqli_stmt_execute($stmt);
+    mysqli_stmt_close($stmt);
+    
+    // Send notification to admin
+    $stmt = mysqli_prepare($db, "SELECT id FROM Users WHERE name = 'The' AND lastname = 'Creator'");
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    if ($creator = mysqli_fetch_array($result)) {
+        $creatorId = $creator['id'];
+        $noteSubject = 'OB: ' . $charName . ' ' . $charLastname;
+        $noteBody = 'Born: ' . ($char['born'] ?? 'Unknown') . '<br/>';
+        $noteBody .= 'ID: ' . $charId . '<br/>';
+        $noteBody .= 'Clan: ' . $societyName . '<br/>';
+        $noteBody .= 'IPs:<br/>';
+        
+        $charIps = unserialize($char['ip']);
+        if (is_array($charIps)) {
+            foreach ($charIps as $ip) {
+                $noteBody .= htmlspecialchars($ip) . '<br/>';
+            }
+            
+            $noteBody .= 'Alts:<br/>';
+            $alts = getAlts($charIps);
+            foreach ($alts as $altName) {
+                $noteBody .= htmlspecialchars($altName) . '<br/>';
+            }
         }
-
-        $query = "DELETE FROM Soc WHERE name='$soc_name'";
-        $result5 = mysqli_query($db,$query);
-      }
+        
+        $currentTime = time();
+        $stmt2 = mysqli_prepare($db, 
+            "INSERT INTO Notes (from_id, to_id, del_from, del_to, type, root, sent, cc, subject, body, special) 
+             VALUES (?, ?, 0, 0, 0, 0, ?, '', ?, ?, '')");
+        mysqli_stmt_bind_param($stmt2, 'iiiss', $creatorId, $creatorId, $currentTime, $noteSubject, $noteBody);
+        mysqli_stmt_execute($stmt2);
+        mysqli_stmt_close($stmt2);
+        
+        $stmt2 = mysqli_prepare($db, "UPDATE Users SET msgcheck = ? WHERE id = ?");
+        mysqli_stmt_bind_param($stmt2, 'ii', $currentTime, $creatorId);
+        mysqli_stmt_execute($stmt2);
+        mysqli_stmt_close($stmt2);
     }
+    mysqli_stmt_close($stmt);
     
-    // Delete any businesses
-    $result4 = mysqli_query($db,"DELETE FROM Profs WHERE owner='$char[id]'");   
-    
-    // Delete any estates
-    $result4 = mysqli_query($db,"DELETE FROM Estates WHERE owner='$char[id]'");  
-       
-    // Send a message to The Creator 
-    $tc = mysqli_fetch_array(mysqli_query($db,"SELECT id, name, lastname FROM Users WHERE name='The' AND lastname='Creator' "));
-    $cid = $tc['id'];
-    $notesub = "OB: ".$char['name']." ".$char['lastname'];
-    $note = "Born: ".$char['born']."<br/>";
-    $note .= "ID: ".$char['id']."<br/>";
-    $note .= "Clan: ".$char['society']."<br/>";
-    $note .= "IPs:<br/>";
-    $charip = unserialize($char['ip']); 
-    for ($i = 0; $i < count($charip); $i++)
-    {
-      $note .= $charip[$i]."<br/>";
-    }
-    $note .= "Alts:<br/>";
-    $alts = getAlts($charip);
-    foreach ($alts as $aname => $anum)
-    {
-      $note .= $aname."<br/>";
-    }
-    
-    $result = mysqli_query($db,"INSERT INTO Notes (from_id,to_id, del_from,del_to,type,root,sent,        cc,subject,   body,   special) 
-                                      VALUES ('$cid', '$cid','0',     '0',   '0', '0', '".time()."','','$notesub','$note','')");
-    mysqli_query($db,"UPDATE Users SET msgcheck='".time()."' WHERE id='$cid'");
-    
-    // Take Care of IP stuff 
-    $ips = unserialize($char['ip']); 
-    $fullname = $char['name']."_".$char['lastname'];
-    for ($i = 0; $i < count($ips); $i++)
-    {
-      $result = mysqli_query($db,"SELECT * FROM IP_logs WHERE addy='$ips[$i]'");
-      $ip_log = mysqli_fetch_array($result);
-      $users= unserialize($ip_log['users']);
-      for ($j=0; $j < count($users); $j++)
-      {
-        if ($users[$j] == $fullname)
-        {
-          $k=0;
-          for ($k = $j; $k < count($users)-1; $k++)
-          {
-            $users[$k] = $users[$k+1];
-          }
-          $users=array_delel($users,$k);
+    // Clean up IP logs
+    $ips = unserialize($char['ip']);
+    if (is_array($ips)) {
+        $fullname = $charName . '_' . $charLastname;
+        
+        foreach ($ips as $ip) {
+            $stmt = mysqli_prepare($db, "SELECT users FROM IP_logs WHERE addy = ?");
+            mysqli_stmt_bind_param($stmt, 's', $ip);
+            mysqli_stmt_execute($stmt);
+            $result = mysqli_stmt_get_result($stmt);
+            
+            if ($ipLog = mysqli_fetch_array($result)) {
+                $users = unserialize($ipLog['users']);
+                if (is_array($users)) {
+                    $users = array_filter($users, fn($user) => $user !== $fullname);
+                    $users = array_values($users);
+                    $usersSerialized = serialize($users);
+                    $userCount = count($users);
+                    
+                    $stmt2 = mysqli_prepare($db, "UPDATE IP_logs SET users = ?, num = ? WHERE addy = ?");
+                    mysqli_stmt_bind_param($stmt2, 'sis', $usersSerialized, $userCount, $ip);
+                    mysqli_stmt_execute($stmt2);
+                    mysqli_stmt_close($stmt2);
+                }
+            }
+            mysqli_stmt_close($stmt);
         }
-      }
-      $ipcount = count($users);
-      $ip_users2 = serialize($users);
-      mysqli_query($db,"UPDATE IP_logs SET users='$ip_users2', num='$ipcount' WHERE addy='$ips[$i]'");
     }
     
-    //Finish 'em off!
-    $id = $char['id'];
-    $query = "DELETE FROM Users_data WHERE id='$id'";
-    $result5 = mysqli_query($db,$query);
-    $query = "DELETE FROM Users WHERE id='$id'";
-    $result5 = mysqli_query($db,$query);
-    // Leave Users_Stats around just in case...
-         
-    $message = "Character deleted.";
-    setcookie("id", "", time()-3600, "/");
-    setcookie("name", "", time()-3600, "/");
-    setcookie("lastname", "", time()-3600, "/");
-    header("Location: $server_name/bio.php");
+    // Delete character data
+    $stmt = mysqli_prepare($db, "DELETE FROM Users_data WHERE id = ?");
+    mysqli_stmt_bind_param($stmt, 'i', $charId);
+    mysqli_stmt_execute($stmt);
+    mysqli_stmt_close($stmt);
+    
+    $stmt = mysqli_prepare($db, "DELETE FROM Users WHERE id = ?");
+    mysqli_stmt_bind_param($stmt, 'i', $charId);
+    mysqli_stmt_execute($stmt);
+    mysqli_stmt_close($stmt);
+    
+    // Clear cookies and redirect
+    setcookie('id', '', time() - 3600, '/');
+    setcookie('name', '', time() - 3600, '/');
+    setcookie('lastname', '', time() - 3600, '/');
+    header('Location: ' . $server_name . '/bio.php');
     exit;
-  }
-  else $message = "Invalid information given.";
 }
 
-// UPDATE PASSWORD
+// ===== MAIN PROCESSING =====
 
-if ($_POST['password'] && $_POST['passworda'] && $_POST['passwordb'])
-{
-$char = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Users WHERE id='$id'"));
-
-if ($_POST['passworda'] == $_POST['passwordb'] && strlen($_POST['passworda']) > 4 && strlen($_POST['passworda']) < 11 && sha1($_POST['password']) == $password)
-{
-$password = sha1($_POST['passworda']);
-setcookie("password", "$password", time()+99999999, "/");
-$query = "UPDATE Accounts SET password='$password' WHERE email='$email' ";
-$result = mysqli_query($db,$query);
+// Handle avatar changes
+if (isset($_POST['changer'])) {
+    error_reporting(E_ALL);
+    
+    // Handle file upload
+    $uploadResult = handleAvatarUpload();
+    if ($uploadResult['success'] && $uploadResult['url']) {
+        if (updateAvatar($uploadResult['url'])) {
+            $message = $uploadResult['message'];
+        } else {
+            $message = 'Failed to save avatar';
+        }
+    } elseif ($uploadResult['message']) {
+        $message = $uploadResult['message'];
+    }
+    
+    // Handle URL-based avatar (if no file was uploaded)
+    if (isset($_POST['newav']) && !$uploadResult['success']) {
+        $avatarURL = trim($_POST['newav']);
+        
+        if (!empty($avatarURL)) {
+            if (updateAvatar($avatarURL)) {
+                $message = 'Character info updated successfully';
+            } else {
+                $message = 'Problem with chosen avatar';
+            }
+        } else {
+            updateAvatar('');
+            $message = 'Avatar cleared';
+        }
+    }
+    
+    // Update character bio
+    if (isset($_POST['aboutchar'])) {
+        $infoResult = updateCharacterInfo($_POST['aboutchar']);
+        if ($infoResult['success']) {
+            $message = $infoResult['message'];
+        } else {
+            $message = $infoResult['message'];
+        }
+    }
 }
-else $message = "Problem with the password";
+
+// Handle password update
+if (isset($_POST['password'], $_POST['passworda'], $_POST['passwordb']) && 
+    !empty($_POST['password']) && !empty($_POST['passworda']) && !empty($_POST['passwordb'])) {
+    
+    $passwordResult = updatePassword($_POST['password'], $_POST['passworda'], $_POST['passwordb']);
+    $message = $passwordResult['message'];
 }
 
-// Update Character Info
-
-if ($_POST['changer'])
-{
-$newtext = htmlspecialchars(stripslashes($newtext),ENT_QUOTES);
-if (strlen($newtext) < 501)
-{
-  // if (preg_match('/^[-a-z0-9+.,!@*_&#:\/%;?\s]*$/i',$newtext))
-  {
-    $char['about']=$newtext;
-    $query = "UPDATE Users_data SET about='$newtext' WHERE id='$id'";
-    $result = mysqli_query($db,$query);
-  }
-  //else $message = "Some punctuation marks are not supported. Please remove them and try again.";
-}
-else $message="Info must be a max of 500 characters";
+// Handle character deletion
+if (isset($_POST['killer'])) {
+    deleteCharacter($_POST['killmail'] ?? '', $_POST['killpass'] ?? '');
 }
 
+// Include header
 include('header.php');
 ?>
-  <div class="row solid-back">
+
+<div class="row solid-back">
     <div class="col-sm-12">
-      <div class='col-sm-8'>
-        <div class='panel panel-info'>
-          <div class='panel-heading'>
-            <h3 class='panel-title'>
-              Character Settings
-            </h3>
-          </div>
-          <div class='panel-body abox'>
-            <form class='form-horizontal' action="avatar.php" method="post" enctype="multipart/form-data">
-              <div class="form-group form-group-sm">
-                <label for='newav' class='control-label col-sm-4'>Offsite Avatar URL: </label>
-                <div class='col-sm-8'>
-                  <input type="text" class="form-control gos-form" name="newav" value="<?php echo $char['avatar']; ?>" id="newav" MAXLENTH="200" />
-                  <i>No offensive or adult themed images<br/>
-                  Leave input field blank for default avatar</i>
+        <?php if ($message): ?>
+            <div class="alert alert-info"><?php echo htmlspecialchars($message); ?></div>
+        <?php endif; ?>
+        
+        <div class='col-sm-8'>
+            <div class='panel panel-info'>
+                <div class='panel-heading'>
+                    <h3 class='panel-title'>Character Settings</h3>
                 </div>
-                </br>
-              </div>
+                <div class='panel-body abox'>
+                    <form class='form-horizontal' action="avatar.php" method="post" enctype="multipart/form-data">
+                        <!-- Avatar URL -->
+                        <div class="form-group form-group-sm">
+                            <label for='newav' class='control-label col-sm-4'>Offsite Avatar URL:</label>
+                            <div class='col-sm-8'>
+                                <input type="text" class="form-control gos-form" name="newav" 
+                                       value="<?php echo htmlspecialchars($char['avatar'] ?? ''); ?>" 
+                                       id="newav" maxlength="200" />
+                                <i>No offensive or adult themed images<br/>
+                                Leave input field blank for default avatar</i>
+                            </div>
+                        </div>
 
+                        <!-- File Upload -->
+                        <div class="form-group form-group-sm">
+                            <label for='file-upload' class='control-label col-sm-4'>File Upload Avatar:</label>
+                            <div class='col-sm-8'>
+                                <input accept="image/png, image/gif, image/webp, image/jpeg, image/jfif" 
+                                       class="form-control gos-form" name="newavupload" id="file-upload" type="file"/>
+                            </div>
+                        </div>
 
-              <div class="form-group form-group-sm">
-                <label for='newav' class='control-label col-sm-4'>File Upload Avatar: </label>
-                <div class='col-sm-8'>
-                <input accept="image/png, image/gif, image/webp, image/jpeg, image/jfif" class="form-control gos-form" name="newavupload" id="file-upload" type="file"/>
+                        <input type="hidden" name="changer" value="1" />
+                        
+                        <!-- Password Section -->
+                        <div class="form-group form-group-sm">
+                            <label class='control-label col-sm-4'>Change Password:</label>
+                        </div>
+                        <div class="form-group form-group-sm">
+                            <label for='oldpass' class='control-label col-sm-4'>Old Password:</label>
+                            <div class='col-sm-8'>
+                                <input id='oldpass' type="password" class="form-control gos-form" 
+                                       name="password" maxlength="20" />
+                            </div>
+                        </div>
+                        <div class="form-group form-group-sm">
+                            <label for='newpass' class='control-label col-sm-4'>New Password:</label>
+                            <div class='col-sm-8'>
+                                <input id='newpass' type="password" class="form-control gos-form" 
+                                       name="passworda" maxlength="20" />
+                            </div>
+                        </div>
+                        <div class="form-group form-group-sm">
+                            <label for='conpass' class='control-label col-sm-4'>Confirm Password:</label>
+                            <div class='col-sm-8'>
+                                <input id='conpass' type="password" class="form-control gos-form" 
+                                       name="passwordb" maxlength="20" />
+                            </div>
+                        </div>
+                        
+                        <!-- Character Info -->
+                        <div class="form-group">
+                            <label for='aboutchar' class='control-label col-sm-4'>Character Information:</label>
+                            <div class='col-sm-8'>
+                                <textarea name="aboutchar" class="form-control gos-form" rows="4" wrap="soft"><?php echo htmlspecialchars($char['about'] ?? ''); ?></textarea>
+                            </div>
+                        </div>
+                        
+                        <input type="submit" name="submit" value="Update Settings" class="btn btn-info"/>
+                    </form>
                 </div>
-                </br>
-              </div>
-
-
-              <input type="hidden" name="changer" value="1" id="changer" />
-              <div class="form-group form-group-sm">
-                <label class='control-label col-sm-4'>Change Password: </label>
-              </div>
-              <div class="form-group form-group-sm">
-                <label for='oldpass' class='control-label col-sm-4'>Old Password: </label>
-                <div class='col-sm-8'>
-                  <input id='oldpass' type="password" class="form-control gos-form" name="password" maxlength="20" id="password" />
-                </div>
-              </div>
-              <div class="form-group form-group-sm">
-                <label for='newpass' class='control-label col-sm-4'>New Password: </label>
-                <div class='col-sm-8'>
-                  <input id='newpass' type="password" class="form-control gos-form" name="passworda" maxlength="20" id="passworda" />
-                </div>
-              </div>
-              <div class="form-group form-group-sm">
-                <label for='conpass' class='control-label col-sm-4'>Confirm Password: </label>
-                <div class='col-sm-8'>
-                  <input id='conpass' type="password" class="form-control gos-form" name="passwordb" maxlength="20" id="passwordb" />
-                </div>
-              </div> 
-              <div class="form-group">
-                <label for='aboutchar' class='control-label col-sm-4'>Character Information: </label>
-                <div class='col-sm-8'>
-                  <textarea name="aboutchar" class="form-control gos-form" rows="4" wrap="soft"><?php echo $char['about']; ?></textarea>
-                </div>
-              </div>
-              <input type="Submit" name="submit" value="Update Settings" class="btn btn-info"/>
-            </form>
-          </div>
+            </div>
         </div>
-      </div>
-      <div class='col-sm-4'>
-        <div class='panel panel-danger'>
-          <div class='panel-heading'>
-            <h3 class='panel-title'>
-              Kill Character
-            </h3>
-          </div>
-          <div class='panel-body solid-back'> 
-            <form action="avatar.php" name="killForm" method="post" enctype="multipart/form-data">
-              <p class='text-danger h5'><i>Character and all of their data will be deleted. Confirm your password and email to delete. Once done, it cannot be undone!</i></p>
-              <input type="hidden" name="killer" value="1" id="killer" />
-              <div class="form-group form-group-sm">
-                <label for='killpass'>Confirm Password: </label>
-                <input type="password" class="form-control gos-form" name="killpass" id="killpass" />
-              </div>
-              <div class="form-group form-group-sm">
-                <label for='killmail'>Confirm E-mail: </label>
-                <input type="text" class="form-control gos-form" name="killmail" id="killmail" />
-              </div>
-              <a href="#" onclick="if(confirm('Warning! Once you do this, this character data will be lost forever! Are you sure?')) `javascript:submitKill(); return false;" class="btn btn-danger btn-sm btn-wrap">Kill Character</a>
-            </form>
-          </div>
+        
+        <!-- Kill Character Panel -->
+        <div class='col-sm-4'>
+            <div class='panel panel-danger'>
+                <div class='panel-heading'>
+                    <h3 class='panel-title'>Kill Character</h3>
+                </div>
+                <div class='panel-body solid-back'>
+                    <form action="avatar.php" name="killForm" method="post" enctype="multipart/form-data">
+                        <p class='text-danger h5'>
+                            <i>Character and all of their data will be deleted. Confirm your password and email to delete. 
+                            Once done, it cannot be undone!</i>
+                        </p>
+                        <input type="hidden" name="killer" value="1" />
+                        <div class="form-group form-group-sm">
+                            <label for='killpass'>Confirm Password:</label>
+                            <input type="password" class="form-control gos-form" name="killpass" id="killpass" />
+                        </div>
+                        <div class="form-group form-group-sm">
+                            <label for='killmail'>Confirm E-mail:</label>
+                            <input type="text" class="form-control gos-form" name="killmail" id="killmail" />
+                        </div>
+                        <a href="#" onclick="if(confirm('Warning! Once you do this, this character data will be lost forever! Are you sure?')){document.killForm.submit();} return false;" 
+                           class="btn btn-danger btn-sm btn-wrap">Kill Character</a>
+                    </form>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
-<script type="text/javascript">  
-function submitKill()
-{
-  document.killForm.submit();
-}
-</script>
+</div>
+
 <?php
 include('footer.htm');
 ?>

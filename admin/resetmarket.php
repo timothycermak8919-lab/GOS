@@ -39,7 +39,7 @@ $result = mysqli_query($db,$query);
 echo "<br>Create New Table: $result";
 }
 // Close Database
-mysql_close();
+mysqli_close($db);
 ?>
 
 <br><br>

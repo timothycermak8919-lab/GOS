@@ -84,7 +84,7 @@ for ($i = 0; $i < $numquests; ++$i)
 }
 
 // Close Database
-mysql_close();
+mysqli_close($db);
 ?>
 
 <br><br>

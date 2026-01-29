@@ -91,7 +91,7 @@ include('header2.htm');
 <?php
 }
 // Close Database
-mysql_close();
+mysqli_close($db);
 ?>
 
 </body>

@@ -49,7 +49,7 @@ $result = mysqli_query($db,$sql);
 
 
 // Close Database
-mysql_close();
+mysqli_close($db);
 ?>
 
 <br><br>

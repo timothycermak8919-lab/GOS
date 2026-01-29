@@ -356,7 +356,10 @@ function getAlts ($ips)
 	  for ($i = 0; $i < count($ips); $i++)
 	  {
 		if(!empty($db)){
-			$result = mysqli_query($db,"SELECT * FROM IP_logs WHERE addy='$ips[$i]'");
+			$stmt = mysqli_prepare($db, "SELECT * FROM IP_logs WHERE addy=?");
+			mysqli_stmt_bind_param($stmt, "s", $ips[$i]);
+			mysqli_stmt_execute($stmt);
+			$result = mysqli_stmt_get_result($stmt);
 			$ip_log = mysqli_fetch_array($result);
 			$users= unserialize($ip_log['users']);
 			if(is_array($users)){
@@ -370,7 +373,10 @@ function getAlts ($ips)
   }
 
   $email = $_COOKIE['email'];
-  $result = mysqli_query($db,"SELECT * FROM Users WHERE email='$email'");
+  $stmt = mysqli_prepare($db, "SELECT * FROM Users WHERE email=?");
+  mysqli_stmt_bind_param($stmt, "s", $email);
+  mysqli_stmt_execute($stmt);
+  $result = mysqli_stmt_get_result($stmt);
   while ($char = mysqli_fetch_array($result)){
     $fullName = $char['name'] . "_" .$char['lastname'];
     $alts[$fullName] = 1;
