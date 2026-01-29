@@ -1,0 +1,129 @@
+[06-Jul-2025 17:08:09 America/Los_Angeles] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string + string in /home/gameofstonesapp/domains/gameofstones.app/public_html/weaveStats.php:45
+Stack trace:
+#0 {main}
+  thrown in /home/gameofstonesapp/domains/gameofstones.app/public_html/weaveStats.php on line 45
+[06-Jul-2025 17:08:18 America/Los_Angeles] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string + string in /home/gameofstonesapp/domains/gameofstones.app/public_html/weaveStats.php:45
+Stack trace:
+#0 {main}
+  thrown in /home/gameofstonesapp/domains/gameofstones.app/public_html/weaveStats.php on line 45
+[06-Jul-2025 17:08:22 America/Los_Angeles] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string + string in /home/gameofstonesapp/domains/gameofstones.app/public_html/weaveStats.php:45
+Stack trace:
+#0 {main}
+  thrown in /home/gameofstonesapp/domains/gameofstones.app/public_html/weaveStats.php on line 45
+[21-Jul-2025 02:14:56 America/Los_Angeles] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'loc_ji' in 'SET' in /home/gameofstonesapp/domains/gameofstones.app/public_html/npc.php:521
+Stack trace:
+#0 /home/gameofstonesapp/domains/gameofstones.app/public_html/npc.php(521): mysqli_query()
+#1 {main}
+  thrown in /home/gameofstonesapp/domains/gameofstones.app/public_html/npc.php on line 521
+[21-Jul-2025 02:15:10 America/Los_Angeles] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'loc_ji' in 'SET' in /home/gameofstonesapp/domains/gameofstones.app/public_html/npc.php:521
+Stack trace:
+#0 /home/gameofstonesapp/domains/gameofstones.app/public_html/npc.php(521): mysqli_query()
+#1 {main}
+  thrown in /home/gameofstonesapp/domains/gameofstones.app/public_html/npc.php on line 521
+[21-Jul-2025 02:19:17 America/Los_Angeles] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'loc_ji' in 'SET' in /home/gameofstonesapp/domains/gameofstones.app/public_html/npc.php:521
+Stack trace:
+#0 /home/gameofstonesapp/domains/gameofstones.app/public_html/npc.php(521): mysqli_query()
+#1 {main}
+  thrown in /home/gameofstonesapp/domains/gameofstones.app/public_html/npc.php on line 521
+[21-Jul-2025 02:19:19 America/Los_Angeles] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'loc_ji' in 'SET' in /home/gameofstonesapp/domains/gameofstones.app/public_html/npc.php:521
+Stack trace:
+#0 /home/gameofstonesapp/domains/gameofstones.app/public_html/npc.php(521): mysqli_query()
+#1 {main}
+  thrown in /home/gameofstonesapp/domains/gameofstones.app/public_html/npc.php on line 521
+[21-Jul-2025 02:56:40 America/Los_Angeles] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'loc_ji' in 'SET' in /home/gameofstonesapp/domains/gameofstones.app/public_html/npc.php:521
+Stack trace:
+#0 /home/gameofstonesapp/domains/gameofstones.app/public_html/npc.php(521): mysqli_query()
+#1 {main}
+  thrown in /home/gameofstonesapp/domains/gameofstones.app/public_html/npc.php on line 521
+[21-Jul-2025 03:16:13 America/Los_Angeles] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'loc_ji' in 'SET' in /home/gameofstonesapp/domains/gameofstones.app/public_html/npc.php:521
+Stack trace:
+#0 /home/gameofstonesapp/domains/gameofstones.app/public_html/npc.php(521): mysqli_query()
+#1 {main}
+  thrown in /home/gameofstonesapp/domains/gameofstones.app/public_html/npc.php on line 521
+[21-Jul-2025 12:31:22 America/Los_Angeles] PHP Deprecated:  strtolower(): Passing null to parameter #1 ($string) of type string is deprecated in /home/gameofstonesapp/domains/gameofstones.app/public_html/header.php on line 322
+[21-Jul-2025 13:12:09 America/Los_Angeles] PHP Deprecated:  strtolower(): Passing null to parameter #1 ($string) of type string is deprecated in /home/gameofstonesapp/domains/gameofstones.app/public_html/header.php on line 322
+[24-Jul-2025 09:07:44 America/Los_Angeles] PHP Fatal error:  Uncaught TypeError: count(): Argument #1 ($value) must be of type Countable|array, false given in /home/gameofstonesapp/domains/gameofstones.app/public_html/hordeinfo.php:32
+Stack trace:
+#0 {main}
+  thrown in /home/gameofstonesapp/domains/gameofstones.app/public_html/hordeinfo.php on line 32
+[24-Jul-2025 09:07:49 America/Los_Angeles] PHP Fatal error:  Uncaught TypeError: count(): Argument #1 ($value) must be of type Countable|array, false given in /home/gameofstonesapp/domains/gameofstones.app/public_html/hordeinfo.php:32
+Stack trace:
+#0 {main}
+  thrown in /home/gameofstonesapp/domains/gameofstones.app/public_html/hordeinfo.php on line 32
+[08-Aug-2025 06:37:44 America/Los_Angeles] PHP Fatal error:  Uncaught TypeError: count(): Argument #1 ($value) must be of type Countable|array, false given in /home/gameofstonesapp/domains/gameofstones.app/public_html/hordeinfo.php:32
+Stack trace:
+#0 {main}
+  thrown in /home/gameofstonesapp/domains/gameofstones.app/public_html/hordeinfo.php on line 32
+[08-Aug-2025 06:37:48 America/Los_Angeles] PHP Fatal error:  Uncaught TypeError: count(): Argument #1 ($value) must be of type Countable|array, false given in /home/gameofstonesapp/domains/gameofstones.app/public_html/hordeinfo.php:32
+Stack trace:
+#0 {main}
+  thrown in /home/gameofstonesapp/domains/gameofstones.app/public_html/hordeinfo.php on line 32
+[08-Aug-2025 06:37:49 America/Los_Angeles] PHP Fatal error:  Uncaught TypeError: count(): Argument #1 ($value) must be of type Countable|array, false given in /home/gameofstonesapp/domains/gameofstones.app/public_html/hordeinfo.php:32
+Stack trace:
+#0 {main}
+  thrown in /home/gameofstonesapp/domains/gameofstones.app/public_html/hordeinfo.php on line 32
+[13-Aug-2025 06:26:24 America/Los_Angeles] PHP Fatal error:  Uncaught TypeError: count(): Argument #1 ($value) must be of type Countable|array, false given in /home/gameofstonesapp/domains/gameofstones.app/public_html/hordeinfo.php:32
+Stack trace:
+#0 {main}
+  thrown in /home/gameofstonesapp/domains/gameofstones.app/public_html/hordeinfo.php on line 32
+[25-Aug-2025 02:14:43 US/Central] PHP Fatal error:  Array and string offset access syntax with curly braces is no longer supported in /home/gameofstonesapp/domains/gameofstones.app/public_html/json.php on line 163
+[31-Aug-2025 06:54:49 America/Los_Angeles] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'loc_ji' in 'SET' in /home/gameofstonesapp/domains/gameofstones.app/public_html/npc.php:521
+Stack trace:
+#0 /home/gameofstonesapp/domains/gameofstones.app/public_html/npc.php(521): mysqli_query()
+#1 {main}
+  thrown in /home/gameofstonesapp/domains/gameofstones.app/public_html/npc.php on line 521
+[31-Aug-2025 06:54:57 America/Los_Angeles] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'loc_ji' in 'SET' in /home/gameofstonesapp/domains/gameofstones.app/public_html/npc.php:521
+Stack trace:
+#0 /home/gameofstonesapp/domains/gameofstones.app/public_html/npc.php(521): mysqli_query()
+#1 {main}
+  thrown in /home/gameofstonesapp/domains/gameofstones.app/public_html/npc.php on line 521
+[31-Aug-2025 06:55:00 America/Los_Angeles] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'loc_ji' in 'SET' in /home/gameofstonesapp/domains/gameofstones.app/public_html/npc.php:521
+Stack trace:
+#0 /home/gameofstonesapp/domains/gameofstones.app/public_html/npc.php(521): mysqli_query()
+#1 {main}
+  thrown in /home/gameofstonesapp/domains/gameofstones.app/public_html/npc.php on line 521
+[31-Aug-2025 06:55:12 America/Los_Angeles] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'loc_ji' in 'SET' in /home/gameofstonesapp/domains/gameofstones.app/public_html/npc.php:521
+Stack trace:
+#0 /home/gameofstonesapp/domains/gameofstones.app/public_html/npc.php(521): mysqli_query()
+#1 {main}
+  thrown in /home/gameofstonesapp/domains/gameofstones.app/public_html/npc.php on line 521
+[31-Aug-2025 06:56:04 America/Los_Angeles] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'loc_ji' in 'SET' in /home/gameofstonesapp/domains/gameofstones.app/public_html/npc.php:521
+Stack trace:
+#0 /home/gameofstonesapp/domains/gameofstones.app/public_html/npc.php(521): mysqli_query()
+#1 {main}
+  thrown in /home/gameofstonesapp/domains/gameofstones.app/public_html/npc.php on line 521
+[31-Aug-2025 06:56:14 America/Los_Angeles] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'loc_ji' in 'SET' in /home/gameofstonesapp/domains/gameofstones.app/public_html/npc.php:521
+Stack trace:
+#0 /home/gameofstonesapp/domains/gameofstones.app/public_html/npc.php(521): mysqli_query()
+#1 {main}
+  thrown in /home/gameofstonesapp/domains/gameofstones.app/public_html/npc.php on line 521
+[31-Aug-2025 06:56:26 America/Los_Angeles] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'loc_ji' in 'SET' in /home/gameofstonesapp/domains/gameofstones.app/public_html/npc.php:521
+Stack trace:
+#0 /home/gameofstonesapp/domains/gameofstones.app/public_html/npc.php(521): mysqli_query()
+#1 {main}
+  thrown in /home/gameofstonesapp/domains/gameofstones.app/public_html/npc.php on line 521
+[31-Aug-2025 11:40:18 America/Los_Angeles] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'loc_ji' in 'SET' in /home/gameofstonesapp/domains/gameofstones.app/public_html/npc.php:521
+Stack trace:
+#0 /home/gameofstonesapp/domains/gameofstones.app/public_html/npc.php(521): mysqli_query()
+#1 {main}
+  thrown in /home/gameofstonesapp/domains/gameofstones.app/public_html/npc.php on line 521
+[01-Sep-2025 06:38:07 America/Los_Angeles] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'loc_ji' in 'SET' in /home/gameofstonesapp/domains/gameofstones.app/public_html/npc.php:521
+Stack trace:
+#0 /home/gameofstonesapp/domains/gameofstones.app/public_html/npc.php(521): mysqli_query()
+#1 {main}
+  thrown in /home/gameofstonesapp/domains/gameofstones.app/public_html/npc.php on line 521
+[15-Sep-2025 16:25:30 America/Los_Angeles] PHP Deprecated:  strtolower(): Passing null to parameter #1 ($string) of type string is deprecated in /home/gameofstonesapp/domains/gameofstones.app/public_html/header.php on line 322
+[17-Oct-2025 04:21:29 US/Central] PHP Fatal error:  Array and string offset access syntax with curly braces is no longer supported in /home/gameofstonesapp/domains/gameofstones.app/public_html/json.php on line 163
+[03-Nov-2025 14:44:35 US/Central] PHP Fatal error:  Array and string offset access syntax with curly braces is no longer supported in /home/gameofstonesapp/domains/gameofstones.app/public_html/json.php on line 163
+[07-Nov-2025 01:08:17 US/Central] PHP Fatal error:  Array and string offset access syntax with curly braces is no longer supported in /home/gameofstonesapp/domains/gameofstones.app/public_html/json.php on line 163
+[08-Nov-2025 05:12:51 US/Central] PHP Fatal error:  Array and string offset access syntax with curly braces is no longer supported in /home/gameofstonesapp/domains/gameofstones.app/public_html/json.php on line 163
+[09-Nov-2025 20:09:49 US/Central] PHP Fatal error:  Array and string offset access syntax with curly braces is no longer supported in /home/gameofstonesapp/domains/gameofstones.app/public_html/json.php on line 163
+[11-Nov-2025 10:29:52 US/Central] PHP Fatal error:  Array and string offset access syntax with curly braces is no longer supported in /home/gameofstonesapp/domains/gameofstones.app/public_html/json.php on line 163
+[12-Nov-2025 01:18:46 US/Central] PHP Fatal error:  Array and string offset access syntax with curly braces is no longer supported in /home/gameofstonesapp/domains/gameofstones.app/public_html/json.php on line 163
+[16-Nov-2025 09:49:26 US/Central] PHP Fatal error:  Array and string offset access syntax with curly braces is no longer supported in /home/gameofstonesapp/domains/gameofstones.app/public_html/json.php on line 163
+[13-Jan-2026 04:50:25 America/Los_Angeles] PHP Fatal error:  Uncaught mysqli_sql_exception: Disk full (/tmp/#sql-temptable-663-95b2d9-7c80f.MAI); waiting for someone to free some space... (errno: 28 "No space left on device") in /home/gameofstonesapp/domains/gameofstones.app/public_html/town.php:361
+Stack trace:
+#0 /home/gameofstonesapp/domains/gameofstones.app/public_html/town.php(361): mysqli_query()
+#1 /home/gameofstonesapp/domains/gameofstones.app/public_html/world.php(111): include('...')
+#2 {main}
+  thrown in /hom
