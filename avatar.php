@@ -24,6 +24,11 @@ define('MAX_PASSWORD_LENGTH', 10);
 require_once 'admin/connect.php';
 require_once 'admin/userdata.php';
 
+// Generate CSRF token
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 // Initialize
 $wikilink = 'Game+Settings';
 $message = 'Edit character settings';
@@ -67,7 +72,7 @@ function getAlts(array $ips): array
         $result = mysqli_stmt_get_result($stmt);
         
         if ($row = mysqli_fetch_array($result)) {
-            $users = unserialize($row['users']);
+            $users = json_decode($row['users'], true);
             if (is_array($users)) {
                 foreach ($users as $user) {
                     $alts[$user] = true;
@@ -495,8 +500,18 @@ function deleteCharacter(string $confirmEmail, string $confirmPass): void
 
 // ===== MAIN PROCESSING =====
 
+// Validate CSRF token for state-changing operations
+$csrf_valid = true;
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        $csrf_valid = false;
+        $message = "Invalid request. Please try again.";
+        error_log("CSRF validation failed in avatar.php from IP: " . $_SERVER['REMOTE_ADDR']);
+    }
+}
+
 // Handle avatar changes
-if (isset($_POST['changer'])) {
+if ($csrf_valid && isset($_POST['changer'])) {
     error_reporting(E_ALL);
     
     // Handle file upload
@@ -539,7 +554,7 @@ if (isset($_POST['changer'])) {
 }
 
 // Handle password update
-if (isset($_POST['password'], $_POST['passworda'], $_POST['passwordb']) && 
+if ($csrf_valid && isset($_POST['password'], $_POST['passworda'], $_POST['passwordb']) && 
     !empty($_POST['password']) && !empty($_POST['passworda']) && !empty($_POST['passwordb'])) {
     
     $passwordResult = updatePassword($_POST['password'], $_POST['passworda'], $_POST['passwordb']);
@@ -547,7 +562,7 @@ if (isset($_POST['password'], $_POST['passworda'], $_POST['passwordb']) &&
 }
 
 // Handle character deletion
-if (isset($_POST['killer'])) {
+if ($csrf_valid && isset($_POST['killer'])) {
     deleteCharacter($_POST['killmail'] ?? '', $_POST['killpass'] ?? '');
 }
 
@@ -568,6 +583,7 @@ include('header.php');
                 </div>
                 <div class='panel-body abox'>
                     <form class='form-horizontal' action="avatar.php" method="post" enctype="multipart/form-data">
+                        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>"/>
                         <!-- Avatar URL -->
                         <div class="form-group form-group-sm">
                             <label for='newav' class='control-label col-sm-4'>Offsite Avatar URL:</label>
@@ -639,6 +655,7 @@ include('header.php');
                 </div>
                 <div class='panel-body solid-back'>
                     <form action="avatar.php" name="killForm" method="post" enctype="multipart/form-data">
+                        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>"/>
                         <p class='text-danger h5'>
                             <i>Character and all of their data will be deleted. Confirm your password and email to delete. 
                             Once done, it cannot be undone!</i>

@@ -4,6 +4,11 @@ include_once("admin/connect.php");
 include_once("admin/userdata.php");
 include_once("admin/itemFuncs.php");
 
+// Generate CSRF token
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 $itmlist="";
 $listsize=0;
 $iresult=mysqli_query($db,"SELECT * FROM Items WHERE owner='$id' AND type<15 AND type>0");
@@ -29,9 +34,9 @@ else {include('header.php');}
     document.getElementById('itemImg').alt="items/"+inv[id]+".gif";
     document.getElementById('itemImg').src="items/"+inv[id]+".gif";
   }
-  
+   
 </script>
-  
+   
 <font class="littletext">
 <center>
 <?php 
@@ -50,6 +55,7 @@ else
 {
 ?>
 <form action="messages.php?trade=1&name=<?php echo $nameto."&last=".$lastnameto;?>" method="post">
+  <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>"/>
   <?php echo $div_img; ?>
   <table border="0" cellspacing="10" cellpadding="3">
     <tr>
@@ -111,7 +117,7 @@ else
   <?php echo $div_img; ?>
 </form>
 
-
+ 
 
 <?php
 }

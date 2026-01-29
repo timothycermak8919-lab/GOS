@@ -1,6 +1,11 @@
 <?php
 error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING);
 include_once("admin/charFuncs.php");
+
+// Generate CSRF token
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
 ?>
 <script language="Javascript">
 var tinfos=new Array(5);
@@ -52,7 +57,7 @@ function swapimg()
   var s = document.getElementsByName('sex');
   var sv = 0;
   if (s[1].checked) {sv = 1;}
- 
+  
   document.getElementById('myimg').innerHTML=nimgs[nv][sv];
 }
 
@@ -62,7 +67,7 @@ function swapinfo()
   var t = document.getElementById("type");
   var nv = n.options[n.selectedIndex].value;
   var tv = t.options[t.selectedIndex].value;
- 
+  
 
   document.getElementById('info').innerHTML=ninfos[nv]+tinfos[tv];
 }
@@ -115,6 +120,7 @@ include('header.php');
 ?>
 
 <form role="form" action="addAccount.php" method="post">
+  <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>"/>
   <div class="row">
     <div class="col-sm-4">
     <div class="form-group form-group-sm">        

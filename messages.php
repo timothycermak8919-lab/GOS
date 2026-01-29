@@ -12,6 +12,11 @@ function array_delel($array,$del)
   return $array;
 }
 
+// Generate CSRF token
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 /* establish a connection with the database */
 include_once("admin/connect.php");
 include_once("admin/userdata.php");
@@ -56,8 +61,18 @@ $tid = mysqli_real_escape_string($db,$_GET['id']);
 $acceptTrade = mysqli_real_escape_string($db,$_GET['accept']);
 if ($rep_id == "") $rep_id=0;
 
+// Validate CSRF token for state-changing operations
+$csrf_valid = true;
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        $csrf_valid = false;
+        $message = "Invalid request. Please try again.";
+        error_log("CSRF validation failed in messages.php from IP: " . $_SERVER['REMOTE_ADDR']);
+    }
+}
+
 // delete selected messages
-if ( $_REQUEST['ifsubmitted'] == 1)
+if ($csrf_valid && $_REQUEST['ifsubmitted'] == 1)
 {
   $x=0;
   while ($x < $in_num)
@@ -73,7 +88,7 @@ if ( $_REQUEST['ifsubmitted'] == 1)
 }
 
 // delete all messages
-if ( $_REQUEST['trashall'] )
+if ($csrf_valid && $_REQUEST['trashall'] )
 {
   $x=0;
   while ($x < $in_num)
@@ -85,7 +100,7 @@ if ( $_REQUEST['trashall'] )
 }
 
 // delete selected messages from outbox
-if ( $_REQUEST['ifoutsubmitted'] == 1)
+if ($csrf_valid && $_REQUEST['ifoutsubmitted'] == 1)
 {
   $x=0;
   while ($x < $out_num)
@@ -101,7 +116,7 @@ if ( $_REQUEST['ifoutsubmitted'] == 1)
 }
 
 // delete all messages from outbox
-if ( $_REQUEST['trashallout'] )
+if ($csrf_valid && $_REQUEST['trashallout'] )
 {
   $x=0;
   while ($x < $out_num)
@@ -154,7 +169,7 @@ if ($acceptTrade)
 }
 
 // SEND NOTE
-else if ($note && time() - intval($char['lastpost']) > $wait_post && $char['id'])
+else if ($csrf_valid && $note && time() - intval($char['lastpost']) > $wait_post && $char['id'])
 {
   $recipient = explode(" ", $noteto);
   $target = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Users WHERE name = '$recipient[0]' AND lastname = '$recipient[1]'"));
@@ -210,7 +225,7 @@ if ($submitted && !$note)
 // SET UP TRADE
 $bypass_check=0;
 
-if ($_GET['trade'] && $_REQUEST['item'])
+if ($csrf_valid && $_GET['trade'] && $_REQUEST['item'])
 {
   $charip = unserialize($char['ip']);
   $alts = getAlts($charip);
@@ -368,6 +383,7 @@ include('header.php');
             {
           ?>
             <form name='delinform' id='delinform' method="post" action="messages.php">
+              <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>"/>
               <div class="panel-group" id="accordion_in">
               <?php
                 while ($x < $in_num)
@@ -429,6 +445,7 @@ include('header.php');
             {
           ?>
             <form name='deloutform' id='deloutform' method="post" action="messages.php">
+              <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>"/>
               <div class="panel-group" id="accordion_out">
               <?php
                 while ($x < $out_num)

@@ -9,6 +9,14 @@ if ($user === null || empty($user)) {
     exit; // Ensure that no further code is executed after the redirect
 }
 
+// Validate CSRF token
+if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+    // Invalid CSRF token - log this attempt and redirect
+    error_log("CSRF validation failed on login attempt from IP: " . $_SERVER['REMOTE_ADDR']);
+    header("Location: $server_name/login.php?error=csrf");
+    exit;
+}
+
 /* establish a connection with the database */
 include_once("admin/connect.php");
 
@@ -116,6 +124,9 @@ if (!is_null($result) && $account = mysqli_fetch_array($result))
                 'samesite' => 'Strict'
             ]);
                 
+            // Regenerate CSRF token for the new session
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+            
             header("Location: $server_name/bio.php?time=$time");
             exit;
         } else {

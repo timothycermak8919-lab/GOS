@@ -9,6 +9,19 @@ include_once("admin/skills.php");
 include_once("admin/charFuncs.php");
 include_once("admin/itemFuncs.php");
 
+// Validate CSRF token
+if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+    error_log("CSRF validation failed on account creation attempt from IP: " . $_SERVER['REMOTE_ADDR']);
+    include('header.php');
+    echo "<br/><br/>";
+    echo "<center><b>Invalid request. Please try again.</b></center>";
+    include('footer.htm');
+    exit;
+}
+
+// Regenerate CSRF token after validation
+$_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+
 //gather user variables from last page where inputed
 $email=mysqli_real_escape_string($db,$_POST['email']);
 $actualpass=$_POST['password'];
@@ -68,15 +81,15 @@ else
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
     $ip_log = mysqli_fetch_array($result); 
-    $users= unserialize($ip_log['users']);
+    $users= json_decode($ip_log['users'], true);
 	if(!empty($users)){
 		for ($j=0; $j < count($users); $j++)  
 		{  $alts[$users[$j]] = 1; } 
 	}
   }
   $maxnum=2;
-   
-  // if ($ip_log['num']) {$maxnum = $ip_log['maxnum'];}
+    
+  // if ($ip_log['num']) {$maxnum = $ip_log['num'];}
 	$maxnum = $ip_log['maxnum'];
   // DISABLE ALT LIMIT
   $limit_off = 0;

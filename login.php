@@ -1,11 +1,18 @@
  <?php
 error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING);
 $skipVerify = 1;
+
+// Generate CSRF token
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 include('header.php');
 ?>
 
- <div class="row"align='left' style="background-color:#00000096; border-radius:25px; padding:20px; margin:20px">
+  <div class="row"align='left' style="background-color:#00000096; border-radius:25px; padding:20px; margin:20px">
       <form role="form" action="verify.php" method="post">
+        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>"/>
         <div class="form-group form-group-sm">
           <label for="email">Email:</label>
           <input type="text" class="form-control gos-form" id="email" name="email" maxlength="40">

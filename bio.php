@@ -49,7 +49,7 @@ mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 $societyo = mysqli_fetch_array($result);
 
-$friends = unserialize($charother['friends']);
+$friends = json_decode($charother['friends'], true);
 
 // get bio to be displayed
 $stmt = mysqli_prepare($db, "SELECT * FROM Users LEFT JOIN Users_data ON Users.id=Users_data.id WHERE Users.name=? AND Users.lastname=?");
@@ -197,7 +197,7 @@ if (!$tab) $tab = 1;
 include('header.php');
 $char = $charb;
 if (!$char['born']) {
-    echo "<center><br><br><font class='medtext'>$bioName $bioLastName does not exist";
+    echo "<center><br><br><font class='medtext'>" . htmlspecialchars($bioName . " " . $bioLastName, ENT_QUOTES) . " does not exist";
     include('footer.htm');
     exit;
 }
@@ -335,7 +335,7 @@ if (!$char['born']) {
                             ?>
                             <div class="panel panel-success">
                                 <div class="panel-heading">
-                                    <h3 class="panel-title"><?php echo "$bioName $bioLastName"; ?></h3>
+                                    <h3 class="panel-title"><?php echo htmlspecialchars($bioName . " " . $bioLastName, ENT_QUOTES); ?></h3>
                                 </div>
                                 <div class="panel-body abox">
                                     <p>
@@ -496,7 +496,7 @@ if (!$char['born']) {
                                      src="<?php echo $avatar; ?>"/><br/>
                             <p>
                                 <?php
-                                $curnote = $char['about'];
+                                $curnote = htmlspecialchars($char['about'], ENT_QUOTES);
                                 $curnote = nl2br($curnote);
                                 echo "<i>$curnote</i>";
                                 ?>
