@@ -17,73 +17,86 @@ include("connect.php");
 $id = $_COOKIE['id'] ?? null;
 $name = $_COOKIE['name'] ?? null;
 $lastname = $_COOKIE['lastname'] ?? null;
-$email  = $_COOKIE['email'] ?? null;
-$password = $_COOKIE['password'] ?? null;
+$email = $_COOKIE['email'] ?? null;
+$session = $_COOKIE['session'] ?? null;
 $mode = $_COOKIE['mode'] ?? null;
 
 
-if ($email && $password) {
-    $result = mysqli_query($db,"SELECT * From Accounts WHERE email='$email' AND password='$password'");
-    if (mysqli_num_rows($result) != 0) {
-        if ($id){
-            $result = mysqli_query($db,"SELECT * From Users WHERE email='$email' AND id='$id'");
+if ($session) {
+    // Validate session token using prepared statements
+    $stmt = mysqli_prepare($db, "SELECT * From Accounts WHERE session_token=? AND session_expires > ?");
+    $currentTime = time();
+    mysqli_stmt_bind_param($stmt, "si", $session, $currentTime);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    $account = mysqli_fetch_array($result);
+    
+    if ($account) {
+        $email = $account['email'];
+        
+        if ($id) {
+            $stmt = mysqli_prepare($db, "SELECT * From Users WHERE email=? AND id=?");
+            mysqli_stmt_bind_param($stmt, "si", $email, $id);
+            mysqli_stmt_execute($stmt);
+            $result = mysqli_stmt_get_result($stmt);
             if (mysqli_num_rows($result) == 0) {
                 $id = null;
                 $email = null;
-                $password = null;
+                $session = null;
                 $name = null;
                 $lastname = null;
                 setcookie("id", "", time()-3600, "/");
                 setcookie("name", "", time()-3600, "/");
                 setcookie("lastname", "", time()-3600, "/");
-                setcookie("email", "", time()-3600, "/");
-                setcookie("password", "", time()-3600, "/");
+                setcookie("session", "", time()-3600, "/");
                 if (!headers_sent()) {
                     $time = time();
                     header("Location: $server_name/index2.php?time=$time"); exit;
                 }
             }
-        }else{
-            if ($skipVerify != 1){
-
-
-                $result = mysqli_query($db,"SELECT * From Users WHERE email='$email'");
-                //If we don't have any character create one
+        } else {
+            if ($skipVerify != 1) {
+                $stmt = mysqli_prepare($db, "SELECT * From Users WHERE email=?");
+                mysqli_stmt_bind_param($stmt, "s", $email);
+                mysqli_stmt_execute($stmt);
+                $result = mysqli_stmt_get_result($stmt);
+                
+                // If we don't have any character create one
                 if (mysqli_num_rows($result) == 0) {
                     header("Location: $server_name/create.php");
-                //If we have some character we just aren't selected select it and go to bio
-                }else{
+                // If we have some character we just aren't selected select it and go to bio
+                } else {
                     $user = mysqli_fetch_array($result);
                     $id = $user['id'];
                     $username = $user['name'];
                     $name = $user['name'];
                     $lastname = $user['lastname'];
-    
-                    setcookie("id", "$id", time()+99999999, "/");
-                    setcookie("name", "$username", time()+99999999, "/");
-                    setcookie("lastname", "$lastname", time()+99999999, "/");
+                    
+                    setcookie("id", $id, time()+3600, "/");
+                    setcookie("name", $username, time()+3600, "/");
+                    setcookie("lastname", $lastname, time()+3600, "/");
                     header("Location: $server_name/bio.php");
                 }
             }
         }
-    }else{
+    } else {
+        // Invalid or expired session
         $id = null;
         $email = null;
-        $password = null;
+        $session = null;
         $name = null;
         $lastname = null;
         setcookie("id", "", time()-3600, "/");
         setcookie("name", "", time()-3600, "/");
         setcookie("lastname", "", time()-3600, "/");
-        setcookie("email", "", time()-3600, "/");
-        setcookie("password", "", time()-3600, "/");
+        setcookie("session", "", time()-3600, "/");
         if (!headers_sent()) {
             $time = time();
             header("Location: $server_name/index2.php?time=$time"); exit;
         }
     }
-}else{
-    if($skipVerify != 1){
+} else {
+    if ($skipVerify != 1) {
         if (!headers_sent()) {
             $time = time();
             header("Location: $server_name/index2.php?time=$time"); exit;

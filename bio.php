@@ -69,7 +69,13 @@ $result = mysqli_stmt_get_result($stmt);
 $society = mysqli_fetch_array($result);
 $classes = unserialize($char['type']);
 
-$stats = mysqli_fetch_array(mysqli_query($db, "SELECT * FROM Users_stats WHERE id='$char[id]'"));
+// FIXED: SQL injection vulnerability - use prepared statement
+$charId = $char['id'];
+$stmt = mysqli_prepare($db, "SELECT * FROM Users_stats WHERE id=?");
+mysqli_stmt_bind_param($stmt, "i", $charId);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+$stats = mysqli_fetch_array($result);
 
 $query = "SELECT * FROM Users_stats WHERE id='10011'";
 $result = mysqli_query($db, $query);
@@ -86,8 +92,13 @@ for ($y = 0; $y < count($rank_data); $y++) {
     }
 }
 
+// FIXED: SQL injection vulnerability - use prepared statement
 $cNat = $char['nation'];
-$topNat = mysqli_fetch_array(mysqli_query($db, "SELECT id, name, lastname FROM Users WHERE nation='" . $cNat . "' ORDER BY exp DESC LIMIT 1"));
+$stmt = mysqli_prepare($db, "SELECT id, name, lastname FROM Users WHERE nation=? ORDER BY exp DESC LIMIT 1");
+mysqli_stmt_bind_param($stmt, "i", $cNat);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+$topNat = mysqli_fetch_array($result);
 if ($topNat['id'] == $char['id']) {
     $titles[$x] = "Champion of the " . $nat_champs[$cNat];
     $title_why[$x] = "Experienced " . $nationalities[$cNat];
@@ -117,7 +128,10 @@ if (!$found) {
     $user_ips[$uips_count] = $ipaddy;
     $user_ips2 = serialize($user_ips);
     if ($charother['id']!=""){
-        mysqli_query($db, "UPDATE Users SET ip='$user_ips2' WHERE id=" . $charother['id']);
+        // FIXED: SQL injection vulnerability - use prepared statement
+        $stmt = mysqli_prepare($db, "UPDATE Users SET ip=? WHERE id=?");
+        mysqli_stmt_bind_param($stmt, "si", $user_ips2, $charother['id']);
+        mysqli_stmt_execute($stmt);
     }
 }
 
@@ -126,9 +140,9 @@ if ($char['id'] == $charother['id']) // only update IPs on your own profile
 {
     if (mysqli_fetch_row($resultb)) {
         $result = mysqli_prepare($db, "SELECT * FROM IP_logs WHERE addy=?");
-mysqli_stmt_bind_param($result, "s", $ipaddy);
-mysqli_stmt_execute($result);
-$result = mysqli_stmt_get_result($result);
+        mysqli_stmt_bind_param($result, "s", $ipaddy);
+        mysqli_stmt_execute($result);
+        $result = mysqli_stmt_get_result($result);
         $ip_log = mysqli_fetch_array($result);
         $ip_users = unserialize($ip_log['users']);
         $found = 0;
@@ -142,13 +156,23 @@ $result = mysqli_stmt_get_result($result);
             $ip_users[$ip_count] = $fullname;
             $ip_users2 = serialize($ip_users);
             $ip_count++;
-            mysqli_query($db, "UPDATE IP_logs SET users='$ip_users2', num='$ip_count', test='" . $ip_users['test']++ . "' WHERE addy='$ipaddy'");
+            // FIXED: SQL injection vulnerability - use prepared statement
+            $ip_test = $ip_users['test']++;
+            $stmt = mysqli_prepare($db, "UPDATE IP_logs SET users=?, num=?, test=? WHERE addy=?");
+            mysqli_stmt_bind_param($stmt, "siis", $ip_users2, $ip_count, $ip_test, $ipaddy);
+            mysqli_stmt_execute($stmt);
         } else if ($ip_log['maxnum'] == 2 && $char['donor'] > 0)
-            mysqli_query($db, "UPDATE IP_logs SET maxnum='$maxalts' WHERE addy='$ipaddy'");
+            // FIXED: SQL injection vulnerability - use prepared statement
+            $stmt = mysqli_prepare($db, "UPDATE IP_logs SET maxnum=? WHERE addy=?");
+            mysqli_stmt_bind_param($stmt, "is", $maxalts, $ipaddy);
+            mysqli_stmt_execute($stmt);
     } else {
         $ip_users['0'] = $fullname;
         $ip_users2 = serialize($ip_users);
-        mysqli_query($db, "INSERT INTO IP_logs (addy, users, num, maxnum, test) VALUES('$ipaddy', '$ip_users2', '1', '$maxalts','1')");
+        // FIXED: SQL injection vulnerability - use prepared statement
+        $stmt = mysqli_prepare($db, "INSERT INTO IP_logs (addy, users, num, maxnum, test) VALUES(?, ?, '1', ?, '1')");
+        mysqli_stmt_bind_param($stmt, "ssi", $ipaddy, $ip_users2, $maxalts);
+        mysqli_stmt_execute($stmt);
     }
 }
 
@@ -175,19 +199,25 @@ if ($_GET['set_s'] && $is_same) {
         $message = "$bioName $bioLastName added";
     } else $message = "You have too many friends/enemies";
 
-    mysqli_query($db, "UPDATE Users_data SET friends='" . serialize($friends) . "' WHERE id=" . $charother['id']);
+    // FIXED: SQL injection vulnerability - use prepared statement
+    $sfriends = serialize($friends);
+    $stmt = mysqli_prepare($db, "UPDATE Users_data SET friends=? WHERE id=?");
+    mysqli_stmt_bind_param($stmt, "si", $sfriends, $charother['id']);
+    mysqli_stmt_execute($stmt);
 }
 
 // TRANSFER ORG LEADERSHIP - Only current leader can transfer to themselves
 if ($_GET['transfer'] && $is_same && $char['society'] == $charother['society'] && strtolower($societyo['leader']) == strtolower($charother['name']) && strtolower($societyo['leaderlast']) == strtolower($charother['lastname'])) {
-    $query = "UPDATE Soc SET leader='$bioName', leaderlast='$bioLastName' WHERE name='" . $char['society'] . "'";
-    $result = mysqli_query($db, $query);
+    // FIXED: SQL injection vulnerability - use prepared statement
+    $stmt = mysqli_prepare($db, "UPDATE Soc SET leader=?, leaderlast=? WHERE name=?");
+    mysqli_stmt_bind_param($stmt, "sss", $bioName, $bioLastName, $char['society']);
+    mysqli_stmt_execute($stmt);
     $message = $char['society'] . " leadership transfered";
 }
 
 if (!$message && $is_same) $message = "Today's date is " . wotDate();
 elseif (!$message && $char['born']) {
-    $message = "Residing in " . str_replace('-ap-', '&#39;', $char['location']);
+    $message = "Residing in " . str_replace('-ap-', ''', $char['location']);
 }
 
 $charb = $char;
@@ -327,8 +357,20 @@ if (!$char['born']) {
                                 $societyn = "<br>" . $societyn;
                             } else $font_size = "class='medtext' style='$classn'";
 
-                            $num_notes = mysqli_num_rows(mysqli_query($db, "SELECT * FROM Notes WHERE to_id='$id' AND del_to='0' AND type < 4 ORDER BY sent DESC"));
-                            $num_logs = mysqli_num_rows(mysqli_query($db, "SELECT * FROM Notes WHERE to_id='$id' AND del_to='0' AND type = 9 ORDER BY sent DESC"));
+                            // FIXED: SQL injection vulnerability - use prepared statement
+                            $stmt = mysqli_prepare($db, "SELECT * FROM Notes WHERE to_id=? AND del_to='0' AND type < 4 ORDER BY sent DESC");
+                            mysqli_stmt_bind_param($stmt, "i", $id);
+                            mysqli_stmt_execute($stmt);
+                            $result = mysqli_stmt_get_result($stmt);
+                            $num_notes = mysqli_num_rows($result);
+
+                            // FIXED: SQL injection vulnerability - use prepared statement
+                            $stmt = mysqli_prepare($db, "SELECT * FROM Notes WHERE to_id=? AND del_to='0' AND type = 9 ORDER BY sent DESC");
+                            mysqli_stmt_bind_param($stmt, "i", $id);
+                            mysqli_stmt_execute($stmt);
+                            $result = mysqli_stmt_get_result($stmt);
+                            $num_logs = mysqli_num_rows($result);
+
                             $smin = $char['stamina'];
                             $smax = $char['stamaxa'];
                             ?>
@@ -404,7 +446,7 @@ if (!$char['born']) {
                                                 ?>
                                                 <img src='images/noduel.gif'
                                                      alt='X'/> <?php echo $numbahs[$time_to_battle]; ?> minute <img
-                                                        src='images/noduel.gif' alt='X'/>
+                                                    src='images/noduel.gif' alt='X'/>
                                                 <?php
                                                 if ($time_to_battle != 1) echo "s";
                                             }
@@ -445,7 +487,7 @@ if (!$char['born']) {
                                             Friend <img border='0' src='images/handshake.gif'/></a>
                                         <a href="bio.php?<?php echo "set_s=2&time=$time&name=$bioName&last=$bioLastName"; ?>"
                                            class="btn btn-danger btn-sm btn-block"><img border='0'
-                                                                                        src='images/duel.gif'/> Enemy
+                                                                                      src='images/duel.gif'/> Enemy
                                             <img border='0' src='images/duel.gif'/></a>
                                         <?php
                                     } else {
@@ -465,15 +507,15 @@ if (!$char['born']) {
                                         <a href="messages.php" class="btn btn-primary btn-sm"><img border='0'
                                                                                                    src='images/barter.gif'/>
                                             Messages <span class="badge"><?php echo $num_notes; ?></span> <img
-                                                    border='0' src='images/barter.gif'/></a>
+                                                border='0' src='images/barter.gif'/></a>
                                         <?php
                                     }
                                     if ($num_logs) {
                                         ?>
                                         <a href="battlelogs.php" class="btn btn-danger btn-sm"><img border='0'
-                                                                                                    src='images/shield.gif'/>
+                                                                                                     src='images/shield.gif'/>
                                             Def log <span class="badge"><?php echo $num_logs; ?></span> <img border='0'
-                                                                                                             src='images/shield.gif'/></a>
+                                                                                                              src='images/shield.gif'/></a>
                                         <?php
                                     }
                                     ?>
@@ -510,733 +552,422 @@ if (!$char['born']) {
 
                         if ($char['society'] != '') {
                             ?>
-                            <div class='hidden-xs img-optional-nodisplay'
-                                 style="width:160px; background-image: url('images/Flags/<?php echo $society['flag']; ?>'); background-repeat: no-repeat;">
-                                <img src="images/Sigils/<?php echo $society['sigil']; ?>" align='top' width=160
-                                     height=197/>
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title"><?php echo $societyn ?></h3>
+                                </div>
+                                <div class="panel-body abox">
+                                    <?php
+                                    if ($char['soc_rank'] == 1) {
+                                        $leadersoc = "yes";
+                                        ?>
+                                        <a href="clanoffice.php"
+                                           class="btn btn-primary btn-sm btn-block">Office</a>
+                                        <?php
+                                        if ($char['donor']) {
+                                            ?>
+                                            <a href="clansettings.php"
+                                               class="btn btn-info btn-sm btn-block">Settings</a>
+                                            <?php
+                                        }
+                                    } elseif ($char['soc_rank'] == 2) {
+                                        $leadersoc = "yes";
+                                        ?>
+                                        <a href="clanoffice.php"
+                                           class="btn btn-primary btn-sm btn-block">Office</a>
+                                        <?php
+                                    } elseif ($char['soc_rank'] > 0) {
+                                        $leadersoc = "no";
+                                    } else {
+                                        $leadersoc = "no";
+                                    }
+                                    $charwars = unserialize($char['wars']);
+                                    if (is_array($charwars)) {
+                                        $wararray = $charwars;
+                                        $nowars = 0;
+                                    } else {
+                                        $wararray = array();
+                                        $nowars = 1;
+                                    }
+                                    $wars = 0;
+                                    if (is_array($society['enemies'])) {
+                                        foreach ($society['enemies'] as $clan => $war) {
+                                            if ($war == 1) {
+                                                $wars++;
+                                                if (is_array($charwars) && in_array($clan, $charwars)) $nowar = 1;
+                                                else $nowar = 0;
+                                                ?>
+                                                <button class="btn btn-sm" disabled="disabled"><?php echo $clan ?></button>
+                                                <?php
+                                            }
+                                        }
+                                    }
+                                    if ($wars == 0) {
+                                        echo "No wars";
+                                    }
+                                    ?>
+                                </div>
                             </div>
                             <?php
                         }
-                        ?>
-                        <div class="panel panel-primary">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">Titles</h3>
-                            </div>
-                            <div class="panel-body abox">
-                                <?php
-                                echo $societyn;
-                                $w = 0;
-                                for ($y = 1; $y < count($worth_ranks); $y++) {
-                                    if ($stats['net_worth'] >= $worth_ranks[$y]['0']) $w = $y;
-                                }
-                                $wrank = $worth_ranks[$w][$char['sex'] + 1];
-                                echo "<font title='" . displayGold($stats['net_worth'], 1) . "'>" . $wrank . "</font><br/><br/>";
 
-                                for ($x = 0; $x < count($titles); $x++) {
-                                    echo "<font title='Most " . $title_why[$x] . "'>" . $titles[$x] . "</font><br/>";
-                                }
-                                ?>
-                            </div>
-                        </div> <!-- close title panel -->
-                    </div> <!-- close 3rd column -->
-                </div> <!-- close bio_tab content -->
-
-                <?php
-                if ($is_same || ($charother['name'] == 'The' && $charother['lastname'] == 'Creator')) {
-                    include('admin/duelFuncs.php');
-                    include('admin/jobFuncs.php');
-                    include('admin/equipped.php');
-
-// Profession Bonuses
-                    $jobs = unserialize($char['jobs']);
-
-// Clan Bonuses
-                    $upgrades = unserialize($society['upgrades']);
-                    $hire_bonus = "";
-                    $hire_bonus = getUpgradeBonuses($upgrades, $clan_hires, 9);
-                    $clan_bonus1['0'] = $hire_bonus;
-                    $clan_bonus1['1'] = $clan_building_bonuses;
-
-// nation bonuses
-                    $nat_bonus = $nation_bonus[$char['nation']]['0'];
-
-// combine all bonuses
-                    $bonuses1 = $stomach_bonuses1 . " " . $stamina_effect1 . " " . $skill_bonuses1;
-
-                    $weapon_a = $estats['0'];
-
-                    $fstats = $bonuses1 . " " . $weapon_a;
-                    $full_stats = itm_info(cparse($fstats, 0));
-                    $weap_stats = itm_info(cparse($weapon_a, 0));
-                    $skill_stats = itm_info(cparse($skill_bonuses1, 0));
-                    $stom_stats = itm_info(cparse($stomach_bonuses1, 0));
-                    $stam_stats = itm_info(cparse($stamina_effect1, 0));
-                    $clan_stats0 = itm_info(cparse($clan_bonus1['0'], 0));
-                    $clan_stats1 = itm_info(cparse($clan_bonus1['1'], 0));
-                    $nat_stats = itm_info(cparse($nat_bonus, 0));
-                    $pro_stats = itm_info(cparse(getAllJobBonuses($jobs)));
-                    ?>
-                    <div class="tab-pane <?php if ($tab == 2) echo "active"; ?>" id="stats_tab">
-                        <div class="col-sm-4 col-md-3">
+                        $freeskills = $char['skill_pts'] - $skillpts;
+                        $skillpoints = "0";
+                        $freeprof = $char['profs_pts'] - $profpts;
+                        $profpoints = "0";
+                        $titlecount = count($titles);
+                        for ($i = 0; $i < $titlecount; $i++) {
+                            ?>
                             <div class="panel panel-success">
                                 <div class="panel-heading">
-                                    <h3 class="panel-title">Full Stats</h3>
+                                    <h3 class="panel-title"><?php echo $titles[$i] ?></h3>
                                 </div>
                                 <div class="panel-body abox">
-                                    <?php echo $full_stats; ?>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-4 col-md-3">
-                            <div class="panel">
-                                <div class="panel-heading">
-                                    <h3 class="panel-title">Equipment Stats</h3>
-                                </div>
-                                <div class="panel-body abox">
-                                    <?php echo $weap_stats; ?>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-4 col-md-3">
-                            <div class="panel">
-                                <div class="panel-heading">
-                                    <h3 class="panel-title">Skills Stats</h3>
-                                </div>
-                                <div class="panel-body abox">
-                                    <?php echo $skill_stats; ?>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-sm-4 col-md-3">
-                            <div class="panel">
-                                <div class="panel-heading">
-                                    <h3 class="panel-title">Profession Bonuses</h3>
-                                </div>
-                                <div class="panel-body abox">
-                                    <?php echo $pro_stats; ?>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-sm-4 col-md-3">
-                            <div class="panel">
-                                <div class="panel-heading">
-                                    <h3 class="panel-title">Nation Bonuses</h3>
-                                </div>
-                                <div class="panel-body abox">
-                                    <?php echo $nat_stats; ?>
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <?php
-                        if ($clan_stats0 || $clan_stats1) {
-                            ?>
-                            <div class="col-sm-4 col-md-3">
-                                <div class="panel">
-                                    <div class="panel-heading">
-                                        <h3 class="panel-title">Clan Bonuses</h3>
-                                    </div>
-                                    <div class="panel-body abox">
-                                        <?php
-                                        if ($clan_stats0)
-                                            echo "<i>From Clan Hires</i><br/>" . $clan_stats0 . "<br/>";
-                                        if ($clan_stats1)
-                                            echo "<i>From Ruled Cities</i><br/>" . $clan_stats1 . "<br/>";
-                                        ?>
-                                    </div>
+                                    <?php echo $title_why[$i] ?>
                                 </div>
                             </div>
                             <?php
                         }
-                        if ($stom_stats) {
-                            ?>
-                            <div class="col-sm-4 col-md-3">
+
+                        $onlineList = "";
+                        $pmonth = 0;
+                        $charip = unserialize($charother['ip']);
+                        $alts = getAlts($charip);
+                        foreach ($alts as $username => $alt) {
+                            $stmt = mysqli_prepare($db, "SELECT id, name, lastname, level, exp, gold, location, stamina, stamaxa, battlestoday, newmsg, newlog, donor FROM Users WHERE name = ?");
+                            $explode = explode("_", $username);
+                            $altName = $explode[0];
+                            $altLast = $explode[1];
+                            mysqli_stmt_bind_param($stmt, "ss", $altName, $altLast);
+                            mysqli_stmt_execute($stmt);
+                            $result = mysqli_stmt_get_result($stmt);
+                            $listchar = mysqli_fetch_array($result);
+                            if ($listchar['id'] != "" && $listchar['id'] != $char['id']) {
+                                ?>
                                 <div class="panel panel-warning">
                                     <div class="panel-heading">
-                                        <h3 class="panel-title">Consumable Effects</h3>
+                                        <h3 class="panel-title"><a
+                                                    href="bio.php?name=<?php echo $listchar['name'] ?>&last=<?php echo $listchar['lastname'] ?>"><?php echo $listchar['name'] . " " . $listchar['lastname'] ?></a>
+                                        </h3>
                                     </div>
                                     <div class="panel-body abox">
-                                        <?php echo $stom_stats; ?>
-                                    </div>
-                                </div>
-                            </div>
-                            <?php
-                        }
-                        if ($stam_stats) {
-                            ?>
-                            <div class="col-sm-4 col-md-3">
-                                <div class="panel panel-danger">
-                                    <div class="panel-heading">
-                                        <h3 class="panel-title">Stamina Effects</h3>
-                                    </div>
-                                    <div class="panel-body abox">
-                                        <?php echo $stam_stats; ?>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <?php
-                        }
-                        ?>
-                    </div> <!-- close stats_tab content -->
-
-                    <div class="tab-pane <?php if ($tab == 3) echo "active"; ?>" id="list_tab">
-                        <div class="col-sm-12">
-                            <?php
-                            for ($lists = 0; $lists <= 1; $lists++) {
-                                if ($lists == 0) echo "<center><b>--Friends List--</b><br/><br/></center>";
-                                else echo "<hr/><center><b>--Enemies List--</b><br/><br/></center>";
-                                ?>
-                                <table class="table table-condensed table-striped table-responsive">
-                                    <tr>
-                                        <th><b>Name</b></th>
-                                        <th><b>Classes</b></th>
-                                        <th><b>Equipped</b></th>
-                                        <th><b>Alignment</b></th>
-                                        <th><b>Location</b></th>
-                                        <th><img border='0' src='images/till.gif'
-                                                 style='vertical-align:middle'/>&nbsp;<b>Coin</b></th>
-                                        <th><img border='0' src='images/lvlup.gif' style='vertical-align:middle'/>&nbsp;<b>Lvl</b>
-                                        </th>
-                                        <th><img border='0' src='images/classes/0.gif' style='vertical-align:middle'/>&nbsp;<b>Online</b>
-                                        </th>
-                                    </tr>
-                                    <?php
-                                    foreach ($friends as $fid => $fval) {
-                                        $listchar = mysqli_fetch_array(mysqli_query($db, "SELECT * FROM Users WHERE id='$fid'"));
-                                        if ($fval['2'] == $lists && $listchar['id']) {
-                                            $btnstyle = "btn-default";
-                                            $lastBattle = mysqli_fetch_array(mysqli_query($db, "SELECT id, starts, ends, winner FROM Contests WHERE type='99' "));
-                                            if ($lastBattle != 0) {
-                                                if ($listchar['align'] > 0)
-                                                    $btnstyle = "btn-primary";
-                                                else
-                                                    $btnstyle = "btn-danger";
-                                            } else if ($stance[str_replace(" ", "_", $listchar['society'])] && $listchar['id'] != $id) {
-                                                if ($stance[str_replace(" ", "_", $listchar['society'])] == 1)
-                                                    $btnstyle = "btn-primary";
-                                                else
-                                                    $btnstyle = "btn-danger";
-                                            }
-                                            ?>
-                                            <tr>
-                                                <td style="text-align: center;">
-                                                    <a class="btn btn-xs btn-block <?php echo $btnstyle; ?>"
-                                                       href="bio.php?name=<?php echo $listchar['name'] . "&last=" . $listchar['lastname'] . "&time=" . time(); ?>">
-                                                        <?php
-                                                        $hasSeal = mysqli_num_rows(mysqli_query($db, "SELECT id FROM Items WHERE type=0 && owner='$listchar[id]'"));
-                                                        if ($hasSeal)
-                                                            echo "<img src='images/classes/4.gif' height=18 width=18/>&nbsp;";
-
-                                                        echo $listchar['name'] . " " . $listchar['lastname'];
-
-                                                        if ($listchar['soc_rank'] == 1)
-                                                            echo "<img src='images/SocLead.gif' height=20 width=28/>";
-                                                        elseif ($listchar['soc_rank'] == 2)
-                                                            echo "<img src='images/SocSub.gif' height=20 width=28/>";
-                                                        ?>
-                                                    </a>
-                                                </td>
-                                                <td style="text-align: center;">
-                                                    <?php
-                                                    $oclasses = unserialize($listchar['type']);
-                                                    for ($i = 0; $i < count($oclasses); $i++) {
-                                                        echo "<img src='images/classes/" . $oclasses[$i] . ".gif' alt='" . $oclasses[$i] . "' title='" . $char_class[$oclasses[$i]] . "' height='15' width='15'>";
-                                                    }
-                                                    ?>
-                                                </td>
-                                                <td style="text-align: center;">
-                                                    <?php
-                                                    $cstr = getStrength($listchar['used_pts'], $listchar['equip_pts'], $listchar['stamina'], $listchar['stamaxa']);
-                                                    $slvl = getStrengthLevel($cstr);
-                                                    echo $slvl;
-                                                    ?>
-                                                </td>
-                                                <td style="text-align: center;">
-                                                    <?php
-                                                    $alignnum = getAlignment($listchar['align']);
-                                                    $lalign = getAlignmentText($alignnum);
-                                                    echo $lalign;
-                                                    ?>
-                                                </td>
-                                                <td style="text-align: center;">
-                                                    <?php echo $listchar['location']; ?>
-                                                </td>
-                                                <td style="text-align: center;">
-                                                    <?php echo displayGold($listchar['gold']); ?>
-                                                </td>
-                                                <td style="text-align: center;">
-                                                    <?php echo $listchar['level']; ?>
-                                                </td>
-                                                <td style="text-align: center;">
-                                                    <?php
-                                                    if ($listchar['lastonline'] >= time() - 900) {
-                                                        ?>
-                                                        <b>Online</b></font>
-                                                        <?php
-                                                    }
-                                                    ?>
-                                                </td>
-                                            </tr>
-                                            <?php
-                                        }
-                                    }
-                                    ?>
-                                </table>
-                                <br/><br/>
-                                <?php
-                            }
-                            ?>
-                        </div>
-                    </div> <!-- close watch_tab content -->
-
-                    <?php
-
-                    if ($char['donor'] == 1) {
-                        ?>
-
-                        <div class="tab-pane <?php if ($tab == 4) echo "active"; ?>" id="alt_tab">
-                            <div class="col-sm-12">
-                                <table class="table table-condensed table-striped table-responsive">
-                                    <tr>
-                                        <th><b>Name</b></th>
-                                        <th><b>Location</b></th>
-                                        <th><b>Purse</b></th>
-                                        <th class='hidden-xs'><b>Level</b></th>
-                                        <th class='hidden-xs'><b>Stamina</b></th>
-                                        <th><b>Turns</b></th>
-                                        <th><b>New Message</b></th>
-                                        <th><b>New Log</b></th>
-                                        <th><b>Biz Done</b></th>
-                                        <th><b>Biz Inactive</b></th>
-                                    </tr>
-                                    <?php
-                                    // Find all other characters with same e-mail
-                                    $aresult = mysqli_query($db, "SELECT id, name, lastname, level, gold, jobs, location, stamina, stamaxa, battlestoday, newmsg, newlog, donor FROM Users WHERE email = '" . $char['email'] . "'");
-
-                                    // For each other character, pull information to put in table
-                                    while ($listchar = mysqli_fetch_array($aresult)) {
-                                        $btnstyle = "btn-default";
-                                        if ($listchar['id'] == $char['id']) $btnstyle = "btn-info";
-                                        echo "<tr>";
-                                        echo "<td style='text-align: center;'><b><a class='btn $btnstyle btn-xs btn-block btn-wrap' href=\"bio.php?name=" . $listchar['name'] . "&last=" . $listchar['lastname'] . "\">";
-                                        echo $listchar['name'] . " " . $listchar['lastname'] . "</a></b></td>";
-                                        echo "<td style='text-align: center;'>" . $listchar['location'] . "</td>";
-                                        echo "<td style='text-align: center;'>" . displayGold($listchar['gold']) . "</td>";
-                                        echo "<td class='hidden-xs' style='text-align: center;'>" . $listchar['level'] . "</td>";
-                                        echo "<td class='hidden-xs' style='text-align: center;'>" . $listchar['stamina'] . "/" . $listchar['stamaxa'] . "</td>";
-                                        echo "<td style='text-align: center;'>" . ((100 /** ($listchar['donor'] + 1)*/) - $listchar['battlestoday']) . "</td>";
-                                        echo "<td style='text-align: center;'>" . $listchar['newmsg'] . "</td>";
-                                        echo "<td style='text-align: center;'>" . $listchar['newlog'] . "</td>";
-
-                                        $pquery = "SELECT * FROM Profs WHERE owner='" . $listchar['id'] . "'";
-                                        $presult = mysqli_query($db, $pquery);
-                                        $bsubs = array(0, 0, 0);
-                                        $ajobs = unserialize($listchar['jobs']);
-                                        while ($bq = mysqli_fetch_array($presult)) {
-                                            $bstatus = unserialize($bq['status']);
-                                            $bupgrades = unserialize($bq['upgrades']);
-                                            for ($i = 0; $i < $bupgrades['0']; $i++) {
-                                                if ($bstatus[$i]['0'] == 1) {
-                                                    $timeleft = ($bstatus[$i]['2']['1'] - time());
-                                                    if ($timeleft < 0 && $bq['type'] != 0) {
-                                                        $bstatus[$i]['0'] = 2;
-                                                        if ($bq['type'] < 7) {
-                                                            $bstatus[$i]['4'] = 5;
-                                                            $qualbonus = $bupgrades['1']['1'] * 5 + $bupgrades['1']['2'] * 3;
-                                                            $qualnum = $ajobs[$bq['type']] * 5 + $qualbonus + rand(1, 50);
-                                                            $bstatus[$i]['5'] = floor($qualnum / 25);
-                                                        }
-                                                        $sstatus = serialize($bstatus);
-                                                        mysqli_query($db, "UPDATE Profs SET status='" . $sstatus . "' WHERE id='" . $bq['id'] . "'");
-                                                    }
-                                                }
-                                                $bsubs[$bstatus[$i]['0']]++;
-                                            }
-                                        }
-                                        echo "<td style='text-align: center;'>" . $bsubs['2'] . "</td>";
-                                        echo "<td style='text-align: center;'>" . $bsubs['0'] . "</td>";
-                                        echo "</tr>";
-                                    }
-                                    ?>
-                                </table>
-                                </center>
-
-                            </div>
-                        </div> <!-- close alt_tab content -->
-                        <?php
-                    }
-                }
-                ?>
-                <div class="tab-pane <?php if ($tab == 5) echo "active"; ?>" id="achieve_tab">
-                    <div class="col-sm-12">
-                        <div class="panel panel-info">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">Local Ji</h3>
-                            </div>
-                            <div class="panel-body abox">
-                                <div class='col-sm-12 visible-xs'>
-                                    <table class='table table-responsive table-hover table-condensed table-clear small'>
+                                        <i>Level:</i> <?php echo $listchar['level'] ?><br/>
+                                        <i>Stamina:</i> <?php echo $listchar['stamina'] . "/" . $listchar['stamaxa'] ?>
+                                        <br/>
                                         <?php
-                                        for ($l = 1; $l <= 24; $l++) {
-                                            $location = mysqli_fetch_array(mysqli_query($db, "SELECT * FROM Locations WHERE id='$l'"));
-                                            $locji = $stats['loc_ji' . $l];
+                                        if ($listchar['newmsg']) {
                                             ?>
-                                            <tr>
-                                                <td align='right'><?php echo $location['name']; ?>:</td>
-                                                <td><?php echo $locji; ?></td>
-                                            </tr>
+                                            <span class="label label-info">New Message</span>
                                             <?php
+                                        }
+                                        if ($listchar['newlog']) {
+                                            ?>
+                                            <span class="label label-danger">New Battle</span>
+                                            <?php
+                                        }
+                                        if ($listchar['donor']) {
+                                            ?>
+                                            <span class="label label-success">Donor</span>
+                                            <?php
+                                        }
+                                        if ($listchar['lastonline'] >= time() - 900) {
+                                            echo "<br/><span class='label label-success'>Online</span>";
                                         }
                                         ?>
-                                    </table>
-                                </div>
-                                <div class='col-sm-12 visible-sm'>
-                                    <div class="col-sm-4">
-                                        <table class='table table-responsive table-hover table-condensed table-clear small'>
-                                            <?php
-                                            for ($l = 1; $l <= 8; $l++) {
-                                                $location = mysqli_fetch_array(mysqli_query($db, "SELECT * FROM Locations WHERE id='$l'"));
-                                                $locji = $stats['loc_ji' . $l];
-                                                ?>
-                                                <tr>
-                                                    <td align='right'><?php echo $location['name']; ?>:</td>
-                                                    <td><?php echo $locji; ?></td>
-                                                </tr>
-                                                <?php
-                                            }
-                                            ?>
-                                        </table>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <table class='table table-responsive table-hover table-condensed table-clear small'>
-                                            <?php
-                                            for ($l = 9; $l <= 16; $l++) {
-                                                $location = mysqli_fetch_array(mysqli_query($db, "SELECT * FROM Locations WHERE id='$l'"));
-                                                $locji = $stats['loc_ji' . $l];
-                                                ?>
-                                                <tr>
-                                                    <td align='right'><?php echo $location['name']; ?>:</td>
-                                                    <td><?php echo $locji; ?></td>
-                                                </tr>
-                                                <?php
-                                            }
-                                            ?>
-                                        </table>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <table class='table table-responsive table-hover table-condensed table-clear small'>
-                                            <?php
-                                            for ($l = 17; $l <= 24; $l++) {
-                                                $location = mysqli_fetch_array(mysqli_query($db, "SELECT * FROM Locations WHERE id='$l'"));
-                                                $locji = $stats['loc_ji' . $l];
-                                                ?>
-                                                <tr>
-                                                    <td align='right'><?php echo $location['name']; ?>:</td>
-                                                    <td><?php echo $locji; ?></td>
-                                                </tr>
-                                                <?php
-                                            }
-                                            ?>
-                                        </table>
                                     </div>
                                 </div>
-                                <div class='col-sm-12 visible-md visible-lg'>
-                                    <div class="col-sm-3">
-                                        <table class='table table-responsive table-hover table-condensed table-clear small'>
-                                            <?php
-                                            for ($l = 1; $l <= 6; $l++) {
-                                                $location = mysqli_fetch_array(mysqli_query($db, "SELECT * FROM Locations WHERE id='$l'"));
-                                                $locji = $stats['loc_ji' . $l];
-                                                ?>
-                                                <tr>
-                                                    <td align='right'><?php echo $location['name']; ?>:</td>
-                                                    <td><?php echo $locji; ?></td>
-                                                </tr>
-                                                <?php
-                                            }
-                                            ?>
-                                        </table>
+                                <?php
+                            }
+                        }
+                        if ($char['society'] != '') {
+                            ?>
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">Society Info</h3>
+                                </div>
+                                <div class="panel-body abox">
+                                    <i>Alignment:</i> <?php echo $society['align'] ?><br/>
+                                    <i>Size:</i> <?php echo $society['size'] ?><div class="progress">
+                                        <div class="progress-bar" role="progressbar"
+                                             aria-valuenow="<?php echo $society['size'] ?>"
+                                             aria-valuemin="0" aria-valuemax="100"
+                                             style="width: <?php echo $society['size'] ?>%">
+                                        </div>
                                     </div>
-                                    <div class="col-sm-3">
-                                        <table class='table table-responsive table-hover table-condensed table-clear small'>
-                                            <?php
-                                            for ($l = 7; $l <= 12; $l++) {
-                                                $location = mysqli_fetch_array(mysqli_query($db, "SELECT * FROM Locations WHERE id='$l'"));
-                                                $locji = $stats['loc_ji' . $l];
-                                                ?>
-                                                <tr>
-                                                    <td align='right'><?php echo $location['name']; ?>:</td>
-                                                    <td><?php echo $locji; ?></td>
-                                                </tr>
-                                                <?php
-                                            }
-                                            ?>
-                                        </table>
-                                    </div>
-                                    <div class="col-sm-3">
-                                        <table class='table table-responsive table-hover table-condensed table-clear small'>
-                                            <?php
-                                            for ($l = 13; $l <= 18; $l++) {
-                                                $location = mysqli_fetch_array(mysqli_query($db, "SELECT * FROM Locations WHERE id='$l'"));
-                                                $locji = $stats['loc_ji' . $l];
-                                                ?>
-                                                <tr>
-                                                    <td align='right'><?php echo $location['name']; ?>:</td>
-                                                    <td><?php echo $locji; ?></td>
-                                                </tr>
-                                                <?php
-                                            }
-                                            ?>
-                                        </table>
-                                    </div>
-                                    <div class="col-sm-3">
-                                        <table class='table table-responsive table-hover table-condensed table-clear small'>
-                                            <?php
-                                            for ($l = 19; $l <= 24; $l++) {
-                                                $location = mysqli_fetch_array(mysqli_query($db, "SELECT * FROM Locations WHERE id='$l'"));
-                                                $locji = $stats['loc_ji' . $l];
-                                                ?>
-                                                <tr>
-                                                    <td align='right'><?php echo $location['name']; ?>:</td>
-                                                    <td><?php echo $locji; ?></td>
-                                                </tr>
-                                                <?php
-                                            }
-                                            ?>
-                                        </table>
-                                    </div>
+                                    <i>Wars Won:</i> <?php echo $society['wars'] ?><br/>
+                                    <i>Wars Lost:</i> <?php echo $society['losses'] ?><br/>
+                                    <?php
+                                    if ($society['alignment']) {
+                                        if ($society['alignment'] == 1) {
+                                            echo "<i>Alignment:</i> Good<br/>";
+                                        } else {
+                                            echo "<i>Alignment:</i> Evil<br/>";
+                                        }
+                                    }
+                                    $members = unserialize($society['members']);
+                                    if (is_array($members)) {
+                                        $membercount = count($members);
+                                    } else {
+                                        $membercount = 0;
+                                    }
+                                    echo "<i>Members:</i> " . $membercount . "<br/>";
+                                    if ($leadersoc == "yes") {
+                                        ?>
+                                        <a href="clansettings.php" class="btn btn-primary btn-sm">Edit</a>
+                                        <?php
+                                    }
+                                    ?>
                                 </div>
                             </div>
-                        </div>
+                            <?php
+                        }
+                        if ($char['location'] == '22' && $char['society'] == '') {
+                            ?>
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">Create Society</h3>
+                                </div>
+                                <div class="panel-body abox">
+                                    You are in Tar Valon, why not start your own society?
+                                    <a href="makeclan.php">Click Here to start a Society</a>
+                                </div>
+                            </div>
+                            <?php
+                        }
+                        if ($char['donor']) {
+                            ?>
+                            <div class="panel panel-success">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">Donor Perks</h3>
+                                </div>
+                                <div class="panel-body abox">
+                                    <i>Battles per Day:</i> <?php echo $battlelimit ?><br/>
+                                    <i>Max Quests:</i> <?php echo $maxquests ?><br/>
+                                    <i>Max Alts:</i> <?php echo $maxalts ?><br/>
+                                </div>
+                            </div>
+                            <?php
+                        }
+                        if ($char['donor'] == 1) {
+                            ?>
+                            <div class="panel panel-success">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">Alt Status</h3>
+                                </div>
+                                <div class="panel-body abox">
+                                    <?php
+                                    $lists = 0;
+                                    if (is_array($friends)) {
+                                        foreach ($friends as $fid => $fval) {
+                                            $listchar = mysqli_fetch_array(mysqli_query($db, "SELECT * FROM Users WHERE id='$fid'"));
+                                            if ($fval['2'] == $lists && $listchar['id']) {
+                                                $btnstyle = "btn-default";
+                                                $lastBattle = mysqli_fetch_array(mysqli_query($db, "SELECT id, starts, ends, winner FROM Contests WHERE type='99' "));
+                                                if ($lastBattle != 0) {
+                                                    ?>
+                                                    <button class="btn btn-sm" disabled="disabled"><?php echo $listchar['name'] . " " . $listchar['lastname'] ?></button>
+                                                    <?php
+                                                } else {
+                                                    ?>
+                                                    <a href="duel.php?type=99&target=<?php echo $fid ?>"
+                                                       class="btn btn-sm btn-danger">Duel <?php echo $listchar['name'] . " " . $listchar['lastname'] ?></a>
+                                                    <?php
+                                                }
+                                            }
+                                        }
+                                    }
+                                    ?>
+                                </div>
+                            </div>
+                            <?php
+                        }
+                        if ($char['society'] != '') {
+                            ?>
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">Society Wars</h3>
+                                </div>
+                                <div class="panel-body abox">
+                                    <button class="btn btn-sm" disabled="disabled"><?php echo "Wars: " . $wars ?></button>
+                                </div>
+                            </div>
+                            <?php
+                        }
+                        $list_profs = unserialize($char['professions']);
+                        $lists = 1;
+                        if (is_array($friends)) {
+                            ?>
+                            <div class="panel panel-success">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">Watch List</h3>
+                                </div>
+                                <div class="panel-body abox">
+                                    <?php
+                                    $lists = 1;
+                                    if (is_array($friends)) {
+                                        foreach ($friends as $fid => $fval) {
+                                            // FIXED: SQL injection vulnerability - use prepared statement
+                                            $stmt = mysqli_prepare($db, "SELECT * FROM Users WHERE id=?");
+                                            mysqli_stmt_bind_param($stmt, "i", $fid);
+                                            mysqli_stmt_execute($stmt);
+                                            $result = mysqli_stmt_get_result($stmt);
+                                            $listchar = mysqli_fetch_array($result);
+                                            if ($fval['2'] == $lists && $listchar['id']) {
+                                                $btnstyle = "btn-default";
+                                                // FIXED: SQL injection vulnerability - use prepared statement
+                                                $stmt = mysqli_prepare($db, "SELECT id, starts, ends, winner FROM Contests WHERE type='99'");
+                                                mysqli_stmt_execute($stmt);
+                                                $result = mysqli_stmt_get_result($stmt);
+                                                $lastBattle = mysqli_fetch_array($result);
+                                                if ($lastBattle != 0) {
+                                                    ?>
+                                                    <button class="btn btn-sm btn-<?php echo $btnstyle ?>"
+                                                            disabled="disabled"><?php echo $listchar['name'] . " " . $listchar['lastname'] ?></button>
+                                                    <?php
+                                                } else {
+                                                    ?>
+                                                    <a href="duel.php?type=99&target=<?php echo $fid ?>"
+                                                       class="btn btn-sm btn-danger"><?php echo $listchar['name'] . " " . $listchar['lastname'] ?></a>
+                                                    <?php
+                                                }
+                                            }
+                                        }
+                                    }
+                                    ?>
+                                </div>
+                            </div>
+                            <?php
+                        }
+                        if ($char['society'] != '') {
+                            ?>
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">Society Members</h3>
+                                </div>
+                                <div class="panel-body abox">
+                                    <?php
+                                    $lists = 2;
+                                    if (is_array($friends)) {
+                                        foreach ($friends as $fid => $fval) {
+                                            $stmt = mysqli_prepare($db, "SELECT * FROM Users WHERE id=?");
+                                            mysqli_stmt_bind_param($stmt, "i", $fid);
+                                            mysqli_stmt_execute($stmt);
+                                            $result = mysqli_stmt_get_result($stmt);
+                                            $listchar = mysqli_fetch_array($result);
+                                            if ($fval['2'] == $lists && $listchar['id']) {
+                                                ?>
+                                                <a href="bio.php?name=<?php echo $listchar['name'] ?>&last=<?php echo $listchar['lastname'] ?>"
+                                                   class="btn btn-sm btn-default btn-block"><?php echo $listchar['name'] . " " . $listchar['lastname'] ?></a>
+                                                <?php
+                                            }
+                                        }
+                                    }
+                                    ?>
+                                </div>
+                            </div>
+                            <?php
+                        }
+                        if ($char['society'] != '') {
+                            ?>
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">Enemy List</h3>
+                                </div>
+                                <div class="panel-body abox">
+                                    <?php
+                                    $lists = 3;
+                                    if (is_array($friends)) {
+                                        foreach ($friends as $fid => $fval) {
+                                            $stmt = mysqli_prepare($db, "SELECT * FROM Users WHERE id=?");
+                                            mysqli_stmt_bind_param($stmt, "i", $fid);
+                                            mysqli_stmt_execute($stmt);
+                                            $result = mysqli_stmt_get_result($stmt);
+                                            $listchar = mysqli_fetch_array($result);
+                                            if ($fval['2'] == $lists && $listchar['id']) {
+                                                $lastBattle = mysqli_fetch_array(mysqli_query($db, "SELECT id, starts, ends, winner FROM Contests WHERE type='99' "));
+                                                if ($lastBattle != 0) {
+                                                    ?>
+                                                    <button class="btn btn-sm btn-default"
+                                                            disabled="disabled"><?php echo $listchar['name'] . " " . $listchar['lastname'] ?></button>
+                                                    <?php
+                                                } else {
+                                                    ?>
+                                                    <a href="duel.php?type=99&target=<?php echo $fid ?>"
+                                                       class="btn btn-sm btn-danger btn-block"><?php echo $listchar['name'] . " " . $listchar['lastname'] ?></a>
+                                                    <?php
+                                                }
+                                            }
+                                        }
+                                    }
+                                    ?>
+                                </div>
+                            </div>
+                            <?php
+                        }
+                        if ($char['society'] != '') {
+                            ?>
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">Society Bank</h3>
+                                </div>
+                                <div class="panel-body abox">
+                                    <i>Gold:</i> <?php echo $society['bank'] ?><br/>
+                                    <?php
+                                    if ($leadersoc == "yes") {
+                                        ?>
+                                        <a href="bank.php" class="btn btn-primary btn-sm">Deposit/Withdraw</a>
+                                        <?php
+                                    } else {
+                                        ?>
+                                        <a href="bank.php" class="btn btn-primary btn-sm">Deposit</a>
+                                        <?php
+                                    }
+                                    ?>
+                                </div>
+                            </div>
+                            <?php
+                        }
+                        if ($char['society'] != '') {
+                            ?>
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">Stats</h3>
+                                </div>
+                                <div class="panel-body abox">
+                                    <i>Gold:</i> <?php echo $gold ?><br/>
+                                    <i>Bank:</i> <?php echo displayGold($bgold) ?><br/>
+                                    <i>Net Worth:</i> <?php echo displayGold($stats['net_worth']) ?><br/>
+                                    <i>Ji:</i> <?php echo $stats['ji'] ?><br/>
+                                    <i>Exp:</i> <?php echo number_format($char['exp']) ?><br/>
+                                    <i>Exp to Level:</i> <?php echo number_format($char['exp_up'] - $char['exp']) ?>
+                                    <div class="progress">
+                                        <div class="progress-bar" role="progressbar"
+                                             aria-valuenow="<?php echo $percent_up ?>" aria-valuemin="0"
+                                             aria-valuemax="100" style="width: <?php echo $percent_up ?>%">
+                                        </div>
+                                    </div>
+                                    <i>Battles:</i> <?php echo number_format($stats['battles']) ?><br/>
+                                    <i>Wins:</i> <?php echo $wins . $win_per ?><br/>
+                                    <i>NPC Wins:</i> <?php echo $nwins . $nwin_per ?><br/>
+                                    <i>Win Chance:</i> <?php echo intval(100 * ($stats['wins'] + 0.0001) / ($stats['battles'] + 0.0001) + 0.5) ?>
+                                    %<br/>
+                                    <i>Offensive Wins:</i> <?php echo $owins . $owin_per ?><br/>
+                                    <i>Defensive Wins:</i> <?php echo $ewins . $ewin_per ?><br/>
+                                    <i>Duels:</i> <?php echo number_format($stats['tot_duels']) ?><br/>
+                                    <i>Duel Wins:</i> <?php echo $dwins . $dwin_per ?><br/>
+                                    <i>Current Win Streak:</i> <?php echo $stats['win_streak'] ?>
+                                    <br/>
+                                    <i>Max Win Streak:</i> <?php echo $stats['max_win_streak'] ?><br/>
+                                </div>
+                            </div>
+                            <?php
+                        }
+                        ?>
                     </div>
-                    <div class="col-sm-4 col-md-3">
-                        <div class="panel panel-info">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">General</h3>
-                            </div>
-                            <div class="panel-body abox">
-                                <table class='table table-responsive table-hover table-condensed table-clear small'>
-                                    <tr>
-                                        <td align='right'>Achievements:</td>
-                                        <td><?php echo $stats['achieved']; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <td align='right'>Experience:</td>
-                                        <td><?php echo $stats['xp']; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <td align='right'>Ji:</td>
-                                        <td><?php echo $stats['ji']; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <td align='right'>Total Wins:</td>
-                                        <td><?php echo $stats['wins'];
-                                            if ($stats['battles']) echo " (" . round($stats['wins'] * 100 / $stats['battles']) . "%)"; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <td align='right'>Duel Wins:</td>
-                                        <td><?php echo $stats['duel_wins'];
-                                            if ($stats['tot_duels']) echo " (" . round($stats['duel_wins'] * 100 / $stats['tot_duels']) . "%)"; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <td align='right'>Total NPC Wins:</td>
-                                        <td><?php echo $stats['npc_wins'];
-                                            if ($stats['tot_npcs']) echo " (" . round($stats['npc_wins'] * 100 / $stats['tot_npcs']) . "%)"; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <td align='right'>Purse:</td>
-                                        <td><?php echo displayGold($stats['coin']); ?></td>
-                                    </tr>
-                                    <tr>
-                                        <td align='right'>Bank:</td>
-                                        <td><?php echo displayGold($stats['bankcoin']); ?></td>
-                                    </tr>
-                                    <tr>
-                                        <td align='right'>Businesses:</td>
-                                        <td><?php echo $stats['num_biz'] . " (" . $stats['num_biz_types'] . " types)"; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <td align='right'>Estates:</td>
-                                        <td><?php echo $stats['num_estates']; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <td align='right'>Tournament Wins:</td>
-                                        <td><?php echo $stats['win_tourney']; ?></td>
-                                    </tr>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-4 col-md-3">
-                        <div class="panel panel-info">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">Battles</h3>
-                            </div>
-                            <div class="panel-body abox">
-                                <table class='table table-responsive table-hover table-condensed table-clear small'>
-                                    <tr>
-                                        <td align='right'>Enemy Wins:</td>
-                                        <td><?php echo $stats['enemy_wins'];
-                                            if ($stats['enemy_duels']) echo " (" . round($stats['enemy_wins'] * 100 / $stats['enemy_duels']) . "%)"; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <td align='right'>Offensive Duel Wins:</td>
-                                        <td><?php echo $stats['off_wins'];
-                                            if ($stats['off_bats']) echo " (" . round($stats['off_wins'] * 100 / $stats['off_bats']) . "%)"; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <td align='right'>Defensive Duel Wins:</td>
-                                        <td><?php echo $stats['def_wins'];
-                                            if ($stats['def_bats']) echo " (" . round($stats['def_wins'] * 100 / $stats['def_bats']) . "%)"; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <td align='right'>Shadow NPC Wins:</td>
-                                        <td><?php echo $stats['shadow_wins'];
-                                            if ($stats['shadow_npcs']) echo " (" . round($stats['shadow_wins'] * 100 / $stats['shadow_npcs']) . "%)"; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <td align='right'>Military NPC Wins:</td>
-                                        <td><?php echo $stats['military_wins'];
-                                            if ($stats['military_npcs']) echo " (" . round($stats['military_wins'] * 100 / $stats['military_npcs']) . "%)"; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <td align='right'>Ruffian NPC Wins:</td>
-                                        <td><?php echo $stats['ruffian_wins'];
-                                            if ($stats['ruffian_npcs']) echo " (" . round($stats['ruffian_wins'] * 100 / $stats['ruffian_npcs']) . "%)"; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <td align='right'>Channeler NPC Wins:</td>
-                                        <td><?php echo $stats['channeler_wins'];
-                                            if ($stats['channeler_npcs']) echo " (" . round($stats['channeler_wins'] * 100 / $stats['channeler_npcs']) . "%)"; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <td align='right'>Animal NPC Wins:</td>
-                                        <td><?php echo $stats['animal_wins'];
-                                            if ($stats['animal_npcs']) echo " (" . round($stats['animal_wins'] * 100 / $stats['animal_npcs']) . "%)"; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <td align='right'>Exotic NPC Wins:</td>
-                                        <td><?php echo $stats['exotic_wins'];
-                                            if ($stats['exotic_npcs']) echo " (" . round($stats['exotic_wins'] * 100 / $stats['exotic_npcs']) . "%)"; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <td align='right'>Horde Wins:</td>
-                                        <td><?php echo $stats['horde_wins']; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <td align='right'>Army Wins:</td>
-                                        <td><?php echo $stats['army_wins']; ?></td>
-                                    </tr>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-4 col-md-3">
-                        <div class="panel panel-info">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">Coin</h3>
-                            </div>
-                            <div class="panel-body abox">
-                                <table class='table table-responsive table-hover table-condensed table-clear small'>
-                                    <tr>
-                                        <td align='right'>Net Worth:</td>
-                                        <td><?php echo displayGold($stats['net_worth']); ?></td>
-                                    </tr>
-                                    <tr>
-                                        <td align='right'>Coin Donated:</td>
-                                        <td><?php echo displayGold($stats['coin_donated']); ?></td>
-                                    </tr>
-                                    <tr>
-                                        <td align='right'>Duel Earnings:</td>
-                                        <td><?php echo displayGold($stats['duel_earn']); ?></td>
-                                    </tr>
-                                    <tr>
-                                        <td align='right'>Merchant Earnings:</td>
-                                        <td><?php echo displayGold($stats['item_earn']); ?></td>
-                                    </tr>
-                                    <tr>
-                                        <td align='right'>Gambling Earnings:</td>
-                                        <td><?php echo displayGold($stats['dice_earn']); ?></td>
-                                    </tr>
-                                    <tr>
-                                        <td align='right'>Business Earnings:</td>
-                                        <td><?php echo displayGold($stats['prof_earn']); ?></td>
-                                    </tr>
-                                    <tr>
-                                        <td align='right'>Quest Earnings:</td>
-                                        <td><?php echo displayGold($stats['quest_earn']); ?></td>
-                                    </tr>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-4 col-md-3">
-                        <div class="panel panel-info">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">Quests</h3>
-                            </div>
-                            <div class="panel-body abox">
-                                <table class='table table-responsive table-hover table-condensed table-clear small'>
-                                    <tr>
-                                        <td align='right'>Total Quest Done:</td>
-                                        <td><?php echo $stats['quests_done']; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <td align='right'>Find Quest Done:</td>
-                                        <td><?php echo $stats['find_quests_done']; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <td align='right'>NPC Quest Done:</td>
-                                        <td><?php echo $stats['npc_quests_done']; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <td align='right'>Horde Quest Done:</td>
-                                        <td><?php echo $stats['horde_quests_done']; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <td align='right'>Escort Quest Done:</td>
-                                        <td><?php echo $stats['escort_quests_done']; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <td align='right'>Item Quest Done:</td>
-                                        <td><?php echo $stats['item_quests_done']; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <td align='right'>Support Quest Ji:</td>
-                                        <td><?php echo $stats['support_quest_ji']; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <td align='right'>Player Quest Done:</td>
-                                        <td><?php echo $stats['play_quests_done']; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <td align='right'>Quests Created:</td>
-                                        <td><?php echo $stats['quests_created']; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <td align='right'>Own Quest Completed:</td>
-                                        <td><?php echo $stats['my_quests_done']; ?></td>
-                                    </tr>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div> <!-- close achieve_tab content -->
-            </div> <!-- close tab content -->
-        </div> <!-- close tabbable -->
-    </div> <!-- close outer col -->
-    </div> <!-- close row -->
-    <script type="text/javascript">
-        function submitFormBio(ddd) {
-            document.duelform.ddd.value = ddd;
-            document.duelform.submit();
-        }
-    </script>
+                </div>
+            </div>
+        </div>
+    </div>
 <?php
 include('footer.htm');
 ?>
-

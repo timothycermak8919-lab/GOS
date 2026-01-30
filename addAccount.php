@@ -116,8 +116,14 @@ else
 	mysqli_stmt_execute($stmt);
 
 
-    setcookie("email", "$email", time()+99999999, "/");
-    setcookie("password", "$password", time()+99999999, "/");
+    setcookie("email", $email, time()+99999999, "/", "", false, true);
+    // Store a session token instead of password
+    $token = bin2hex(random_bytes(32));
+    // Store token in database for this account
+    $stmt = mysqli_prepare($db, "UPDATE Accounts SET session_token=? WHERE email=?");
+    mysqli_stmt_bind_param($stmt, "ss", $token, $email);
+    mysqli_stmt_execute($stmt);
+    setcookie("session_token", $token, time()+99999999, "/", "", false, true);
 
     header("Location: $server_name/create.php?time=$born");
     exit;

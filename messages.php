@@ -23,14 +23,22 @@ include_once("admin/userdata.php");
 include_once("admin/itemFuncs.php");
 include_once("admin/charFuncs.php");
 
-$iresult=mysqli_query($db,"SELECT * FROM Notes WHERE to_id='$id' AND del_to='0' AND type < 5 ORDER BY sent DESC LIMIT 0, 50");
+// FIXED: SQL injection vulnerability - use prepared statement
+$stmt = mysqli_prepare($db, "SELECT * FROM Notes WHERE to_id=? AND del_to='0' AND type < 5 ORDER BY sent DESC LIMIT 0, 50");
+mysqli_stmt_bind_param($stmt, "i", $id);
+mysqli_stmt_execute($stmt);
+$iresult = mysqli_stmt_get_result($stmt);
 $inbox = [];
 $in_num = 0;
 while ($inote = mysqli_fetch_array($iresult))
 {
   $inbox[$in_num++] = $inote;
 }
-$oresult=mysqli_query($db,"SELECT * FROM Notes WHERE from_id='$id' AND del_from='0' AND type < 4 ORDER BY sent DESC LIMIT 0, 50");
+// FIXED: SQL injection vulnerability - use prepared statement
+$stmt = mysqli_prepare($db, "SELECT * FROM Notes WHERE from_id=? AND del_from='0' AND type < 4 ORDER BY sent DESC LIMIT 0, 50");
+mysqli_stmt_bind_param($stmt, "i", $id);
+mysqli_stmt_execute($stmt);
+$oresult = mysqli_stmt_get_result($stmt);
 $outbox = [];
 $out_num = 0;
 while ($onote = mysqli_fetch_array($oresult))
@@ -172,7 +180,12 @@ if ($acceptTrade)
 else if ($csrf_valid && $note && time() - intval($char['lastpost']) > $wait_post && $char['id'])
 {
   $recipient = explode(" ", $noteto);
-  $target = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Users WHERE name = '$recipient[0]' AND lastname = '$recipient[1]'"));
+  // FIXED: SQL injection vulnerability - use prepared statement
+  $stmt = mysqli_prepare($db, "SELECT * FROM Users WHERE name = ? AND lastname = ?");
+  mysqli_stmt_bind_param($stmt, "ss", $recipient[0], $recipient[1]);
+  mysqli_stmt_execute($stmt);
+  $result = mysqli_stmt_get_result($stmt);
+  $target = mysqli_fetch_array($result);
   if ($target)
   {
     if (strlen($note) < 1000)

@@ -4,7 +4,11 @@ include_once("config.php");
 include_once('displayFuncs.php');
 include_once('busiFuncs.php');
 include_once('charFuncs.php');
-$char = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Users LEFT JOIN Users_data ON Users.id=Users_data.id WHERE Users.id='$id'"));
+$stmt = mysqli_prepare($db, "SELECT * FROM Users LEFT JOIN Users_data ON Users.id=Users_data.id WHERE Users.id=?");
+mysqli_stmt_bind_param($stmt, "i", $id);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+$char = mysqli_fetch_array($result);
 $curtime=time();
 $jobs_data = $char['jobs'] ?? null; // Use null coalescing operator to handle potential non-existence
 $jobs = $jobs_data ? unserialize($jobs_data) : []; // Unserialize only if not null/empty, otherwise default to empty array
@@ -16,7 +20,9 @@ $inv_max=$base_inv_max+5*$char['travelmode2']+$pro_stats['eS'];
 $pouch_max = 4+2*$char['pouch_type']+$pro_stats['cS'];
 
 $char['lastonline']= time();
-mysqli_query($db,"UPDATE Users SET lastonline='$char[lastonline]' WHERE id='$id'");
+$stmt = mysqli_prepare($db, "UPDATE Users SET lastonline=? WHERE id=?");
+mysqli_stmt_bind_param($stmt, "ii", $char['lastonline'], $id);
+mysqli_stmt_execute($stmt);
 
 // Darkfriends cannot have a positive alignment.
 $types_data = $char['type'] ?? null;
@@ -25,7 +31,9 @@ $types = $types_data ? unserialize($types_data) : [];
 if (!empty($types) && $types[0] == 5 && $char['align'] > 0) 
 {
   $char['align'] = 0;
-  mysqli_query($db,"UPDATE Users SET align='$char[align]' WHERE id='$id'");
+  $stmt = mysqli_prepare($db, "UPDATE Users SET align=? WHERE id=?");
+  mysqli_stmt_bind_param($stmt, "ii", $char['align'], $id);
+  mysqli_stmt_execute($stmt);
 }
 
 $lastBattleDone = mysqli_num_rows(mysqli_query($db,"SELECT id FROM Contests WHERE type='99' AND done='1'"));
@@ -48,15 +56,30 @@ if ($funtime == 2) // Ironman rules
 mysqli_query($db,"LOCK TABLES Users WRITE;");
 if ($char['gold'] < 0 || $char['gold'] > $max_gold) // KEEP GOLD BELOW MAX
 {
-  if ($char['gold'] < 0) mysqli_query($db,"UPDATE Users SET gold='0' WHERE id='$id'");
-  else  mysqli_query($db,"UPDATE Users SET gold='$max_gold' WHERE id=$id");
+  if ($char['gold'] < 0) {
+    $stmt = mysqli_prepare($db, "UPDATE Users SET gold='0' WHERE id=?");
+    mysqli_stmt_bind_param($stmt, "i", $id);
+    mysqli_stmt_execute($stmt);
+  }
+  else  {
+    $stmt = mysqli_prepare($db, "UPDATE Users SET gold=? WHERE id=?");
+    mysqli_stmt_bind_param($stmt, "ii", $max_gold, $id);
+    mysqli_stmt_execute($stmt);
+  }
 }
 
 if ($char['arrival']<=time() && $char['arrival']!=0) // ARRIVE AT TRAVEL TO PLACE
 {
-  include($_SERVER['DOCUMENT_ROOT']."/".$subfile."/map/mapdata/coordinates.inc");
+  // FIX: Path traversal prevention - whitelist allowed files
+  $allowed_files = ['coordinates.inc'];
+  $safe_subfile = basename($subfile);
+  if (in_array($safe_subfile, $allowed_files)) {
+    include($_SERVER['DOCUMENT_ROOT']."/".$safe_subfile."/map/mapdata/coordinates.inc");
+  }
   $char['location']=$char['travelto'];
-  mysqli_query($db,"UPDATE Users SET location='".$char['travelto']."', arrival='0' WHERE id='$id'");
+  $stmt = mysqli_prepare($db, "UPDATE Users SET location=?, arrival='0' WHERE id=?");
+  mysqli_stmt_bind_param($stmt, "si", $char['travelto'], $id);
+  mysqli_stmt_execute($stmt);
 }
 mysqli_query($db,"UNLOCK TABLES;");
 
@@ -64,14 +87,23 @@ mysqli_query($db,"UNLOCK TABLES;");
 mysqli_query($db,"LOCK TABLES Users WRITE, Users_data WRITE, Users_stats WRITE, Notes WRITE;");
 $myAchieve_data = $char['achieve'] ?? null;
 $myAchieve = $myAchieve_data ? unserialize($myAchieve_data) : [];
-$stats = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Users_stats WHERE id='$char[id]'"));
+$stmt = mysqli_prepare($db, "SELECT * FROM Users_stats WHERE id=?");
+mysqli_stmt_bind_param($stmt, "i", $char['id']);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+$stats = mysqli_fetch_array($result);
 if ($char['align'] > $stats['align_high']) 
 {
-  mysqli_query($db,"UPDATE Users_stats SET align_high='".$char['align']."' WHERE id='$id'");
+  $stmt = mysqli_prepare($db, "UPDATE Users_stats SET align_high=? WHERE id=?");
+  mysqli_stmt_bind_param($stmt, "ii", $char['align'], $id);
+  mysqli_stmt_execute($stmt);
 }
 if ((0-$char['align']) > $stats['align_low']) 
 {
-  mysqli_query($db,"UPDATE Users_stats SET align_low='".(0-$char['align'])."' WHERE id='$id'");
+  $align_low = 0 - $char['align'];
+  $stmt = mysqli_prepare($db, "UPDATE Users_stats SET align_low=? WHERE id=?");
+  mysqli_stmt_bind_param($stmt, "ii", $align_low, $id);
+  mysqli_stmt_execute($stmt);
 }
 $achieved=0;
 $maGold=0;
@@ -80,7 +112,10 @@ $maSp=0;
 $maPp=0;
 $maAchieved=0;
 $amsg = "You have completed an Achievement!<br/>";
-$creator = mysqli_fetch_array(mysqli_query($db,"SELECT id, name, lastname FROM Users WHERE name = 'The' AND lastname = 'Creator' "));
+$stmt = mysqli_prepare($db, "SELECT id, name, lastname FROM Users WHERE name = 'The' AND lastname = 'Creator'");
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($result);
+$creator = mysqli_fetch_array($result);
 $cid = $creator['id'];
 foreach ($achievements as $branch => $ainfo)
 {
@@ -138,7 +173,9 @@ foreach ($achievements as $branch => $ainfo)
 if ($maAchieved != $stats['achieved'])
 {
   $stats['achieved'] = $maAchieved;
-  mysqli_query($db,"UPDATE Users_stats SET achieved='".$stats['achieved']."' WHERE id='$id'");
+  $stmt = mysqli_prepare($db, "UPDATE Users_stats SET achieved=? WHERE id=?");
+  mysqli_stmt_bind_param($stmt, "ii", $stats['achieved'], $id);
+  mysqli_stmt_execute($stmt);
 }
 if ($achieved)
 { 
@@ -148,9 +185,17 @@ if ($achieved)
   $char['propoints'] += $maPp;
   $sma=serialize($myAchieve);
 
-  mysqli_query($db,"UPDATE Users SET newachieve=newachieve+1, gold='".$char['gold']."', points='".$char['points']."', propoints='".$char['propoints']."' WHERE id='$id'");
-  mysqli_query($db,"UPDATE Users_data SET achieve='".$sma."' WHERE id='$id'");
-  mysqli_query($db,"UPDATE Users_stats SET ji='".$stats['ji']."' WHERE id='$id'");
+  $stmt = mysqli_prepare($db, "UPDATE Users SET newachieve=newachieve+1, gold=?, points=?, propoints=? WHERE id=?");
+  mysqli_stmt_bind_param($stmt, "iddi", $char['gold'], $char['points'], $char['propoints'], $id);
+  mysqli_stmt_execute($stmt);
+
+  $stmt = mysqli_prepare($db, "UPDATE Users_data SET achieve=? WHERE id=?");
+  mysqli_stmt_bind_param($stmt, "si", $sma, $id);
+  mysqli_stmt_execute($stmt);
+
+  $stmt = mysqli_prepare($db, "UPDATE Users_stats SET ji=? WHERE id=?");
+  mysqli_stmt_bind_param($stmt, "ii", $stats['ji'], $id);
+  mysqli_stmt_execute($stmt);
 }
 mysqli_query($db,"UNLOCK TABLES;");
 
