@@ -11,7 +11,7 @@ $result = mysqli_stmt_get_result($stmt);
 $char = mysqli_fetch_array($result);
 $curtime=time();
 $jobs_data = $char['jobs'] ?? null; // Use null coalescing operator to handle potential non-existence
-$jobs = $jobs_data ? unserialize($jobs_data) : []; // Unserialize only if not null/empty, otherwise default to empty array
+$jobs = $jobs_data ? json_decode($jobs_data, true) : []; // json_decode instead of unserialize
 $pro_stats=cparse(getAllJobBonuses($jobs));
 $check=intval(time()/3600);
 
@@ -26,7 +26,7 @@ mysqli_stmt_execute($stmt);
 
 // Darkfriends cannot have a positive alignment.
 $types_data = $char['type'] ?? null;
-$types = $types_data ? unserialize($types_data) : [];
+$types = $types_data ? json_decode($types_data, true) : [];
 
 if (!empty($types) && $types[0] == 5 && $char['align'] > 0) 
 {
@@ -71,9 +71,9 @@ if ($char['gold'] < 0 || $char['gold'] > $max_gold) // KEEP GOLD BELOW MAX
 if ($char['arrival']<=time() && $char['arrival']!=0) // ARRIVE AT TRAVEL TO PLACE
 {
   // FIX: Path traversal prevention - whitelist allowed files
-  $allowed_files = ['coordinates.inc'];
-  $safe_subfile = basename($subfile);
-  if (in_array($safe_subfile, $allowed_files)) {
+  $allowed_subdirs = ['admin', 'map'];
+  $safe_subfile = preg_replace('/[^a-zA-Z0-9_-]/', '', $subfile);
+  if (in_array($safe_subfile, $allowed_subdirs)) {
     include($_SERVER['DOCUMENT_ROOT']."/".$safe_subfile."/map/mapdata/coordinates.inc");
   }
   $char['location']=$char['travelto'];
@@ -86,7 +86,7 @@ mysqli_query($db,"UNLOCK TABLES;");
 // UPDATE USER ACHIEVEMENTS
 mysqli_query($db,"LOCK TABLES Users WRITE, Users_data WRITE, Users_stats WRITE, Notes WRITE;");
 $myAchieve_data = $char['achieve'] ?? null;
-$myAchieve = $myAchieve_data ? unserialize($myAchieve_data) : [];
+$myAchieve = $myAchieve_data ? json_decode($myAchieve_data, true) : [];
 $stmt = mysqli_prepare($db, "SELECT * FROM Users_stats WHERE id=?");
 mysqli_stmt_bind_param($stmt, "i", $char['id']);
 mysqli_stmt_execute($stmt);
@@ -183,7 +183,7 @@ if ($achieved)
   $stats['ji']+=$maJi;
   $char['points'] += $maSp;
   $char['propoints'] += $maPp;
-  $sma=serialize($myAchieve);
+  $sma=json_encode($myAchieve);
 
   $stmt = mysqli_prepare($db, "UPDATE Users SET newachieve=newachieve+1, gold=?, points=?, propoints=? WHERE id=?");
   mysqli_stmt_bind_param($stmt, "iddi", $char['gold'], $char['points'], $char['propoints'], $id);

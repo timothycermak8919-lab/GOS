@@ -67,7 +67,7 @@ mysqli_stmt_bind_param($stmt, "s", $socname);
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 $society = mysqli_fetch_array($result);
-$classes = unserialize($char['type']);
+$classes = json_decode($char['type'], true);
 
 // FIXED: SQL injection vulnerability - use prepared statement
 $charId = $char['id'];
@@ -111,10 +111,10 @@ mysqli_stmt_execute($resultb);
 $resultb = mysqli_stmt_get_result($resultb);
 $fullname = $charother['name'] . "_" . $charother['lastname'];
 
-$charip = unserialize($charother['ip']);
+$charip = json_decode($charother['ip'], true);
 $alts = getAlts($charip);
 
-$user_ips = unserialize($charother['ip']);
+$user_ips = json_decode($charother['ip'], true);
 
 $uips_count=0;
 if(is_array($user_ips)){
@@ -126,7 +126,7 @@ for ($i = 0; $i < $uips_count; $i++) {
 }
 if (!$found) {
     $user_ips[$uips_count] = $ipaddy;
-    $user_ips2 = serialize($user_ips);
+    $user_ips2 = json_encode($user_ips);
     if ($charother['id']!=""){
         // FIXED: SQL injection vulnerability - use prepared statement
         $stmt = mysqli_prepare($db, "UPDATE Users SET ip=? WHERE id=?");
@@ -144,7 +144,7 @@ if ($char['id'] == $charother['id']) // only update IPs on your own profile
         mysqli_stmt_execute($result);
         $result = mysqli_stmt_get_result($result);
         $ip_log = mysqli_fetch_array($result);
-        $ip_users = unserialize($ip_log['users']);
+        $ip_users = json_decode($ip_log['users'], true);
         $found = 0;
         $ip_count = count($ip_users);
         for ($i = 0; $i < $ip_count; $i++) {
@@ -154,7 +154,7 @@ if ($char['id'] == $charother['id']) // only update IPs on your own profile
         }
         if (!$found) {
             $ip_users[$ip_count] = $fullname;
-            $ip_users2 = serialize($ip_users);
+            $ip_users2 = json_encode($ip_users);
             $ip_count++;
             // FIXED: SQL injection vulnerability - use prepared statement
             $ip_test = $ip_users['test']++;
@@ -168,7 +168,7 @@ if ($char['id'] == $charother['id']) // only update IPs on your own profile
             mysqli_stmt_execute($stmt);
     } else {
         $ip_users['0'] = $fullname;
-        $ip_users2 = serialize($ip_users);
+        $ip_users2 = json_encode($ip_users);
         // FIXED: SQL injection vulnerability - use prepared statement
         $stmt = mysqli_prepare($db, "INSERT INTO IP_logs (addy, users, num, maxnum, test) VALUES(?, ?, '1', ?, '1')");
         mysqli_stmt_bind_param($stmt, "ssi", $ipaddy, $ip_users2, $maxalts);
@@ -200,7 +200,7 @@ if ($_GET['set_s'] && $is_same) {
     } else $message = "You have too many friends/enemies";
 
     // FIXED: SQL injection vulnerability - use prepared statement
-    $sfriends = serialize($friends);
+    $sfriends = json_encode($friends);
     $stmt = mysqli_prepare($db, "UPDATE Users_data SET friends=? WHERE id=?");
     mysqli_stmt_bind_param($stmt, "si", $sfriends, $charother['id']);
     mysqli_stmt_execute($stmt);
@@ -217,7 +217,7 @@ if ($_GET['transfer'] && $is_same && $char['society'] == $charother['society'] &
 
 if (!$message && $is_same) $message = "Today's date is " . wotDate();
 elseif (!$message && $char['born']) {
-    $message = "Residing in " . str_replace('-ap-', ''', $char['location']);
+    $message = "Residing in " . str_replace('-ap-', "'", $char['location']);
 }
 
 $charb = $char;
@@ -309,7 +309,7 @@ if (!$char['born']) {
                             $npc6_wins = number_format($stats['exotic_wins']);
                             $npc6_per = "(" . intval(100 * $stats['exotic_wins'] / ($stats['exotic_npcs'] + 0.0001) + 0.5) . "%) ";
 
-                            $stance = unserialize($societyo['stance']);
+                            $stance = json_decode($societyo['stance'], true);
                             $associated = "";
                             if ($stance[str_replace(" ", "_", $char['society'])] == 1 && $char['society'] != $charother['society'] && $char['society']) $associated = "ally ";
                             if ($stance[str_replace(" ", "_", $char['society'])] == 2 && !$is_same) $associated = "enemy ";
@@ -324,7 +324,7 @@ if (!$char['born']) {
                                     if ($society['subtitle'] != "") $soctit = $society['subtitle'];
                                     $societyn = "<img src='images/SocSub.gif' height=20 width=28> " . $soctit . " of ";
                                 } elseif ($char['soc_rank'] > 0) {
-                                    $cranks = unserialize($society['ranks']);
+                                    $cranks = json_decode($society['ranks'], true);
                                     $societyn = $cranks[7 - $char['soc_rank']]['0'] . " of ";
                                 } else {
                                     $societyn = "Member of ";
@@ -420,7 +420,7 @@ if (!$char['born']) {
                                         if (!$is_same)
                                         {
                                         // BATTLE
-                                        $find_battle = unserialize($charother['find_battle']);
+                                        $find_battle = json_decode($charother['find_battle'], true);
                                         $numbahs = array("Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Ten");
 
                                         if ($char['location'] == $charother['location']) {
@@ -581,7 +581,7 @@ if (!$char['born']) {
                                     } else {
                                         $leadersoc = "no";
                                     }
-                                    $charwars = unserialize($char['wars']);
+                                    $charwars = json_decode($char['wars'], true);
                                     if (is_array($charwars)) {
                                         $wararray = $charwars;
                                         $nowars = 0;
@@ -631,7 +631,7 @@ if (!$char['born']) {
 
                         $onlineList = "";
                         $pmonth = 0;
-                        $charip = unserialize($charother['ip']);
+                        $charip = json_decode($charother['ip'], true);
                         $alts = getAlts($charip);
                         foreach ($alts as $username => $alt) {
                             $stmt = mysqli_prepare($db, "SELECT id, name, lastname, level, exp, gold, location, stamina, stamaxa, battlestoday, newmsg, newlog, donor FROM Users WHERE name = ?");
@@ -704,7 +704,7 @@ if (!$char['born']) {
                                             echo "<i>Alignment:</i> Evil<br/>";
                                         }
                                     }
-                                    $members = unserialize($society['members']);
+                                    $members = json_decode($society['members'], true);
                                     if (is_array($members)) {
                                         $membercount = count($members);
                                     } else {
@@ -793,7 +793,7 @@ if (!$char['born']) {
                             </div>
                             <?php
                         }
-                        $list_profs = unserialize($char['professions']);
+                        $list_profs = json_decode($char['professions'], true);
                         $lists = 1;
                         if (is_array($friends)) {
                             ?>

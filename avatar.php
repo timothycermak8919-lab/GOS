@@ -299,7 +299,7 @@ function deleteCharacter(string $confirmEmail, string $confirmPass): void
                 
                 // Try to transfer leadership to subleader
                 if ($society['subs'] > 0) {
-                    $subleaders = unserialize($society['subleaders']);
+                    $subleaders = json_decode($society['subleaders'], true);
                     if (is_array($subleaders) && !empty($subleaders)) {
                         reset($subleaders);
                         $newLeaderId = key($subleaders);
@@ -315,7 +315,7 @@ function deleteCharacter(string $confirmEmail, string $confirmPass): void
                         unset($subleaders[$newLeaderId]);
                         $subleaders = delete_blank($subleaders);
                         $subs = count($subleaders);
-                        $subleadersSerialized = serialize($subleaders);
+                        $subleadersSerialized = json_encode($subleaders);
                         
                         $subQuery = $subs > 0 ? 
                             "UPDATE Soc SET subleaders = ?, subs = ? WHERE name = ?" :
@@ -371,7 +371,7 @@ function deleteCharacter(string $confirmEmail, string $confirmPass): void
             
             // Delete society if no members left
             if ($memberCount <= 0) {
-                $stance = unserialize($society['stance']);
+                $stance = json_decode($society['stance'], true);
                 if (is_array($stance)) {
                     foreach ($stance as $otherSocName => $stanceValue) {
                         if ($stanceValue != 0) {
@@ -382,9 +382,9 @@ function deleteCharacter(string $confirmEmail, string $confirmPass): void
                             $result = mysqli_stmt_get_result($stmt);
                             
                             if ($otherSoc = mysqli_fetch_array($result)) {
-                                $otherStance = unserialize($otherSoc['stance']);
+                                $otherStance = json_decode($otherSoc['stance'], true);
                                 $otherStance[str_replace(' ', '_', $societyName)] = 0;
-                                $otherStanceSerialized = serialize($otherStance);
+                                $otherStanceSerialized = json_encode($otherStance);
                                 
                                 $stmt2 = mysqli_prepare($db, "UPDATE Soc SET stance = ? WHERE name = ?");
                                 mysqli_stmt_bind_param($stmt2, 'ss', $otherStanceSerialized, $otherSocNameSpaced);
@@ -427,7 +427,7 @@ function deleteCharacter(string $confirmEmail, string $confirmPass): void
         $noteBody .= 'Clan: ' . $societyName . '<br/>';
         $noteBody .= 'IPs:<br/>';
         
-        $charIps = unserialize($char['ip']);
+        $charIps = json_decode($char['ip'], true);
         if (is_array($charIps)) {
             foreach ($charIps as $ip) {
                 $noteBody .= htmlspecialchars($ip) . '<br/>';
@@ -456,7 +456,7 @@ function deleteCharacter(string $confirmEmail, string $confirmPass): void
     mysqli_stmt_close($stmt);
     
     // Clean up IP logs
-    $ips = unserialize($char['ip']);
+    $ips = json_decode($char['ip'], true);
     if (is_array($ips)) {
         $fullname = $charName . '_' . $charLastname;
         
@@ -467,11 +467,11 @@ function deleteCharacter(string $confirmEmail, string $confirmPass): void
             $result = mysqli_stmt_get_result($stmt);
             
             if ($ipLog = mysqli_fetch_array($result)) {
-                $users = unserialize($ipLog['users']);
+                $users = json_decode($ipLog['users'], true);
                 if (is_array($users)) {
                     $users = array_filter($users, fn($user) => $user !== $fullname);
                     $users = array_values($users);
-                    $usersSerialized = serialize($users);
+                    $usersSerialized = json_encode($users);
                     $userCount = count($users);
                     
                     $stmt2 = mysqli_prepare($db, "UPDATE IP_logs SET users = ?, num = ? WHERE addy = ?");
