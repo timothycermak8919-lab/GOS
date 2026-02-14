@@ -3,6 +3,12 @@ $skipVerify = 1;
 require_once("ayah.php");
 $integration = new AYAH();
 
+// Debug: Check session status
+if (session_status() === PHP_SESSION_NONE) {
+    error_log("[DEBUG] Session not started in addAccount.php - attempting to start");
+    session_start();
+}
+error_log("[DEBUG] addAccount.php - Session status: " . session_status() . ", CSRF token present: " . (isset($_SESSION['csrf_token']) ? 'yes' : 'no'));
 
 include_once("admin/connect.php");
 include_once("admin/skills.php");

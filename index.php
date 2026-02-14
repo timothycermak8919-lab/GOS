@@ -1,5 +1,24 @@
 <?php
-include('char/logo.png');
+// TEMPORARY DEBUG - Remove after debugging
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+// Log debug info
+error_log('[DEBUG] index.php starting');
+
+// Check if char directory exists
+$charDir = __DIR__ . '/char';
+if (!is_dir($charDir)) {
+    error_log('[DEBUG] char directory does not exist: ' . $charDir);
+}
+
+// Try to include - but don't fail hard if missing
+if (file_exists('char/logo.png')) {
+    include('char/logo.png');
+} else {
+    error_log('[DEBUG] char/logo.png does not exist');
+}
+
 include("admin/connect.php");
 $id = $_COOKIE['id'] ?? null;
 $session = $_COOKIE['session'] ?? null;

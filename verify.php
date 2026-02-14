@@ -9,10 +9,17 @@ if ($user === null || empty($user)) {
     exit; // Ensure that no further code is executed after the redirect
 }
 
+// Debug: Check session status
+if (session_status() === PHP_SESSION_NONE) {
+    error_log("[DEBUG] Session not started in verify.php - attempting to start");
+    session_start();
+}
+error_log("[DEBUG] verify.php - Session status: " . session_status() . ", CSRF token present: " . (isset($_SESSION['csrf_token']) ? 'yes' : 'no'));
+
 // Validate CSRF token
 if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
     // Invalid CSRF token - log this attempt and redirect
-    error_log("CSRF validation failed on login attempt from IP: " . $_SERVER['REMOTE_ADDR']);
+    error_log("CSRF validation failed on login attempt from IP: " . $_SERVER['REMOTE_ADDR'] . " - Session token: " . ($_SESSION['csrf_token'] ?? 'none') . " POST token: " . ($_POST['csrf_token'] ?? 'none'));
     header("Location: $server_name/login.php?error=csrf");
     exit;
 }
@@ -41,17 +48,31 @@ if (!is_null($result) && $account = mysqli_fetch_assoc($result))
     $storedPassword = $account['password'];
     $validPassword = false;
     
+    // Debug: Log password hash format for analysis
+    $hashPrefix = substr($storedPassword, 0, 4);
+    if ($hashPrefix === '$2y$' || $hashPrefix === '$2a$') {
+        error_log("[DEBUG] Password for " . $email . " uses modern password_hash (prefix: $hashPrefix)");
+    } elseif (substr($storedPassword, 0, 5) === 'sha1(') {
+        error_log("[DEBUG] Password for " . $email . " uses legacy SHA1 wrapper format");
+    } elseif (strlen($storedPassword) === 40 && ctype_xdigit($storedPassword)) {
+        error_log("[DEBUG] Password for " . $email . " uses raw SHA1 hex (40 chars) - LEGACY - VULNERABLE");
+    } else {
+        error_log("[DEBUG] Password for " . $email . " has unknown format: " . substr($storedPassword, 0, 10) . "...");
+    }
+    
     // Check if it's a modern password_hash (starts with $2y$ or $2a$)
-    if (strpos($storedPassword, '$2y$') === 0 || strpos($storedPassword, '$2a$') === 0) {
+    if ($hashPrefix === '$2y$' || $hashPrefix === '$2a$') {
         $validPassword = password_verify($password, $storedPassword);
     } else {
         // Legacy support for SHA1 hashed passwords
+        error_log("[DEBUG] Falling back to legacy SHA1 verification for " . $email . " - SECURITY WARNING");
         $validPassword = (sha1($password) === $storedPassword);
     }
     
     if ($validPassword) {
         // Upgrade legacy SHA1 password to password_hash on successful login
-        if (strpos($storedPassword, '$2y$') !== 0 && strpos($storedPassword, '$2a$') !== 0) {
+        if ($hashPrefix !== '$2y$' && $hashPrefix !== '$2a$') {
+            error_log("[DEBUG] Upgrading legacy password to password_hash for " . $email);
             $newHash = password_hash($password, PASSWORD_DEFAULT);
             $updateQuery = "UPDATE Accounts SET password = ? WHERE email = ?";
             $updateStmt = mysqli_prepare($db, $updateQuery);
@@ -135,11 +156,14 @@ if (!is_null($result) && $account = mysqli_fetch_assoc($result))
         }
     } else {
         // Invalid password - redirect to login with error
+        error_log("[DEBUG] Invalid password attempt for " . $email . " from IP: " . $_SERVER['REMOTE_ADDR']);
         header("Location: $server_name/login.php?error=1");
         exit;
     }
 } else {
     // No account found
+    error_log("[DEBUG] No account found for email: " . $email . " from IP: " . $_SERVER['REMOTE_ADDR']);
     header("Location: $server_name/login.php?error=1");
     exit;
 }
+?>

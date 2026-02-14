@@ -8,11 +8,21 @@ if (!function_exists('safe_count')) {
 
 include_once('config.php');
 global $db;
+
+// Debug logging
+error_log('[DEBUG] admin/connect.php - Attempting database connection');
+error_log('[DEBUG] Server: ' . ($database_server ?? 'UNSET'));
+error_log('[DEBUG] Database: ' . ($database_name ?? 'UNSET'));
+error_log('[DEBUG] Username: ' . ($database_username ?? 'UNSET'));
+
 $db = @mysqli_connect($database_server, $database_username, $database_password, $database_name);
 if (!$db) {
+    $error = mysqli_connect_error();
+    error_log('[DEBUG] Database connection FAILED: ' . $error);
     echo "<br><b>Could not connect to the MySQL database. Please try again in a few minutes.</b>";
     exit;
 }
+error_log('[DEBUG] Database connection SUCCESS');
 $time = time();
 $div_img = "<table border='0' cellpadding='0' cellspacing='0' width='550' height='1' background=\"images/divider.gif\"><tr><td></td></tr></table>";
 

@@ -4,10 +4,22 @@
   include_once("admin/displayFuncs.php");
   include_once("admin/userdata.php");
 
+  // Debug: Check session status
+  if (session_status() === PHP_SESSION_NONE) {
+      error_log("[DEBUG] Session not started in header.php - attempting to start");
+      session_start();
+  }
+
   if (!$skipVerify) {
+
+    //Debug: Log the authentication query with raw variables
+    $debugEmail = isset($email) ? $email : 'UNSET';
+    $debugPassword = isset($password) ? (strlen($password) > 0 ? 'SET(' . strlen($password) . ' chars)' : 'EMPTY') : 'UNSET';
+    error_log("[DEBUG] header.php auth check - email: $debugEmail, password: $debugPassword");
 
     //Verify we have a correct email/pass combo 
     $headerQuery = "SELECT * FROM Accounts WHERE email = '$email' AND password = '$password'";
+    error_log("[DEBUG] header.php SQL (VULNERABLE): $headerQuery");
     $headerResult = mysqli_query($db,$headerQuery);
     if (mysqli_num_rows($headerResult) <= 0) {
       if (!headers_sent()) {
@@ -18,6 +30,7 @@
 
     //Verify we have some sort of name, lastname
     // TODO: check if this is valid for our email?
+    error_log("[DEBUG] header.php name check - name: " . ($name ?? 'UNSET') . ", lastname: " . ($lastname ?? 'UNSET'));
     if((!($name && $lastname))){
       if (!headers_sent()) {
       header("Location: $server_name/verify.php?enabled=1",false); exit;
