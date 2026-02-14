@@ -80,7 +80,7 @@ else
     mysqli_stmt_bind_param($stmt, "s", $ips[$i]);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
-    $ip_log = mysqli_fetch_array($result); 
+    $ip_log = mysqli_fetch_assoc($result); 
     $users= json_decode($ip_log['users'], true);
 	if(!empty($users)){
 		for ($j=0; $j < count($users); $j++)  

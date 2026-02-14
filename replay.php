@@ -13,7 +13,7 @@ $rmsg='';
 $battle_view = 1000;
 
 $log_id = intval($_REQUEST['log']);
-$dlog = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Notes WHERE id='$log_id'"));
+$dlog = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Notes WHERE id='$log_id'"));
 
 if (!$dlog['id'] || $dlog['type'] != 9)  
 {
@@ -31,8 +31,8 @@ else if ($dlog['to_id'] != $char['id'] && $dlog['from_id'] != $char['id'])
 if (!$redirect)
 {
   $bresult = unserialize($dlog['special']);
-  $defend = mysqli_fetch_array(mysqli_query($db,"SELECT id, name, lastname FROM Users WHERE id='".$dlog['to_id']."'"));
-  $offend = mysqli_fetch_array(mysqli_query($db,"SELECT id, name, lastname FROM Users WHERE id='".$dlog['from_id']."'"));
+  $defend = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, name, lastname FROM Users WHERE id='".$dlog['to_id']."'"));
+  $offend = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, name, lastname FROM Users WHERE id='".$dlog['from_id']."'"));
   // THE ACTUAL PAGE DRAWING
   $message = "<b>".$offend['name']." ".$offend['lastname']."</b> vs <b>".$defend['name']." ".$defend['lastname']."</b> - Replay";
   $array_gen = generate_duel_text($bresult);

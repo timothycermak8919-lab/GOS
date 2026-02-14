@@ -65,12 +65,12 @@ $supporting=array();
 
 updateSocScores();
 
-$loc_query = mysqli_fetch_array(mysqli_query($db,"SELECT id,clan_scores, clan_support FROM `Locations` WHERE name = '$loc'"));
+$loc_query = mysqli_fetch_assoc(mysqli_query($db,"SELECT id,clan_scores, clan_support FROM `Locations` WHERE name = '$loc'"));
 $loco = $loc_query['id'];
 
 if($socAmount > 0) {
 
-  while ($soc = mysqli_fetch_array( $result ) )
+  while ($soc = mysqli_fetch_assoc( $result ) )
   {
     if ($location_array[$loc]['2'])
     {
@@ -93,7 +93,7 @@ if($socAmount > 0) {
 $x=0;
 foreach ($clans as $key => $value)
 {
-  $soc = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM `Soc` WHERE id = '$key'"));
+  $soc = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM `Soc` WHERE id = '$key'"));
   $soc_offices = unserialize($soc['offices']);
   $area_score = unserialize($soc['area_score']);
 ?>

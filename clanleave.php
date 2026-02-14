@@ -29,7 +29,7 @@ $id=$char['id'];
 
 
 $soc_name = $char['society'];
-$society = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Soc WHERE name='$soc_name' "));
+$society = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Soc WHERE name='$soc_name' "));
 
 $inCB = inClanBattle($society['id']);
 // LEAVE CLAN

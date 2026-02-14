@@ -13,7 +13,7 @@ if ($session) {
     mysqli_stmt_bind_param($stmt, "si", $session, $currentTime);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
-    $account = mysqli_fetch_array($result);
+    $account = mysqli_fetch_assoc($result);
     
     // If we are logged into an account
     if ($account) {
@@ -38,7 +38,7 @@ if ($session) {
                 header("Location: $server_name/create.php");
             // If we have some character we just aren't selected select it and go to bio
             } else {
-                $user = mysqli_fetch_array($result);
+                $user = mysqli_fetch_assoc($result);
                 $id = $user['id'];
                 $username = $user['name'];
                 $name = $user['name'];

@@ -4,7 +4,7 @@ mysqli_query($db,"LOCK TABLES Users WRITE, Locations WRITE, Estates WRITE, Users
 $result = mysqli_query($db,"SELECT * FROM Locations WHERE 1");
 
 
-while ( $listloc = mysqli_fetch_array( $result ) )
+while ( $listloc = mysqli_fetch_assoc( $result ) )
 {
   if (!$listloc['isDestroyed'])
   {

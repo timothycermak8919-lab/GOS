@@ -289,10 +289,10 @@ function updateDice(array $curr_dice, int $wager, int $gtype): void
     if (intval($p_info[$p]) == intval($winning_score) && $username[0] != "NPC")
     {
       $tresult = mysqli_query($db,"SELECT id, gold FROM Users WHERE name='".$username[0]."' AND lastname='".$username[1]."'");
-      $user = mysqli_fetch_array($tresult);
+      $user = mysqli_fetch_assoc($tresult);
       $user['gold'] = $user['gold'] + $winnings;
       mysqli_query($db,"UPDATE Users SET gold='$user[gold]' WHERE id='$user[id]'");
-      $ustats = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Users_stats WHERE id='".$user['id']."'"));
+      $ustats = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Users_stats WHERE id='".$user['id']."'"));
       $ustats['dice_earn'] += $winnings;
       $ustats['dice_wins']++;
       $result = mysqli_query($db,"UPDATE Users_stats SET dice_earn='".$ustats['dice_earn']."', dice_wins='".$ustats['dice_wins']."' WHERE id='".$user['id']."'");
@@ -1019,7 +1019,7 @@ function inClanBattle(int $clan_id): int
   $hour = time()/3600;
   if(!empty($db)){
   $cresult=mysqli_query($db,"SELECT id, contestants FROM Contests WHERE type = 10 AND starts < '".$hour."' AND ends > '".$hour."'");
-  while ($cb = mysqli_fetch_array($cresult))
+  while ($cb = mysqli_fetch_assoc($cresult))
   {
     $contestants = unserialize($cb['contestants']);
     foreach ($contestants as $cid => $cdata)
@@ -1034,7 +1034,7 @@ function inClanBattle(int $clan_id): int
 function isClanLeader(array $achar, string $soc_name, int $officer, int $loc_id): bool
 {
   if(!empty($db)){
-	  $society = mysqli_fetch_array(mysqli_query($db,"SELECT id, subleaders, subs, offices, area_score, leader, leaderlast FROM Soc WHERE name='$soc_name' "));
+	  $society = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, subleaders, subs, offices, area_score, leader, leaderlast FROM Soc WHERE name='$soc_name' "));
 	  $subleaders = unserialize($society['subleaders']);
 	  $subs = $society['subs'];
 	  $offices = unserialize($society['offices']);

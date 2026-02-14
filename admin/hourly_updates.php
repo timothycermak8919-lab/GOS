@@ -11,7 +11,7 @@ echo "Starting Hourly Updates...";
 $curtime=time();
 $check=intval(time()/3600);
 $lastBattleDone = mysqli_num_rows(mysqli_query($db,"SELECT id FROM Contests WHERE type='99' AND done='1'"));
-$msgs = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM messages WHERE id='0'"));
+$msgs = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM messages WHERE id='0'"));
     
 // UPDATE CLAN DATA
 echo "Updating Clans...";
@@ -23,7 +23,7 @@ include_once("clandata.php");
 $row = mysqli_fetch_assoc(mysqli_query($db,'SELECT SUM(vitality) AS value_sum FROM Users WHERE nation != 0')); 
 $totvit = $row['value_sum'];
 $resulth = mysqli_query($db,"SELECT id, level FROM Users WHERE nation != 0 ORDER BY level DESC, exp DESC LIMIT 1");
-$topchar = mysqli_fetch_array($resulth);
+$topchar = mysqli_fetch_assoc($resulth);
 echo "\n</br> Top char: ".json_encode($topchar);
 echo "\n</br> Top char is: ".$topchar['name']." ".$topchar['lastname'];
 $hhealth = $totvit*$topchar['level']/20;

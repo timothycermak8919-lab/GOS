@@ -36,9 +36,9 @@ if ($fromLoc == $clean_loc && (($toLoc >= 0 && $toLoc < 4) || $escortId > 0 || $
   else if ($escortId > 0)
   { 
     $myquests= unserialize($char['quests']);
-    $quest = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Quests WHERE id='$escortId'"));
+    $quest = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Quests WHERE id='$escortId'"));
     $goals = unserialize($quest['goals']);
-    $route = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Routes WHERE id='".$goals[1]."'"));
+    $route = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Routes WHERE id='".$goals[1]."'"));
     $rpath = unserialize($route['path']);
     $loc = $rpath[$myquests[$escortId][1]+1];
     $myquests[$escortId][1] += 1;
@@ -50,7 +50,7 @@ if ($fromLoc == $clean_loc && (($toLoc >= 0 && $toLoc < 4) || $escortId > 0 || $
   }
   else if ($waysId > 0 && $waysId == $char['route'])
   {
-    $route = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Routes WHERE id='".$waysId."'"));
+    $route = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Routes WHERE id='".$waysId."'"));
     $rpath = unserialize($route['path']);
     $loc = $rpath[$char['routepoint']+1];
     $char['routepoint'] = $char['routepoint']+1;

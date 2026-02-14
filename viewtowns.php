@@ -40,13 +40,13 @@ include('header.php');
   else if ($sort == 3) $sortBy='ruler';
   
   $result = mysqli_query($db,"SELECT id, name, shoplvls, clan_scores, ruler, myOrder, army, isDestroyed FROM Locations ORDER BY $sortBy");  
-  while ($loc = mysqli_fetch_array( $result ) )
+  while ($loc = mysqli_fetch_assoc( $result ) )
   {
     if (!$loc['isDestroyed'])
     {
       $himage = "";
       $result3 = mysqli_query($db,"SELECT id, target, location FROM Hordes WHERE done='0'");
-      while ($myHorde = mysqli_fetch_array( $result3 ) )
+      while ($myHorde = mysqli_fetch_assoc( $result3 ) )
       {
         if ($myHorde['target'] == $loc['name']) 
         {
@@ -69,7 +69,7 @@ include('header.php');
         <td align='center'><?php echo $loc['myOrder']; ?></td>
         <td align='center' class='hidden-xs'><?php echo $loc['army']; ?></td>  
         <?php
-          $resultf = mysqli_fetch_array(mysqli_query($db,"SELECT COUNT(*) FROM Users WHERE location='$loc[name]' "));
+          $resultf = mysqli_fetch_assoc(mysqli_query($db,"SELECT COUNT(*) FROM Users WHERE location='$loc[name]' "));
           $numchar = $resultf[0];    
         ?>
         <td align='center' class='hidden-xs'><?php echo number_format($numchar); ?></td>          
@@ -91,7 +91,7 @@ include('header.php');
           {
             foreach ($clanscores as $key => $value)
             {
-              $tsoc = mysqli_fetch_array(mysqli_query($db,"SELECT id, name FROM `Soc` WHERE id = '$key'"));
+              $tsoc = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, name FROM `Soc` WHERE id = '$key'"));
               if ($ruler=='No One' && $rival == 'No One')
               { 
                 $ruler_wins = 100;

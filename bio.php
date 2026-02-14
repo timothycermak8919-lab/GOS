@@ -47,7 +47,7 @@ $stmt = mysqli_prepare($db, "SELECT * FROM Soc WHERE name=?");
 mysqli_stmt_bind_param($stmt, "s", $socnameother);
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
-$societyo = mysqli_fetch_array($result);
+$societyo = mysqli_fetch_assoc($result);
 
 $friends = json_decode($charother['friends'], true);
 
@@ -56,7 +56,7 @@ $stmt = mysqli_prepare($db, "SELECT * FROM Users LEFT JOIN Users_data ON Users.i
 mysqli_stmt_bind_param($stmt, "ss", $bioName, $bioLastName);
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
-$char = mysqli_fetch_array($result);
+$char = mysqli_fetch_assoc($result);
 $cid = $char['id'];
 $time = time();
 $username = $char['name'] . "_" . $char['lastname'];
@@ -66,7 +66,7 @@ $stmt = mysqli_prepare($db, "SELECT * FROM Soc WHERE name=?");
 mysqli_stmt_bind_param($stmt, "s", $socname);
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
-$society = mysqli_fetch_array($result);
+$society = mysqli_fetch_assoc($result);
 $classes = json_decode($char['type'], true);
 
 // FIXED: SQL injection vulnerability - use prepared statement
@@ -75,11 +75,11 @@ $stmt = mysqli_prepare($db, "SELECT * FROM Users_stats WHERE id=?");
 mysqli_stmt_bind_param($stmt, "i", $charId);
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
-$stats = mysqli_fetch_array($result);
+$stats = mysqli_fetch_assoc($result);
 
 $query = "SELECT * FROM Users_stats WHERE id='10011'";
 $result = mysqli_query($db, $query);
-$heroes = mysqli_fetch_array($result);
+$heroes = mysqli_fetch_assoc($result);
 
 $titles = [''];
 $title_why = [''];
@@ -98,7 +98,7 @@ $stmt = mysqli_prepare($db, "SELECT id, name, lastname FROM Users WHERE nation=?
 mysqli_stmt_bind_param($stmt, "i", $cNat);
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
-$topNat = mysqli_fetch_array($result);
+$topNat = mysqli_fetch_assoc($result);
 if ($topNat['id'] == $char['id']) {
     $titles[$x] = "Champion of the " . $nat_champs[$cNat];
     $title_why[$x] = "Experienced " . $nationalities[$cNat];
@@ -143,7 +143,7 @@ if ($char['id'] == $charother['id']) // only update IPs on your own profile
         mysqli_stmt_bind_param($result, "s", $ipaddy);
         mysqli_stmt_execute($result);
         $result = mysqli_stmt_get_result($result);
-        $ip_log = mysqli_fetch_array($result);
+        $ip_log = mysqli_fetch_assoc($result);
         $ip_users = json_decode($ip_log['users'], true);
         $found = 0;
         $ip_count = count($ip_users);
@@ -641,7 +641,7 @@ if (!$char['born']) {
                             mysqli_stmt_bind_param($stmt, "ss", $altName, $altLast);
                             mysqli_stmt_execute($stmt);
                             $result = mysqli_stmt_get_result($stmt);
-                            $listchar = mysqli_fetch_array($result);
+                            $listchar = mysqli_fetch_assoc($result);
                             if ($listchar['id'] != "" && $listchar['id'] != $char['id']) {
                                 ?>
                                 <div class="panel panel-warning">
@@ -759,10 +759,10 @@ if (!$char['born']) {
                                     $lists = 0;
                                     if (is_array($friends)) {
                                         foreach ($friends as $fid => $fval) {
-                                            $listchar = mysqli_fetch_array(mysqli_query($db, "SELECT * FROM Users WHERE id='$fid'"));
+                                            $listchar = mysqli_fetch_assoc(mysqli_query($db, "SELECT * FROM Users WHERE id='$fid'"));
                                             if ($fval['2'] == $lists && $listchar['id']) {
                                                 $btnstyle = "btn-default";
-                                                $lastBattle = mysqli_fetch_array(mysqli_query($db, "SELECT id, starts, ends, winner FROM Contests WHERE type='99' "));
+                                                $lastBattle = mysqli_fetch_assoc(mysqli_query($db, "SELECT id, starts, ends, winner FROM Contests WHERE type='99' "));
                                                 if ($lastBattle != 0) {
                                                     ?>
                                                     <button class="btn btn-sm" disabled="disabled"><?php echo $listchar['name'] . " " . $listchar['lastname'] ?></button>
@@ -811,14 +811,14 @@ if (!$char['born']) {
                                             mysqli_stmt_bind_param($stmt, "i", $fid);
                                             mysqli_stmt_execute($stmt);
                                             $result = mysqli_stmt_get_result($stmt);
-                                            $listchar = mysqli_fetch_array($result);
+                                            $listchar = mysqli_fetch_assoc($result);
                                             if ($fval['2'] == $lists && $listchar['id']) {
                                                 $btnstyle = "btn-default";
                                                 // FIXED: SQL injection vulnerability - use prepared statement
                                                 $stmt = mysqli_prepare($db, "SELECT id, starts, ends, winner FROM Contests WHERE type='99'");
                                                 mysqli_stmt_execute($stmt);
                                                 $result = mysqli_stmt_get_result($stmt);
-                                                $lastBattle = mysqli_fetch_array($result);
+                                                $lastBattle = mysqli_fetch_assoc($result);
                                                 if ($lastBattle != 0) {
                                                     ?>
                                                     <button class="btn btn-sm btn-<?php echo $btnstyle ?>"
@@ -853,7 +853,7 @@ if (!$char['born']) {
                                             mysqli_stmt_bind_param($stmt, "i", $fid);
                                             mysqli_stmt_execute($stmt);
                                             $result = mysqli_stmt_get_result($stmt);
-                                            $listchar = mysqli_fetch_array($result);
+                                            $listchar = mysqli_fetch_assoc($result);
                                             if ($fval['2'] == $lists && $listchar['id']) {
                                                 ?>
                                                 <a href="bio.php?name=<?php echo $listchar['name'] ?>&last=<?php echo $listchar['lastname'] ?>"
@@ -882,9 +882,9 @@ if (!$char['born']) {
                                             mysqli_stmt_bind_param($stmt, "i", $fid);
                                             mysqli_stmt_execute($stmt);
                                             $result = mysqli_stmt_get_result($stmt);
-                                            $listchar = mysqli_fetch_array($result);
+                                            $listchar = mysqli_fetch_assoc($result);
                                             if ($fval['2'] == $lists && $listchar['id']) {
-                                                $lastBattle = mysqli_fetch_array(mysqli_query($db, "SELECT id, starts, ends, winner FROM Contests WHERE type='99' "));
+                                                $lastBattle = mysqli_fetch_assoc(mysqli_query($db, "SELECT id, starts, ends, winner FROM Contests WHERE type='99' "));
                                                 if ($lastBattle != 0) {
                                                     ?>
                                                     <button class="btn btn-sm btn-default"

@@ -35,7 +35,7 @@ $result = mysqli_stmt_get_result($stmt);
 
 
 // Allow access if a matching record was found and cookies enabled, else deny access.
-if (!is_null($result) && $account = mysqli_fetch_array($result))
+if (!is_null($result) && $account = mysqli_fetch_assoc($result))
 {
     // Verify password - support both password_hash and legacy sha1
     $storedPassword = $account['password'];
@@ -98,7 +98,7 @@ if (!is_null($result) && $account = mysqli_fetch_array($result))
 
         if (mysqli_num_rows($result) > 0) {
 
-            $char = mysqli_fetch_array($result);
+            $char = mysqli_fetch_assoc($result);
             $id = $char['id'];
             $user = $char['name'];
             $lastname = $char['lastname'];

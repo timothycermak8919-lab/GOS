@@ -17,7 +17,7 @@ $id = $char['id'];
 $itmlist=[];
 $listsize=0;
 $iresult=mysqli_query($db,"SELECT * FROM Items WHERE owner='$id' AND type<15 AND istatus <=0");
-while ($qitem = mysqli_fetch_array($iresult))
+while ($qitem = mysqli_fetch_assoc($iresult))
 {
   $itmlist[$listsize++] = $qitem;
 }
@@ -26,7 +26,7 @@ $myquests= unserialize($char['quests']);
 $isCL = 1;
 $isCO = 1;
 $getitems = 0;
-$ustats = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Users_stats WHERE id='$id'"));
+$ustats = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Users_stats WHERE id='$id'"));
 
 $submitted= mysqli_real_escape_string($db,$_POST['sub']);
 $subtype= mysqli_real_escape_string($db,$_POST['subtype']);
@@ -56,7 +56,7 @@ $goodevil=$char['goodevil'];
 if ($goodevil >1) $goodevil= 1;
 
 $soc_name = $char['society'];
-$society = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Soc WHERE name='$soc_name' "));
+$society = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Soc WHERE name='$soc_name' "));
 $subleaders = unserialize($society['subleaders']);
 $subs = $society['subs'];
 $offices = unserialize($society['offices']);
@@ -102,7 +102,7 @@ if(is_array($offices[$location['id']])){
 // Set your quest to expire (OBE?)
 if ($exq != '')
 {
-  $quest = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Quests WHERE id='$exq'"));
+  $quest = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Quests WHERE id='$exq'"));
   $qofferer = $char['name']." ".$char['lastname'];
   
   if ($qofferer == $quest['offerer'])
@@ -181,7 +181,7 @@ if ($nq != '')
     {
       $query1 = "SELECT * FROM Users WHERE name = '$nqtarget1' AND lastname = '$nqtarget2'";
       $result5 = mysqli_query($db,$query1);
-      $target = mysqli_fetch_array($result5);
+      $target = mysqli_fetch_assoc($result5);
       if ($target)   
         $nqgoals[1]= $nqtarget1."_".$nqtarget2;  
       else
@@ -194,7 +194,7 @@ if ($nq != '')
     {
       $query1 = "SELECT * FROM Soc WHERE name = '$nqtarget'";
       $result5 = mysqli_query($db,$query1);
-      $target = mysqli_fetch_array($result5);
+      $target = mysqli_fetch_assoc($result5);
       if ($target)    
         $nqgoals[1]= $nqtarget;  
       else
@@ -252,7 +252,7 @@ if ($nq != '')
       $nqrewarded[0] = "I";
       $nqrewarded[1] = $nqitem;
       $nqrewards = serialize($nqrewarded);
-      $itms[0] = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Items WHERE id='$nqitem'"));
+      $itms[0] = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Items WHERE id='$nqitem'"));
     }
   }
   
@@ -280,7 +280,7 @@ if ($nq != '')
 
 if ($action) // Items quests Part 2
 {
-  $quest = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Quests WHERE id='$action'"));
+  $quest = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Quests WHERE id='$action'"));
   $goals = unserialize($quest['goals']);      
   $good = 1;
   $z=0;
@@ -295,7 +295,7 @@ if ($action) // Items quests Part 2
   if ($quest['type']==$quest_type_num["Items"]) $typeq = " AND type='".$goals[1][0][1]."'";
 
   $iresult=mysqli_query($db,"SELECT * FROM Items WHERE owner='$id'".$typeq." AND istatus <=0 AND society=0 ORDER BY id");
-  while ($qitem = mysqli_fetch_array($iresult))
+  while ($qitem = mysqli_fetch_assoc($iresult))
   {
     $itmlist[$listsize++] = $qitem;
   } 
@@ -305,7 +305,7 @@ if ($action) // Items quests Part 2
     $tmpItm = mysqli_real_escape_string($db,$_POST[$x]);
     if ($tmpItm)
     {
-      $inv[$q]=mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Items WHERE id='".$tmpItm."'"));
+      $inv[$q]=mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Items WHERE id='".$tmpItm."'"));
       if ($inv[$q]['type'] > 13) $value += intval($item_base[$inv[$q]['base']][2]*1.1);
       else $value += intval(item_val(iparse($inv[$q],$item_base, $item_ix,$ter_bonuses))*1.1);
       $rlist[$q] = $inv[$q];
@@ -326,7 +326,7 @@ if ($action) // Items quests Part 2
   $ritem=0;
   if ($qreward[0]=="I") // Item Reward
   {
-     $ritem = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Items WHERE id='".$qreward[1]."'"));
+     $ritem = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Items WHERE id='".$qreward[1]."'"));
   }
   if ($quest['type']==$quest_type_num["Items"]) // Items quest
   {
@@ -368,19 +368,19 @@ if ($action) // Items quests Part 2
         $area_reps = serialize($area_rep);
         mysqli_query($db,"UPDATE Soc SET area_rep='".$area_reps."' WHERE id='".$society['id']."'");
       }
-      $qloc = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM `Locations` WHERE name = '$quest[location]'"));
+      $qloc = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM `Locations` WHERE name = '$quest[location]'"));
       if ($myquests) 
       {
         foreach ($myquests as $c_n => $c_s)
         {
           if ($c_s[0] == 1)
           {
-            $quest2 = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Quests WHERE id='$c_n'"));
+            $quest2 = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Quests WHERE id='$c_n'"));
             $goals = unserialize($quest2['goals']);
             $qreward= unserialize($quest2['reward']);
             if ($quest2['type'] == $quest_type_num["Support"] && $goals[2] == $quest['location'] && $soc_name != $quest2['offerer'] && $quest2['done']==0) 
             {
-              $society = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Soc WHERE name='".$quest2['offerer']."' "));
+              $society = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Soc WHERE name='".$quest2['offerer']."' "));
               
               $greward = $scoreup * $qreward[1];
               $stats['quest_earn'] += $greward;
@@ -408,7 +408,7 @@ if ($action) // Items quests Part 2
       mysqli_query($db,"UPDATE Soc SET score=score+".$scoreup." WHERE name='$char[society]' ");
       mysqli_query($db,"UPDATE Soc SET area_score='$a_s_str' WHERE id='$clan_id' ");
       // Reset society
-      $society = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Soc WHERE name='$soc_name' "));
+      $society = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Soc WHERE name='$soc_name' "));
       
       $ustats['loc_ji'.$qloc['id']]+=$scoreup;
       $ustats['loc_ji'.$qloc['id']]=number_format($ustats['loc_ji'.$qloc['id']],2,'.','');
@@ -418,7 +418,7 @@ if ($action) // Items quests Part 2
       
       if ($quest['type'] == $quest_type_num["Escort"])
       {
-        $qloc2 = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM `Locations` WHERE name = '$goals[2]'"));
+        $qloc2 = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM `Locations` WHERE name = '$goals[2]'"));
         $ustats['loc_ji'.$qloc2['id']]+=$scoreup;
         $ustats['loc_ji'.$qloc2['id']]=number_format($ustats['loc_ji'.$qloc2['id']],2,'.','');
         if (!empty($qloc2['id'])) {
@@ -449,8 +449,8 @@ if ($action) // Items quests Part 2
     if ($quest['type'] == $quest_type_num["Request"]) // Player Item quest
     {
       $offerername = explode(" ", $quest['offerer']);
-      $charo = mysqli_fetch_array(mysqli_query($db,"SELECT id FROM Users WHERE name='$offerername[0]' AND lastname='$offerername[1]'"));
-      $ostats = mysqli_fetch_array(mysqli_query($db,"SELECT my_quests_done FROM Users_stats WHERE id='$charo[id]'"));
+      $charo = mysqli_fetch_assoc(mysqli_query($db,"SELECT id FROM Users WHERE name='$offerername[0]' AND lastname='$offerername[1]'"));
+      $ostats = mysqli_fetch_assoc(mysqli_query($db,"SELECT my_quests_done FROM Users_stats WHERE id='$charo[id]'"));
       $ostats['my_quests_done']++;
       $ustats['play_quests_done']++;
       $ustats['quests_done']++;
@@ -509,7 +509,7 @@ if ($action) // Items quests Part 2
 if ($subtype == $quest_type_num["Items"] || $subtype == $quest_type_num["Request"])  // Setup for Item Quest submitting
 {
   $getitems = 1;
-  $quest = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Quests WHERE id='$submitted'"));
+  $quest = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Quests WHERE id='$submitted'"));
   $goals = unserialize($quest['goals']);
   if ($subtype == $quest_type_num["Items"])
   {  
@@ -526,7 +526,7 @@ elseif ($submitted != '') // Non-Item Quests
   $good = 1;
   $scoreup = 0;
   $charo = [];
-  $quest = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Quests WHERE id='$submitted'"));
+  $quest = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Quests WHERE id='$submitted'"));
   $goals = unserialize($quest['goals']);      
                   
   if ($quest['type'] == $quest_type_num["Horde"])
@@ -585,13 +585,13 @@ elseif ($submitted != '') // Non-Item Quests
           $itmlist=[];
           $listsize=0;
           $iresult=mysqli_query($db,"SELECT * FROM Items WHERE owner='$id' AND type<15");
-          while ($qitem = mysqli_fetch_array($iresult))
+          while ($qitem = mysqli_fetch_assoc($iresult))
           {
             $itmlist[$listsize++] = $qitem;
           }
           if ($listsize < $inv_max) 
           { 
-            $ritem = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Items WHERE id='".$qreward[1]."'"));
+            $ritem = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Items WHERE id='".$qreward[1]."'"));
             $result = mysqli_query($db,"UPDATE Items SET owner='".$char['id']."', last_moved='".time()."' WHERE id='".$ritem['id']."'");
             $message = "Quest submitted. You earned a ".iname($ritem).".";        
           } 
@@ -643,7 +643,7 @@ elseif ($submitted != '') // Non-Item Quests
           $itmlist=[];
           $listsize=0;
           $iresult=mysqli_query($db,"SELECT * FROM Items WHERE owner='$id' AND type<15");
-          while ($qitem = mysqli_fetch_array($iresult))
+          while ($qitem = mysqli_fetch_assoc($iresult))
           {
             $itmlist[$listsize++] = $qitem;
           }        
@@ -687,7 +687,7 @@ elseif ($submitted != '') // Non-Item Quests
             }
             $clan_id = $society['id'];
             $qloc_name = $quest['location'];
-            $qloc = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM `Locations` WHERE name = '$qloc_name'"));
+            $qloc = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM `Locations` WHERE name = '$qloc_name'"));
 
             if ($myquests) 
             {
@@ -695,12 +695,12 @@ elseif ($submitted != '') // Non-Item Quests
               {
                 if ($c_s[0] == 1)
                 {
-                  $quest2 = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Quests WHERE id='$c_n'"));
+                  $quest2 = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Quests WHERE id='$c_n'"));
                   $goals = unserialize($quest2['goals']);
                   $qreward= unserialize($quest2['reward']);
                   if ($quest2['type'] == $quest_type_num["Support"] && $goals[2] == $quest['location'] && $soc_name != $quest2['offerer'] && $quest2['done']==0) 
                   {
-                    $society = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Soc WHERE name='".$quest2['offerer']."' "));
+                    $society = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Soc WHERE name='".$quest2['offerer']."' "));
               
                     $greward = $scoreup * $qreward[1];
                     $stats['quest_earn'] += $greward;
@@ -725,7 +725,7 @@ elseif ($submitted != '') // Non-Item Quests
             {
               $qloc_name2 = $goals[2];
               echo $qloc_name2;
-              $qloc2 = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM `Locations` WHERE name = '$qloc_name2'"));
+              $qloc2 = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM `Locations` WHERE name = '$qloc_name2'"));
               $area_score[$qloc2['id']] = $area_score[$qloc2['id']]+$scoreup;
               $area_score[$qloc2['id']] = number_format($area_score[$qloc2['id']],2,'.','');
               if ($qloc2['next_wins'] <= $area_score[$qloc2['id']])
@@ -751,7 +751,7 @@ elseif ($submitted != '') // Non-Item Quests
             mysqli_query($db,"UPDATE Soc SET score=score+1 WHERE name='$char[society]' ");
             mysqli_query($db,"UPDATE Soc SET area_score='$a_s_str' WHERE id='$society[id]' ");
             // Reset society
-            $society = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Soc WHERE name='$soc_name' "));
+            $society = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Soc WHERE name='$soc_name' "));
                   
             $ustats['loc_ji'.$qloc['id']]+=$scoreup;
             $ustats['loc_ji'.$qloc['id']]=number_format($ustats['loc_ji'.$qloc['id']],2,'.','');
@@ -761,7 +761,7 @@ elseif ($submitted != '') // Non-Item Quests
             
             if ($quest['type'] == $quest_type_num["Escort"])
             {
-              $qloc2 = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM `Locations` WHERE name = '$goals[2]'"));
+              $qloc2 = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM `Locations` WHERE name = '$goals[2]'"));
               $ustats['loc_ji'.$qloc2['id']]+=$scoreup;
               $ustats['loc_ji'.$qloc2['id']]=number_format($ustats['loc_ji'.$qloc2['id']],2,'.','');
               if (!empty($qloc2['id'])) {
@@ -797,7 +797,7 @@ elseif ($submitted != '') // Non-Item Quests
           
           // check for estates
           $est_bonus=array();
-          $myEstate= mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Estates WHERE owner='$id' AND location='$tgoals[2]'"));
+          $myEstate= mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Estates WHERE owner='$id' AND location='$tgoals[2]'"));
           if ($myEstate['id'])
           {
             $eups=unserialize($myEstate['upgrades']);
@@ -923,8 +923,8 @@ elseif ($submitted != '') // Non-Item Quests
             }
               
             $offerername = explode(" ", $quest['offerer']);
-            $charo = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Users WHERE name='$offerername[0]' AND lastname='$offerername[1]'"));
-            $ostats = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Users_stats WHERE id='$charo[id]'"));
+            $charo = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Users WHERE name='$offerername[0]' AND lastname='$offerername[1]'"));
+            $ostats = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Users_stats WHERE id='$charo[id]'"));
             $ostats['my_quests_done']++;        
             $ustats['play_quests_done']++;
             $ustats['quests_done']++;
@@ -953,7 +953,7 @@ elseif ($submitted != '') // Non-Item Quests
 <?php
   $result = mysqli_query($db,"SELECT * FROM Quests");
   $y=0;
-  while ($quest = mysqli_fetch_array( $result ) )
+  while ($quest = mysqli_fetch_assoc( $result ) )
   {
     $qid = $quest['id'];
     $nqofferer = $char['name']." ".$char['lastname'];
@@ -970,7 +970,7 @@ elseif ($submitted != '') // Non-Item Quests
   $query = "SELECT * FROM Quests WHERE offerer='".$char['name']." ".$char['lastname']."' && done='0'";
   $result = mysqli_query($db,$query);
   $y=0;
-  while ($quest = mysqli_fetch_array( $result ) )
+  while ($quest = mysqli_fetch_assoc( $result ) )
   { 
     $qid = $quest['id'];
      
@@ -1008,7 +1008,7 @@ $listsize=0;
 
 $iresult=mysqli_query($db,"SELECT * FROM Items WHERE owner='".$id."' AND type<15 AND istatus <=0");
 
-while ($qitem = mysqli_fetch_array($iresult))
+while ($qitem = mysqli_fetch_assoc($iresult))
 {
   $itmlist[$listsize++] = $qitem;
 }
@@ -1050,7 +1050,7 @@ while ($qitem = mysqli_fetch_array($iresult))
                 $query = "SELECT * FROM Quests WHERE expire >= '".$curTime."' ORDER BY expire ASC";
                 $result = mysqli_query($db,$query);
                 $y=0;
-                while ($quest = mysqli_fetch_array( $result ) )
+                while ($quest = mysqli_fetch_assoc( $result ) )
                 {
                   $qid = $quest['id'];
                   $goals = unserialize($quest['goals']);      
@@ -1092,7 +1092,7 @@ while ($qitem = mysqli_fetch_array($iresult))
                   }
                   else if ($quest['type'] == $quest_type_num["Escort"])
                   {
-                    $route = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Routes WHERE id='".$goals[1]."'"));
+                    $route = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Routes WHERE id='".$goals[1]."'"));
                     $rpath = unserialize($route['path']);
                     echo $rpath[$myquests[$qid][1]];
                   }
@@ -1196,7 +1196,7 @@ while ($qitem = mysqli_fetch_array($iresult))
                 if ($l==0) { $result = mysqli_query($db,"SELECT * FROM Quests WHERE offerer='".$char['name']." ".$char['lastname']."' && done='0' ORDER BY expire ASC");}
                 else { $result = mysqli_query($db,"SELECT * FROM Quests WHERE offerer='".$char['society']."' && done='0' ORDER BY expire ASC");}
 
-                while ($quest = mysqli_fetch_array( $result ) )
+                while ($quest = mysqli_fetch_assoc( $result ) )
                 {      
                   $qid = $quest['id']; 
                   $y++;        
@@ -1462,7 +1462,7 @@ while ($qitem = mysqli_fetch_array($iresult))
                 $query = "SELECT * FROM Quests WHERE cat = '1' ORDER BY id ASC";
                 $result = mysqli_query($db,$query);
                 $y=0;
-                while ($quest = mysqli_fetch_array( $result ) )
+                while ($quest = mysqli_fetch_assoc( $result ) )
                 {
                   $qid = $quest['id'];
                   $goals = unserialize($quest['goals']);
@@ -1513,7 +1513,7 @@ while ($qitem = mysqli_fetch_array($iresult))
                   }
                   else if ($quest['type'] == $quest_type_num["Escort"])
                   {
-                    $route = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Routes WHERE id='".$goals[1]."'"));
+                    $route = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Routes WHERE id='".$goals[1]."'"));
                     $rpath = unserialize($route['path']);
                     echo $rpath[$myquests[$qid][1]];
                   }
@@ -1614,7 +1614,7 @@ else // Items Quests part 1
       if ($subtype==$quest_type_num['Items']) $typeq = " AND type='".$goals[1][0][1]."'";
 
       $iresult=mysqli_query($db,"SELECT * FROM Items WHERE owner='".$id."'".$typeq." AND istatus <=0 AND society=0 ORDER BY id");
-      while ($qitem = mysqli_fetch_array($iresult))
+      while ($qitem = mysqli_fetch_assoc($iresult))
       {
         $itmlist[$listsize++] = $qitem;
       }     

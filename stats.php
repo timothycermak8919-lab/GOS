@@ -146,7 +146,7 @@ for ($x = 0; $x < 7; $x++)
 }
 
 $tskills = $stomach_bonuses1." ".$stamina_effect1." ".$clan_bonus1." ".$skill_bonuses1;
-$stats = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Users_stats WHERE id='$char[id]'"));
+$stats = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Users_stats WHERE id='$char[id]'"));
 
 
 $itmlist=[];
@@ -164,7 +164,7 @@ $pts_tot = 0;
 if (isChanneler($types))
 {
   $iresult=mysqli_query($db,"SELECT * FROM Items WHERE owner='$id' AND type<15 ".$invSort);
-  while ($qitem = mysqli_fetch_array($iresult))
+  while ($qitem = mysqli_fetch_assoc($iresult))
   {
     $itmlist[$listsize++] = $qitem;
   
@@ -248,7 +248,7 @@ if (is_array($types) && floor($char['level']/20)+2>count($types))
   if ($char['nation'] == 1) { $noclass[101]=1; }  
   
   // Check for Noble Rank. If so, turn on Noble class.
-  $stats = mysqli_fetch_array(mysqli_query($db,"SELECT id, net_worth FROM Users_stats WHERE id='$char[id]'"));
+  $stats = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, net_worth FROM Users_stats WHERE id='$char[id]'"));
   $w=0;
   for ($y=1; $y < count($worth_ranks); $y++)
   {
@@ -351,7 +351,7 @@ if ($skillup != '' && $skillup != '-1')
       if (isChanneler($types))
       {
         $iresult=mysqli_query($db,"SELECT * FROM Items WHERE owner='$id' AND type<15 ".$invSort);
-        while ($qitem = mysqli_fetch_array($iresult))
+        while ($qitem = mysqli_fetch_assoc($iresult))
         {
           $itmlist[$listsize++] = $qitem;
       

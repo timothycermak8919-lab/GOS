@@ -46,7 +46,7 @@ $myquests= unserialize($char['quests']);
 // GET SURROUNDING AREAS
 $surrounding_area = $map_data[$loc];
 
-$myEstate= mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Estates WHERE owner='$id' AND location='$loc_name'"));
+$myEstate= mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Estates WHERE owner='$id' AND location='$loc_name'"));
 
 if ($ename)
 {
@@ -72,7 +72,7 @@ $myNumEstates =  mysqli_num_rows( mysqli_query($db,"SELECT * FROM Estates WHERE 
 $tot_loc_estates=0;
 $myLocEstates=0;
 $result = mysqli_query($db,"SELECT * FROM Estates WHERE location='$loc'");
-while ($testate = mysqli_fetch_array( $result ) )
+while ($testate = mysqli_fetch_assoc( $result ) )
 {
   $loc_estates[$testate['row']][$testate['col']]['0']++;
   if ($testate['name'] != "") $loc_estates[$testate['row']][$testate['col']]['1'] = $testate['name'];
@@ -84,7 +84,7 @@ $equery = mysqli_query($db,"SELECT * FROM Estates WHERE owner='$id' ORDER BY id"
 $myEstate= array();
 $enum =0;
 $x=0;
-while ($tmpEstate=mysqli_fetch_array($equery))
+while ($tmpEstate=mysqli_fetch_assoc($equery))
 {
   if ($tmpEstate['location'] == $loc_name) 
   {
@@ -180,13 +180,13 @@ if ($action==1) // withdraw
   $listsize=0;
   $itmlist=[];
   $iresult=mysqli_query($db,"SELECT * FROM Items WHERE owner='$eid' AND type<15 ".$invSort);
-  while ($qitem = mysqli_fetch_array($iresult))
+  while ($qitem = mysqli_fetch_assoc($iresult))
   {
     $itmlist[$listsize++] = $qitem;
   }
   $num_itmso=0;
   $iresult=mysqli_query($db,"SELECT * FROM Items WHERE owner='$id' AND type<15 ".$invSort);
-  while ($qitem = mysqli_fetch_array($iresult))
+  while ($qitem = mysqli_fetch_assoc($iresult))
   {
     $itmlistchar[$num_itmso++] = $qitem;
   }
@@ -201,7 +201,7 @@ if ($action==1) // withdraw
     if (isset($tmpItm))
     {
       $tmpItm =  mysqli_real_escape_string($db,$tmpItm);
-      $sitem=mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Items WHERE id='$tmpItm'"));
+      $sitem=mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Items WHERE id='$tmpItm'"));
 
       if ($num_itmso+$q<$inv_max) 
       {
@@ -311,7 +311,7 @@ if ($uptrade)
     }
     else if ( $etrade < 100)
     {
-      $tloc = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Locations WHERE id='$etrade'"));
+      $tloc = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Locations WHERE id='$etrade'"));
 
       $rgold = round(10*1000/$tloc[$wildGood]);
       if ($rgold>100) $rgold=100;
@@ -326,7 +326,7 @@ if ($uptrade)
     else
     {
       $sid = $etrade-100;
-      $society = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Soc WHERE id='".$sid."'"));
+      $society = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Soc WHERE id='".$sid."'"));
       if ($society['name'] == $char['society'])
       {
         $sgoods = unserialize($society['goods']);
@@ -351,7 +351,7 @@ if ($uptrade)
 
 if ($accepted != '')
 {
-  $quest = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Quests WHERE id='$accepted'"));
+  $quest = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Quests WHERE id='$accepted'"));
   $qgoals = unserialize($quest['goals']);
   $myquests[$accepted][0] = 1;
   $myquests[$accepted][1] = 0; 
@@ -376,7 +376,7 @@ if ($accepted != '')
     $curTime = intval(time()/3600);
     $query = "SELECT * FROM Quests WHERE expire >= '".$curTime."' ORDER BY expire ASC";
     $result = mysqli_query($db,$query);
-    while ($quest2 = mysqli_fetch_array( $result ) )
+    while ($quest2 = mysqli_fetch_assoc( $result ) )
     {
       $qid = $quest2['id'];
       $goals = unserialize($quest2['goals']);      
@@ -423,7 +423,7 @@ $eid=20000+$myEstate['id'];
 $listsize=0;
 $itmlist=[];
 $iresult=mysqli_query($db,"SELECT * FROM Items WHERE owner='$eid' AND type<15 ".$invSort);
-while ($qitem = mysqli_fetch_array($iresult))
+while ($qitem = mysqli_fetch_assoc($iresult))
 {
   $itmlist[$listsize++] = $qitem;
 }
@@ -556,12 +556,12 @@ var qinfo = new Array();
   {    
     for ($x=0; $x<4; $x++) 
     {
-      $location = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Locations WHERE name='$surrounding_area[$x]'"));
+      $location = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Locations WHERE name='$surrounding_area[$x]'"));
       // setup bonuses for the current location
       include("admin/locBonuses.php");
 
       $result = mysqli_query($db,"SELECT * FROM Quests WHERE location='".$location['name']."' AND done='0'");
-      while ($quest = mysqli_fetch_array( $result ) )
+      while ($quest = mysqli_fetch_assoc( $result ) )
       {
         $qid = $quest['id'];
         
@@ -583,7 +583,7 @@ function swapQinfo(myQuest)
 
 
 <?php
-$myEstate= mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Estates WHERE owner='$id' AND location='$loc_name'"));
+$myEstate= mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Estates WHERE owner='$id' AND location='$loc_name'"));
 ?>
   <div class="row solid-back">
     <div class="col-sm-12">
@@ -852,7 +852,7 @@ if ($myEstate)
                   {
                     $result = mysqli_query($db,"SELECT * FROM Quests WHERE location='".$surrounding_area[$x]."' AND done='0' ORDER BY expire ASC");  
                     $y=0;
-                    while ($quest = mysqli_fetch_array( $result ) )
+                    while ($quest = mysqli_fetch_assoc( $result ) )
                     { 
                       $qid = $quest['id']; 
                       if (!$myquests[$qid][0])
@@ -972,11 +972,11 @@ if ($myEstate)
                       for ($x=0; $x<4; $x++) 
                       {
                         echo "<tr><td align='right'>".$surrounding_area[$x].":</td><td>";
-                        $city[$x] = mysqli_fetch_array(mysqli_query($db,"SELECT id, name, grain, livestock, lumber, stone, fish, luxury FROM Locations WHERE name='$surrounding_area[$x]'"));
+                        $city[$x] = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, name, grain, livestock, lumber, stone, fish, luxury FROM Locations WHERE name='$surrounding_area[$x]'"));
                         echo "<select name='support".$x."' size='1' class='form-control gos-form input-sm'>";
                         echo "  <option value='0'>No one</option>";
                         $result2 = mysqli_query($db,"SELECT id, name FROM Soc WHERE 1 ORDER BY score DESC, members DESC");
-                        while ( $listchar = mysqli_fetch_array( $result2 ) )
+                        while ( $listchar = mysqli_fetch_assoc( $result2 ) )
                         {
                     ?> 
                           <option value="<?php echo $listchar['id'];?>" <?php if ($listchar['id']==$supporting[$surrounding_area[$x]]) echo ' selected';?>><?php echo str_replace('-ap-','&#39;',$listchar['name']); ?></option>
@@ -1020,7 +1020,7 @@ if ($myEstate)
                         echo ">".str_replace('-ap-','&#39;',$city[$x]['name'])."</option>";
                       }
 
-                      $society = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Soc WHERE name='$char[society]'"));
+                      $society = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Soc WHERE name='$char[society]'"));
                       if ($society['id'] != "") {
                         echo "<option value='".(100+$society['id'])."'>".$society['name']."</option>";
                       }

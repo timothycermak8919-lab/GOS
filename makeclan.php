@@ -46,12 +46,12 @@ if ($doit == 1) {
 		
         $query = "SELECT * FROM Soc WHERE name='$clan'";
         $result = mysqli_query($db, $query);
-        $society = mysqli_fetch_array($result);
+        $society = mysqli_fetch_assoc($result);
         $querya = "INSERT INTO messages (id, checktime, message) VALUES ('$society[id]','0','a:0:{}')";
         $result = mysqli_query($db, $querya);
         $querya = "UPDATE Users SET society='$clan', soc_rank='1' WHERE id='$id'";
         $result = mysqli_query($db, $querya);
-        $ustats = mysqli_fetch_array(mysqli_query($db, "SELECT * FROM Users_stats WHERE id='$id'"));
+        $ustats = mysqli_fetch_assoc(mysqli_query($db, "SELECT * FROM Users_stats WHERE id='$id'"));
         $ustats['clans_joined']++;
         mysqli_query($db, "UPDATE Users_stats SET clans_joined='$ustats[clans_joined]' WHERE id='$id' ");
         header("Location: $server_name/clan.php?time=$curtime");
@@ -98,7 +98,7 @@ include('header.php');
                         <option value="0">-Select-</option>
                         <?php
                         $result = mysqli_query($db, "SELECT id, name FROM Locations ORDER BY name");
-                        while ($city = mysqli_fetch_array($result)) {
+                        while ($city = mysqli_fetch_assoc($result)) {
                             echo "<option value='$city[id]'>$city[name]</option>";
                         }
                         ?>

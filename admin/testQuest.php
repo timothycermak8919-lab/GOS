@@ -18,7 +18,7 @@ $nqreq=[];
 $nqname="Intro to Escort Quests";
 $sloc = "Mayene";
 $nqgoals[0] = 6;
-$route = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Routes WHERE start='".$sloc."' AND length >'".$goals[0]."' ORDER BY rand()"));
+$route = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Routes WHERE start='".$sloc."' AND length >'".$goals[0]."' ORDER BY rand()"));
 $nqgoals[1] = $route['id'];
 $path = unserialize($route['path']);
 $nqgoals[2] = $path[$nqgoals[0]];  

@@ -23,7 +23,7 @@ $time=time();
 $listsize=0;
 
 $soc_name = $char['society'];
-$society = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Soc WHERE name='$soc_name' "));
+$society = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Soc WHERE name='$soc_name' "));
 
 $bonuses1 = $stomach_bonuses1." ".$stamina_effect1." ".$clan_bonus1." ".$skill_bonuses1." ".$clan_building_bonuses;
 $skills = $bonuses1;
@@ -34,11 +34,11 @@ $b = [];
 $c = [];
 $d = [];
 $e = [];
-$a = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Items WHERE owner='$char[id]' AND istatus='1' AND type<15"));
-$b = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Items WHERE owner='$char[id]' AND istatus='2' AND type<15"));
-$c = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Items WHERE owner='$char[id]' AND istatus='3' AND type<15"));
-$d = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Items WHERE owner='$char[id]' AND istatus='4' AND type<15"));
-$e = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Items WHERE owner='$char[id]' AND istatus='5' AND type<15"));
+$a = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Items WHERE owner='$char[id]' AND istatus='1' AND type<15"));
+$b = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Items WHERE owner='$char[id]' AND istatus='2' AND type<15"));
+$c = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Items WHERE owner='$char[id]' AND istatus='3' AND type<15"));
+$d = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Items WHERE owner='$char[id]' AND istatus='4' AND type<15"));
+$e = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Items WHERE owner='$char[id]' AND istatus='5' AND type<15"));
 $estats = getstats($a,$b,$c,$d,$e,$skills);
 $skills = $skills." ".$estats[0];
 $pts_tot = 0;
@@ -55,7 +55,7 @@ if ($pts_tot != $char['used_pts'])
 }
 
 $iresult=mysqli_query($db,"SELECT * FROM Items WHERE owner='$id' AND type<15");
-while ($qitem = mysqli_fetch_array($iresult))
+while ($qitem = mysqli_fetch_assoc($iresult))
 {
   $itmlist[$listsize++] = $qitem;
 }
@@ -68,7 +68,7 @@ $loc_query = $char['location'];
 $rv = $pro_stats['rV'] + $town_bonuses['rV'] + $town_bonuses['tV'];
 $myPoints = $char['equip_pts']-$char['used_pts'];
 
-$ustats = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Users_stats WHERE id='$id'"));
+$ustats = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Users_stats WHERE id='$id'"));
 
 $action = mysqli_real_escape_string($db,$_POST['action']);
 
@@ -88,7 +88,7 @@ if ($action > 0 && $is_town)
       $tmpItm = mysqli_real_escape_string($db,$_POST[$itm]);
       if ($tmpItm)
       {
-        $sitem=mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Items WHERE id='$tmpItm'"));
+        $sitem=mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Items WHERE id='$tmpItm'"));
         if ($sitem['id'])
         {    
           $itemp[$q] = $sitem;
@@ -115,7 +115,7 @@ if ($action > 0 && $is_town)
   else if ($action == 2)
   {
     $eresult = mysqli_query($db,"SELECT * FROM Items WHERE owner='$char[id]' AND istatus>0 AND type<15");
-    while ($eitem = mysqli_fetch_array($eresult))
+    while ($eitem = mysqli_fetch_assoc($eresult))
     {   
       $itemp[$q] = $eitem;
       $itemp[$q]['cond']=100;
@@ -135,7 +135,7 @@ if ($action > 0 && $is_town)
   else if ($action == 3)
   {
     $uresult = mysqli_query($db,"SELECT * FROM Items WHERE owner='$char[id]' AND istatus<1 AND type<15");
-    while ($uitem = mysqli_fetch_array($uresult))
+    while ($uitem = mysqli_fetch_assoc($uresult))
     {   
       $itemp[$q] = $uitem;
       $itemp[$q]['cond']=100;
@@ -191,7 +191,7 @@ if ($action > 0 && $is_town)
 
 $listsize=0;
 $iresult=mysqli_query($db,"SELECT * FROM Items WHERE owner='$id' AND type<15");
-while ($qitem = mysqli_fetch_array($iresult))
+while ($qitem = mysqli_fetch_assoc($iresult))
 {
   $itmlist[$listsize++] = $qitem;
 }

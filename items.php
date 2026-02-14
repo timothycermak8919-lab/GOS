@@ -36,7 +36,7 @@ $d = -1;
 $e = -1;
 $currw = [];
 $iresult = mysqli_query($db, "SELECT * FROM Items WHERE owner='$id' AND type<15 " . $invSort);
-while ($qitem = mysqli_fetch_array($iresult)) {
+while ($qitem = mysqli_fetch_assoc($iresult)) {
 
   $itmlist[$listsize++] = $qitem;
   if ($qitem['istatus'] == 1) $a = $listsize - 1;
@@ -46,7 +46,7 @@ while ($qitem = mysqli_fetch_array($iresult)) {
   else if ($qitem['istatus'] == 5) $e = $listsize - 1;
 }
 
-$currw = mysqli_fetch_array(mysqli_query($db, "SELECT * FROM Items WHERE owner='$char[id]' AND type='8'"));
+$currw = mysqli_fetch_assoc(mysqli_query($db, "SELECT * FROM Items WHERE owner='$char[id]' AND type='8'"));
 if ($currw['istatus'] > 0) $wEq = 1;
 
 
@@ -55,7 +55,7 @@ $pouch = [];
 $stomach = [];
 $fullness = 0;
 $presult = mysqli_query($db, "SELECT * FROM Items WHERE owner='$id' AND type>=19 " . $consumeSort);
-while ($qitem = mysqli_fetch_array($presult)) {
+while ($qitem = mysqli_fetch_assoc($presult)) {
   if ($qitem['istatus'] == 0) $pouch[$clistsize++] = $qitem;
   else $stomach[$fullness++] = $qitem;
 }
@@ -135,7 +135,7 @@ if ($doequip) {
     $iresult = mysqli_query($db, "SELECT * FROM Items WHERE owner='$id' AND type<14 " . $invSort);
 
 
-    while ($qitem = mysqli_fetch_array($iresult)) {
+    while ($qitem = mysqli_fetch_assoc($iresult)) {
       $itmlist[$listsize++] = $qitem;
 
       if ($qitem['istatus'] == 1) $a = $listsize - 1;
@@ -177,7 +177,7 @@ $good = 1;
 $oldlist = $itmlist;
 $oldpouch = $pouch;
 
-$ustats = mysqli_fetch_array(mysqli_query($db, "SELECT * FROM Users_stats WHERE id='$id'"));
+$ustats = mysqli_fetch_assoc(mysqli_query($db, "SELECT * FROM Users_stats WHERE id='$id'"));
 
 // EQUIPMENT ACTIONS
 
@@ -192,7 +192,7 @@ if ($action == 1) // SELL
     while ($x < 100) {
       $tmpItm = isset($_POST["$x"]) ? mysqli_real_escape_string($db, $_POST["$x"]) : null; // Use string key
       if ($tmpItm) {
-        $sitem = mysqli_fetch_array(mysqli_query($db, "SELECT * FROM Items WHERE id='$tmpItm'"));
+        $sitem = mysqli_fetch_assoc(mysqli_query($db, "SELECT * FROM Items WHERE id='$tmpItm'"));
         // --- DEBUG START ---
         // echo "Checking item ID: $tmpItm<br>";
         // var_dump($sitem);
@@ -247,7 +247,7 @@ if ($action == 1) // SELL
     if ($tmpItm) {
       // echo "Processing POST key: $itm, Item ID: $tmpItm<br>"; // DEBUG
       // Fetch only necessary fields + check owner
-      $sitem = mysqli_fetch_array(mysqli_query($db, "SELECT id, istatus FROM Items WHERE id='$tmpItm' AND owner='$id'"));
+      $sitem = mysqli_fetch_assoc(mysqli_query($db, "SELECT id, istatus FROM Items WHERE id='$tmpItm' AND owner='$id'"));
       if ($sitem) { // Check if item exists and belongs to user
         // echo "Item found. Current status: " . $sitem['istatus'] . "<br>"; // DEBUG
         $processed_count++; // Item selected and found
@@ -289,7 +289,7 @@ if ($action == 1) // SELL
 } elseif ($action == 3) // DONATE
 {
   $soc_name = $char['society'];
-  $society = mysqli_fetch_array(mysqli_query($db, "SELECT * FROM Soc WHERE name='$soc_name'"));
+  $society = mysqli_fetch_assoc(mysqli_query($db, "SELECT * FROM Soc WHERE name='$soc_name'"));
   $upgrades = unserialize($society['upgrades']);
   $maxvault = 50 + 10 * $upgrades[0];
   $vaultsize = mysqli_num_rows(mysqli_query($db, "SELECT * FROM Items WHERE society='$society[id]'"));
@@ -303,7 +303,7 @@ if ($action == 1) // SELL
   while ($x < 100) {
     $tmpItm = isset($_POST["$x"]) ? mysqli_real_escape_string($db, $_POST["$x"]) : null; // Use string key
     if ($tmpItm) {
-      $sitem = mysqli_fetch_array(mysqli_query($db, "SELECT * FROM Items WHERE id='$tmpItm'"));
+      $sitem = mysqli_fetch_assoc(mysqli_query($db, "SELECT * FROM Items WHERE id='$tmpItm'"));
       if (($sitem['society'] == 0 || $sitem['society'] == "") && $sitem['type'] > 0) { // Allow 0 or empty string for society
         if ($sitem['istatus'] == 0) {
           $dlist[$q] = $sitem;
@@ -339,7 +339,7 @@ if ($action == 1) // SELL
     while ($x < $listsize) {
       $tmpItm = isset($_POST["$x"]) ? mysqli_real_escape_string($db, $_POST["$x"]) : null; // Use string key
       if ($tmpItm) {
-        $sitem = mysqli_fetch_array(mysqli_query($db, "SELECT * FROM Items WHERE id='$tmpItm'"));
+        $sitem = mysqli_fetch_assoc(mysqli_query($db, "SELECT * FROM Items WHERE id='$tmpItm'"));
         if (($sitem['society'] == 0 || $sitem['society'] == "") && $sitem['type'] > 0) { // Allow 0 or empty string for society
           if ($sitem['istatus'] == 0) {
             $result5 = mysqli_query($db, "DELETE FROM Items WHERE id='$sitem[id]'");
@@ -365,7 +365,7 @@ if ($action == 1) // SELL
   }
 } elseif ($action == 5) // ESTATE
 {
-  $myEstate = mysqli_fetch_array(mysqli_query($db, "SELECT * FROM Estates WHERE owner='$id' AND location='$char[location]'"));
+  $myEstate = mysqli_fetch_assoc(mysqli_query($db, "SELECT * FROM Estates WHERE owner='$id' AND location='$char[location]'"));
   $upgrades = unserialize($myEstate['upgrades']);
   $maxestinv = 3 + 3 * $upgrades[2];
   $eid = 20000 + $myEstate['id'];
@@ -380,7 +380,7 @@ if ($action == 1) // SELL
   while ($x < 100) {
     $tmpItm = isset($_POST["$x"]) ? mysqli_real_escape_string($db, $_POST["$x"]) : null; // Use string key
     if ($tmpItm) {
-      $sitem = mysqli_fetch_array(mysqli_query($db, "SELECT * FROM Items WHERE id='$tmpItm'"));
+      $sitem = mysqli_fetch_assoc(mysqli_query($db, "SELECT * FROM Items WHERE id='$tmpItm'"));
       if (($sitem['society'] == 0 || $sitem['society'] == "") && $sitem['type'] > 0) { // Allow 0 or empty string for society
         if ($sitem['istatus'] == 0) {
 
@@ -419,7 +419,7 @@ if ($consume == 1) // SELL
     {
       $tmpItm = isset($_POST["$x"]) ? mysqli_real_escape_string($db, $_POST["$x"]) : null; // Use string key
       if ($tmpItm) {
-        $sitem = mysqli_fetch_array(mysqli_query($db, "SELECT * FROM Items WHERE id='$tmpItm'"));
+        $sitem = mysqli_fetch_assoc(mysqli_query($db, "SELECT * FROM Items WHERE id='$tmpItm'"));
         if ($sitem['istatus'] == 0) {
           if ($sitem['type'] != 14) {
             $value += intval(0.5 * $item_base[$pouch[$x]['base']][2]);
@@ -455,7 +455,7 @@ if ($consume == 1) // SELL
     while ($x < $clistsize) {
       $tmpItm = isset($_POST["$x"]) ? mysqli_real_escape_string($db, $_POST["$x"]) : null; // Use string key
       if ($tmpItm) {
-        $sitem = mysqli_fetch_array(mysqli_query($db, "SELECT * FROM Items WHERE id='$tmpItm'"));
+        $sitem = mysqli_fetch_assoc(mysqli_query($db, "SELECT * FROM Items WHERE id='$tmpItm'"));
         if ($sitem['istatus'] == 0) {
           $result5 = mysqli_query($db, "DELETE FROM Items WHERE id='$sitem[id]'");
           $q++;
@@ -488,7 +488,7 @@ if ($consume == 1) // SELL
   while ($x < 100) {
     $tmpItm = isset($_POST["$x"]) ? mysqli_real_escape_string($db, $_POST["$x"]) : null; // Use string key
     if ($tmpItm) {
-      $sitem = mysqli_fetch_array(mysqli_query($db, "SELECT * FROM Items WHERE id='$tmpItm'"));
+      $sitem = mysqli_fetch_assoc(mysqli_query($db, "SELECT * FROM Items WHERE id='$tmpItm'"));
       //FOOD ITEM
       if ($sitem['type'] != 14) {
         if ($fullness + $q < 2) {
@@ -504,7 +504,7 @@ if ($consume == 1) // SELL
         //Get locations current resources
         $query = "SELECT * FROM Locations WHERE name='$char[location]'";
         $result = mysqli_query($db, $query);
-        $location = mysqli_fetch_array($result);
+        $location = mysqli_fetch_assoc($result);
 
         if ($location) {
 
@@ -578,7 +578,7 @@ if ($consume == 1) // SELL
 $itmlist = [];
 $listsize = 0;
 $iresult = mysqli_query($db, "SELECT * FROM Items WHERE owner='$id' AND type<15 " . $invSort);
-while ($qitem = mysqli_fetch_array($iresult)) {
+while ($qitem = mysqli_fetch_assoc($iresult)) {
   $itmlist[$listsize++] = $qitem;
 }
 
@@ -587,7 +587,7 @@ $pouch = [];
 $stomach = [];
 $fullness = 0;
 $presult = mysqli_query($db, "SELECT * FROM Items WHERE owner='$id' AND type>=14  " . $consumeSort);
-while ($qitem = mysqli_fetch_array($presult)) {
+while ($qitem = mysqli_fetch_assoc($presult)) {
   if ($qitem['istatus'] == 0) $pouch[$clistsize++] = $qitem;
   else $stomach[$fullness++] = $qitem;
 }
@@ -597,11 +597,11 @@ $b = [];
 $c = [];
 $d = [];
 $e = [];
-$a = mysqli_fetch_array(mysqli_query($db, "SELECT * FROM Items WHERE owner='$char[id]' AND istatus='1' AND type<14"));
-$b = mysqli_fetch_array(mysqli_query($db, "SELECT * FROM Items WHERE owner='$char[id]' AND istatus='2' AND type<14"));
-$c = mysqli_fetch_array(mysqli_query($db, "SELECT * FROM Items WHERE owner='$char[id]' AND istatus='3' AND type<14"));
-$d = mysqli_fetch_array(mysqli_query($db, "SELECT * FROM Items WHERE owner='$char[id]' AND istatus='4' AND type<14"));
-$e = mysqli_fetch_array(mysqli_query($db, "SELECT * FROM Items WHERE owner='$char[id]' AND istatus='5' AND type<14"));
+$a = mysqli_fetch_assoc(mysqli_query($db, "SELECT * FROM Items WHERE owner='$char[id]' AND istatus='1' AND type<14"));
+$b = mysqli_fetch_assoc(mysqli_query($db, "SELECT * FROM Items WHERE owner='$char[id]' AND istatus='2' AND type<14"));
+$c = mysqli_fetch_assoc(mysqli_query($db, "SELECT * FROM Items WHERE owner='$char[id]' AND istatus='3' AND type<14"));
+$d = mysqli_fetch_assoc(mysqli_query($db, "SELECT * FROM Items WHERE owner='$char[id]' AND istatus='4' AND type<14"));
+$e = mysqli_fetch_assoc(mysqli_query($db, "SELECT * FROM Items WHERE owner='$char[id]' AND istatus='5' AND type<14"));
 
 for ($i = 0; $i < $listsize; ++$i) {
   $invinfo[$i] = "<div class='panel panel-success' style='width: 150px;'><div class='panel-heading'><h3 class='panel-title'>" . ucwords($itmlist[$i]['prefix'] . " " . $itmlist[$i]['base']) . " " . str_replace("Of", "of", ucwords($itmlist[$i]['suffix'])) . "</h3></div><div class='panel-body abox' align='center'><img class='img-responsive hidden-xs img-optional-nodisplay' border='0' bordercolor='black' src='items/" . str_replace(' ', '', $itmlist[$i]['base']) . ".gif'/>";
@@ -670,11 +670,11 @@ include('header.php');
           $c = [];
           $d = [];
           $e = [];
-          $a = mysqli_fetch_array(mysqli_query($db, "SELECT * FROM Items WHERE owner='$char[id]' AND istatus='1' AND type<14"));
-          $b = mysqli_fetch_array(mysqli_query($db, "SELECT * FROM Items WHERE owner='$char[id]' AND istatus='2' AND type<14"));
-          $c = mysqli_fetch_array(mysqli_query($db, "SELECT * FROM Items WHERE owner='$char[id]' AND istatus='3' AND type<14"));
-          $d = mysqli_fetch_array(mysqli_query($db, "SELECT * FROM Items WHERE owner='$char[id]' AND istatus='4' AND type<14"));
-          $e = mysqli_fetch_array(mysqli_query($db, "SELECT * FROM Items WHERE owner='$char[id]' AND istatus='5' AND type<14"));
+          $a = mysqli_fetch_assoc(mysqli_query($db, "SELECT * FROM Items WHERE owner='$char[id]' AND istatus='1' AND type<14"));
+          $b = mysqli_fetch_assoc(mysqli_query($db, "SELECT * FROM Items WHERE owner='$char[id]' AND istatus='2' AND type<14"));
+          $c = mysqli_fetch_assoc(mysqli_query($db, "SELECT * FROM Items WHERE owner='$char[id]' AND istatus='3' AND type<14"));
+          $d = mysqli_fetch_assoc(mysqli_query($db, "SELECT * FROM Items WHERE owner='$char[id]' AND istatus='4' AND type<14"));
+          $e = mysqli_fetch_assoc(mysqli_query($db, "SELECT * FROM Items WHERE owner='$char[id]' AND istatus='5' AND type<14"));
           $estats = getstats($a, $b, $c, $d, $e, $skills);
           $tskills = $skills . " " . $estats[0];
           $pts_tot = 0;
@@ -702,7 +702,7 @@ include('header.php');
                   for ($placeequip = 1; $placeequip < 6; $placeequip++) {
                     $itemtoblit = 0;
                     $blited = 0;
-                    $itemtoblit = mysqli_fetch_array(mysqli_query($db, "SELECT * FROM Items WHERE owner='$char[id]' AND istatus='$placeequip' AND type<14"));
+                    $itemtoblit = mysqli_fetch_assoc(mysqli_query($db, "SELECT * FROM Items WHERE owner='$char[id]' AND istatus='$placeequip' AND type<14"));
                     echo "<div class='col-xs-5ths'>";
                     if ($itemtoblit['id']) {
                       $blited = 1;
@@ -895,7 +895,7 @@ include('header.php');
                     <a href="#" onclick="if(confirm('Donate selected items to your clan's vault?')) `javascript:submitFormItem(3);; return false;" class="btn btn-primary btn-sm btn-wrap">Donate to Vault</a>
                   <?php
                   }
-                  $myEstate = mysqli_fetch_array(mysqli_query($db, "SELECT * FROM Estates WHERE owner='$id' AND location='$char[location]'"));
+                  $myEstate = mysqli_fetch_assoc(mysqli_query($db, "SELECT * FROM Estates WHERE owner='$id' AND location='$char[location]'"));
                   if ($myEstate['id']) {
                     $upgrades = unserialize($myEstate['upgrades']);
                     $maxestinv = 3 + 3 * $upgrades[2];

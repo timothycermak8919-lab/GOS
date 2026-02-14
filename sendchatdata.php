@@ -9,7 +9,7 @@ $write=1;
 $id=mysqli_real_escape_string($db,$_GET['id']);
 $jtime=time();
 // insert new message into database table
-$msgs = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM messages WHERE id='".$id."'"));
+$msgs = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM messages WHERE id='".$id."'"));
 $msg = unserialize($msgs['message']);
 
 if (!($name && $lastname && $password)) 

@@ -86,7 +86,7 @@ $time = time();
         $itime=time();
         $result = mysqli_query($db,"INSERT INTO Items (owner,type,    cond, istatus,points, society,last_moved,base,   prefix,suffix,stats) 
                                           VALUES ('$id','$itype','100','0',    '$ipts','',     '$itime',  '$base','',    '',    '$istats')");
-        $ustats = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Users_stats WHERE id='$id'"));
+        $ustats = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Users_stats WHERE id='$id'"));
         $ustats['item_earn'] -= $worth;
         $ustats['spent_shop'] += $worth;
         $result = mysqli_query($db,"UPDATE Users_stats SET item_earn='".$ustats['item_earn']."', spent_shop='".$ustats['spent_shop']."' WHERE id='".$id."'");
@@ -106,13 +106,13 @@ $time = time();
 
         if ($sellclan != 0)
         {
-          $society = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Soc WHERE id='".$sellclan."' "));
+          $society = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Soc WHERE id='".$sellclan."' "));
           $society['bank'] += $clan_cut;
           mysqli_query($db,"UPDATE Soc SET bank='".$society['bank']."' WHERE id='".$sellclan."'");
         }
         else
         {
-          $society = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Soc WHERE name='".$location['ruler']."' "));
+          $society = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Soc WHERE name='".$location['ruler']."' "));
           $society['bank'] += $clan_cut;
           mysqli_query($db,"UPDATE Soc SET bank='".$society['bank']."' WHERE name='".$location['ruler']."'");
         }
@@ -239,7 +239,7 @@ function marketBuy(bid,bs)
             $foundnum=0;
             $farr=[];
             $result = mysqli_query($db,"SELECT * FROM Profs WHERE location='$char[location]' AND type=0");  
-            while ($bq = mysqli_fetch_array( $result ) )
+            while ($bq = mysqli_fetch_assoc( $result ) )
             {
               $tbis = unserialize($bq['status']);
               for ($i=0; $i <9; $i++)
@@ -250,7 +250,7 @@ function marketBuy(bid,bs)
                   $tname = strtolower(iname($tbis[$i][1][0]));  
                   $statstr = iparse($tbis[$i][1][0],$item_base, $item_ix,$ter_bonuses);
                   $teq = lvl_req($statstr,100);
-                  $os = mysqli_fetch_array(mysqli_query($db,"SELECT society,jobs FROM Users WHERE id='".$bq['owner']."'"));
+                  $os = mysqli_fetch_assoc(mysqli_query($db,"SELECT society,jobs FROM Users WHERE id='".$bq['owner']."'"));
                   $costmult = 1;
                   if ($char['society'] != "" && $os['society'] != "")
                   {

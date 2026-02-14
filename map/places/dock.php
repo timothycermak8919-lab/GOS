@@ -3,7 +3,7 @@
 	include('info.php');
 	$no_query=1;
 	include('connect_info.php');
-	$char = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Users LEFT JOIN Users_data ON Users.id=Users_data.id WHERE Users.id='$id'"));
+	$char = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Users LEFT JOIN Users_data ON Users.id=Users_data.id WHERE Users.id='$id'"));
 	include($_SERVER['DOCUMENT_ROOT']."/".$subfile.'/map/mapdata/coordinates.inc');
 	
 	include($_SERVER['DOCUMENT_ROOT']."/".$subfile."/admin/tree_skills.php");

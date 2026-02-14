@@ -15,7 +15,7 @@ if (!$lastBattleDone)
   
   
   $result = mysqli_query($db,"SELECT * FROM Users LEFT JOIN Users_stats ON Users.id=Users_stats.id WHERE (Users.nation!='0')");
-  while ( $listchar = mysqli_fetch_array( $result ) )
+  while ( $listchar = mysqli_fetch_assoc( $result ) )
   {
     $listchar['coin']=$listchar['gold'];
     $listchar['xp']=$listchar['exp'];
@@ -24,7 +24,7 @@ if (!$lastBattleDone)
     $tot_estate = 0;
     $estquery = mysqli_query($db,"SELECT id, owner, value, level FROM Estates WHERE owner='".$listchar['id']."' ORDER BY value DESC");
 
-      while ($tmpEstate = mysqli_fetch_array($estquery))
+      while ($tmpEstate = mysqli_fetch_assoc($estquery))
       {
         if (!$enum)
         {
@@ -43,7 +43,7 @@ if (!$lastBattleDone)
     $tot_business = 0;
     $bquery = mysqli_query($db,"SELECT id, owner, value FROM Profs WHERE owner='".$listchar['id']."' ORDER BY value DESC");
 	
-    while ($tmpBiz = mysqli_fetch_array($bquery))
+    while ($tmpBiz = mysqli_fetch_assoc($bquery))
     {
       if (!$bnum)
       {
@@ -60,7 +60,7 @@ if (!$lastBattleDone)
  }
     
   // loop over all ranks and deterime top 10. If LB is has started, don't update coin ranks.
-  $cityRumors = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM messages WHERE id='50000'"));
+  $cityRumors = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM messages WHERE id='50000'"));
   $hoursFromBreak = intval(((time()/3600)-$cityRumors['checktime']));
   $loops =count($rank_data);
   if ($cityRumors['checktime'] != 0 && $hoursFromBreak >= 720) 
@@ -74,7 +74,7 @@ if (!$lastBattleDone)
     $x=0;
     $result = mysqli_query($db,"SELECT * FROM Users LEFT JOIN Users_stats ON Users.id=Users_stats.id WHERE (Users.nation!='0') ORDER BY ".$rank_by." DESC, exp DESC LIMIT 0,10 ");
 	$numchar = mysqli_num_rows($result);
-    while ( $listchar = mysqli_fetch_array( $result ) )
+    while ( $listchar = mysqli_fetch_assoc( $result ) )
     {
       $heroes[$x+1][$rank_by]=$listchar[$rank_by];
       $heroes[$x+11][$rank_by]=$listchar['id'];
@@ -99,7 +99,7 @@ if (!$lastBattleDone)
 mysqli_query($db,"UNLOCK TABLES;");
 
 // Update Soc Stats
-$msgs = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM messages WHERE id='0'"));
+$msgs = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM messages WHERE id='0'"));
 if ($msgs['checktime'] < floor(time()/600) && !$lastBattleDone)
 {
   for ($y = 0; $y < count($soc_rank_data); $y++)
@@ -116,7 +116,7 @@ if ($msgs['checktime'] < floor(time()/600) && !$lastBattleDone)
     $x=0;
     $result = mysqli_query($db,"SELECT * FROM Soc WHERE 1 ORDER BY ".$orderBy.", id ASC LIMIT 0,10 ");
     $numsoc = mysqli_num_rows($result);
-    while ( $listsoc = mysqli_fetch_array( $result ) )
+    while ( $listsoc = mysqli_fetch_assoc( $result ) )
     {
       $heroes[$x+1][$rank_by]=$listsoc[$field];
       $heroes[$x+11][$rank_by]=$listsoc['id'];

@@ -12,11 +12,11 @@ $id=$char['id'];
 $soc_name=str_replace("+"," ",mysqli_real_escape_string($db,strval($_GET['name'])));
 
 
-$society = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Soc WHERE name='$soc_name' "));
+$society = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Soc WHERE name='$soc_name' "));
 $message = $soc_name;
 $blocked = unserialize($society['blocked']);
 
-$resultf = mysqli_fetch_array(mysqli_query($db,"SELECT COUNT(*) FROM Users"));
+$resultf = mysqli_fetch_assoc(mysqli_query($db,"SELECT COUNT(*) FROM Users"));
 $numchar = $resultf[0];
 $soclimit = floor($numchar/10);
 if ($soclimit < 10) $soclimit=10;
@@ -24,7 +24,7 @@ if ($soclimit < 10) $soclimit=10;
 if ($char['goodevil']==1) $classn="good"; elseif ($char['goodevil']==2) $classn="evil"; else $classn="neutral";
 
 $soc_name_char = $char['society'];
-$society_char = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Soc WHERE name='$soc_name_char' "));
+$society_char = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Soc WHERE name='$soc_name_char' "));
 $stance = unserialize($society_char['stance']);
 
 // SET CLAN'S STANCE
@@ -33,11 +33,11 @@ if ($name == $society_char['leader'] && $lastname == $society_char['leaderlast']
   $atWar=0;
   $query = "SELECT * FROM Locations WHERE 1";
   $result2 = mysqli_query($db,$query);
-  while ( $listchar = mysqli_fetch_array( $result2 ) )
+  while ( $listchar = mysqli_fetch_assoc( $result2 ) )
   {
     if ($listchar['last_war'])
     {
-      $myWar = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Contests WHERE id='$listchar[last_war]' "));
+      $myWar = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Contests WHERE id='$listchar[last_war]' "));
       if (!$myWar['done'] && !($myWar['starts'] > intval(time()/3600)))
       {
         // Get clan id's that might be involved in war.
@@ -70,7 +70,7 @@ if ($name == $society_char['leader'] && $lastname == $society_char['leaderlast']
       $support = unserialize($society_char['support']);
       $support2 = unserialize($society['support']);
 
-      while ( $listchar = mysqli_fetch_array( $result2 ) )
+      while ( $listchar = mysqli_fetch_assoc( $result2 ) )
       {
         $loco = $listchar['id'];
         if ($support[$loco] == $society['id'])
@@ -111,7 +111,7 @@ if ($name == $society_char['leader'] && $lastname == $society_char['leaderlast']
     $result = mysqli_query($db,"UPDATE Soc SET stance='$changed_stance', align='".$society_char['align']."' WHERE name='$soc_name_char' ");
 
     // notifiy other leader and update their stances
-    $soc_lead = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Users WHERE name='$society[leader]' AND lastname='$society[leaderlast]'"));
+    $soc_lead = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Users WHERE name='$society[leader]' AND lastname='$society[leaderlast]'"));
     
     $notesub = "";
     $note = "";
@@ -147,7 +147,7 @@ if ($name == $society_char['leader'] && $lastname == $society_char['leaderlast']
   }  
   else if (($new_stance == 1 || $new_stance == -2))
   {
-    $reqnote = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Notes WHERE id='$noter'"));
+    $reqnote = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Notes WHERE id='$noter'"));
     $align = getClanAlignment($society_char['align'],$society_char['members']);
     $align2 = getClanAlignment($society['align'],$society['members']);
 
@@ -190,7 +190,7 @@ if ($name == $society_char['leader'] && $lastname == $society_char['leaderlast']
       $result = mysqli_query($db,$query);
 
       // notifiy other leader and update their stances
-      $soc_lead = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Users LEFT JOIN Users_data ON Users.id=Users_data.id WHERE Users.name='$society[leader]' AND Users.lastname='$society[leaderlast]'"));
+      $soc_lead = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Users LEFT JOIN Users_data ON Users.id=Users_data.id WHERE Users.name='$society[leader]' AND Users.lastname='$society[leaderlast]'"));
    
       $note="";
       $notesub="";
@@ -229,7 +229,7 @@ if ($name == $society_char['leader'] && $lastname == $society_char['leaderlast']
     else 
     {
       // Send Request
-      $soc_lead = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Users WHERE name='".$society['leader']."' AND lastname='".$society['leaderlast']."'"));
+      $soc_lead = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Users WHERE name='".$society['leader']."' AND lastname='".$society['leaderlast']."'"));
 
       $note="";
       $notesub="";
@@ -250,7 +250,7 @@ if ($name == $society_char['leader'] && $lastname == $society_char['leaderlast']
                                         VALUES ('$char[id]','$soc_lead[id]','0',     '0',   '4', '0', '".$mytime."','','$notesub','$note','$note_extra')"); 
 
       // Update the message's body with the message's own id
-      $myrequest = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Notes WHERE sent='".$mytime."' AND from_id='".$char['id']."'"));
+      $myrequest = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Notes WHERE sent='".$mytime."' AND from_id='".$char['id']."'"));
       $myrequest['body'] = "<b>$note $society[name]</b><br><br><a href=joinclan.php?request=1&name=$socnameother2&stance=$new_stance&note=".$myrequest['id']." >Accept Offer</a>";
       mysqli_query($db,"UPDATE Notes SET body='".$myrequest['body']."' WHERE id='".$myrequest['id']."'");
  
@@ -277,7 +277,7 @@ if ($doit == 1)
       $alts = getAlts($charip);
       $result = mysqli_query($db,"SELECT name, lastname, id FROM Users WHERE society='".$society['name']."'");
       $socalts=0;
-      while ( $listchar = mysqli_fetch_array( $result ) )
+      while ( $listchar = mysqli_fetch_assoc( $result ) )
       {  
         $username = $listchar['name']."_".$listchar['lastname'];
         if ($alts[$username]) $socalts++;
@@ -288,7 +288,7 @@ if ($doit == 1)
         $alignnum = getAlignment($char);
         if ($society['invite'] < 3 || ($society['invite'] == 3 && $alignnum >= 0) || ($society['invite'] == 4 && $alignnum <= 0) || ($society['invite'] == 5 && $alignnum == 0))
         {
-          $reqnote = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Notes WHERE id='$noter'"));
+          $reqnote = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Notes WHERE id='$noter'"));
   
           if ($reqnote['special'] == $soc_name || $society['invite'] == 0 || (strtolower($name) == "the" && strtolower($lastname) == "creator"))
           {
@@ -299,12 +299,12 @@ if ($doit == 1)
             }
          
             // SET DATABASE
-            $ustats = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Users_stats WHERE id='$id'"));
+            $ustats = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Users_stats WHERE id='$id'"));
             $ustats['clans_joined']++;
             mysqli_query($db,"UPDATE Users SET society='$soc_name' WHERE id='$id' ");
             mysqli_query($db,"UPDATE Users_stats SET clans_joined='$ustats[clans_joined]' WHERE id='$id' ");
             // ADD TO NUMBER OF MEMBERS
-            $society = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Soc WHERE name='$soc_name' "));
+            $society = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Soc WHERE name='$soc_name' "));
             $memnumb = $society['members'] + 1;
             $result = mysqli_query($db,"UPDATE Soc SET members='$memnumb' WHERE name='$soc_name' ");
             header("Location: $server_name/clan.php?message=You Have Joined $soc_name&time=$curtime");

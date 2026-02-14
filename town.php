@@ -12,23 +12,23 @@ $loc_query = $char['location'];
 $surrounding_area = $map_data[$loc];
 
 // LOAD LOCATION TABLE
-$location = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Locations WHERE name='$loc_query'"));
+$location = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Locations WHERE name='$loc_query'"));
 
 $upgrades = unserialize($location['upgrades']);
 
 // UPDATE NUMBER OF MEMEBERS
 $query = "SELECT COUNT(*) FROM Users WHERE location='$loc_query' ";
-$resultf = mysqli_fetch_array(mysqli_query($db,$query));
+$resultf = mysqli_fetch_assoc(mysqli_query($db,$query));
 $numchar = $resultf['0'];
 
 // CHECK FOR LOCAL BUSINESSES
   $myLocBiz['999'] = '';
   $query1 = "SELECT COUNT(*) FROM Profs WHERE owner='$id' AND location='$loc_query'";
-  $resultf1 = mysqli_fetch_array(mysqli_query($db,$query));
+  $resultf1 = mysqli_fetch_assoc(mysqli_query($db,$query));
   if ($resultf1)
   {
     $result = mysqli_query($db,"SELECT id, type FROM Profs WHERE owner='$id' AND location='$loc_query'");  
-    while ($bq = mysqli_fetch_array( $result ) )
+    while ($bq = mysqli_fetch_assoc( $result ) )
     {
       $myLocBiz[$bq['type']]=1;
     }
@@ -40,7 +40,7 @@ $numchar = $resultf['0'];
   <?php
     if ($location['ruler'] != 'No One' && !$location['isDestroyed'])
     {
-      $rulersoc = mysqli_fetch_array(mysqli_query($db,"SELECT id, flag, sigil FROM Soc WHERE name='$location[ruler]' "));
+      $rulersoc = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, flag, sigil FROM Soc WHERE name='$location[ruler]' "));
       echo "<div class='col-sm-3 col-lg-2 hidden-xs'><div class='img-optional' style=\"background-image: url('images/Flags/".$rulersoc['flag']."'); background-repeat: no-repeat;\"><img src=\"images/Sigils/".$rulersoc['sigil']."\" align='top' width=160 height=197 class='img-optional'></div></div>";
     } 
     else 
@@ -113,7 +113,7 @@ $numchar = $resultf['0'];
               </div>
           <?php
             }        
-            $society = mysqli_fetch_array(mysqli_query($db,"SELECT id, subleaders, subs, offices, area_score, leader, leaderlast FROM Soc WHERE name='$soc_name' "));
+            $society = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, subleaders, subs, offices, area_score, leader, leaderlast FROM Soc WHERE name='$soc_name' "));
             $subleaders = unserialize($society['subleaders']);
             $subs = $society['subs'];
             $offices = unserialize($society['offices']);
@@ -162,7 +162,7 @@ $numchar = $resultf['0'];
               $myTourney = 0;
               if ($location['last_tourney'])
               {
-                $myTourney = mysqli_fetch_array(mysqli_query($db,"SELECT id, starts, ends, winner FROM Contests WHERE id='$location[last_tourney]' "));
+                $myTourney = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, starts, ends, winner FROM Contests WHERE id='$location[last_tourney]' "));
               }
               if ($myTourney != 0) // Previous tournament
               {
@@ -189,12 +189,12 @@ $numchar = $resultf['0'];
               $myWar = 0;
               
               // Check if it's Last Battle Time. :)
-              $lastBattle = mysqli_fetch_array(mysqli_query($db,"SELECT id, starts, ends, winner FROM Contests WHERE type='99' "));
+              $lastBattle = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, starts, ends, winner FROM Contests WHERE type='99' "));
               if ($lastBattle == 0) // if not, look for clan battles
               {
                 if ($location['last_war'])
                 {
-                  $myWar = mysqli_fetch_array(mysqli_query($db,"SELECT id, starts, ends, winner FROM Contests WHERE id='$location[last_war]' "));
+                  $myWar = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, starts, ends, winner FROM Contests WHERE id='$location[last_war]' "));
                 }
                 if ($myWar != 0) // Previous tournament
                 { 
@@ -244,7 +244,7 @@ $numchar = $resultf['0'];
               
 			  
 			  
-			  while ($myHorde = mysqli_fetch_array( $result3 ) )
+			  while ($myHorde = mysqli_fetch_assoc( $result3 ) )
               {
                 $npc_info = unserialize($myHorde['npcs']);
                 $hordemsg = "";
@@ -341,7 +341,7 @@ function getXMLHttpRequestObject(){
       
           $loco = $location['id'];
           updateSocScores();
-          $location = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Locations WHERE name='$loc_query'"));
+          $location = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Locations WHERE name='$loc_query'"));
           $clanscores = unserialize($location['clan_scores']);
           $supporting = unserialize($location['clan_support']);
 
@@ -359,7 +359,7 @@ function getXMLHttpRequestObject(){
           $h=0;
 
           $result =mysqli_query($db,"SELECT * FROM Users LEFT JOIN Users_stats ON Users.id=Users_stats.id WHERE 1 ORDER BY loc_ji".$loco." DESC, exp DESC LIMIT 0,5");
-          while ( $listchar = mysqli_fetch_array( $result ) )
+          while ( $listchar = mysqli_fetch_assoc( $result ) )
           {
             $topheroes[$h]['0']=$listchar['name']." ".$listchar['lastname'];
             $topheroes[$h]['1']=$listchar['loc_ji'.$loco];
@@ -402,7 +402,7 @@ function getXMLHttpRequestObject(){
               {
                 if ($topclans[$x])
                 {
-                  $soc = mysqli_fetch_array(mysqli_query($db,"SELECT id, name FROM `Soc` WHERE id = '$topclans[$x]'"));
+                  $soc = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, name FROM `Soc` WHERE id = '$topclans[$x]'"));
                   echo "<tr><td align='left'>".$soc['name'].":</td>";
                   if ($supporting[$topclans[$x]]==0) echo "<td align='left'>". number_format($clanscores[$topclans[$x]])."</td>";
                   else echo "<td align='left'>Supporting</td>";

@@ -20,7 +20,7 @@ if ($goodevil >1) $goodevil= 1;
 <font face="VERDANA"><font class="bigtext"><center><br>
 
 <?php
-$quest =  mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Quests WHERE id=$id"));
+$quest =  mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Quests WHERE id=$id"));
 
 $qtype = $quest_type[$quest[type]];
 if ($quest[expire] != -1)

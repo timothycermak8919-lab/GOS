@@ -20,14 +20,14 @@ $soc_name = $char['society'];
 
 if ($soc_name)
 {
-  $society = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Soc WHERE name='$soc_name' ORDER BY id"));
+  $society = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Soc WHERE name='$soc_name' ORDER BY id"));
   $stance = unserialize($society['stance']);
 }
 
 $query = "SELECT * FROM Users_stats WHERE id>'10000'";
 $result = mysqli_query($db,$query);
 $x=0;
-while ( $listchar = mysqli_fetch_array( $result ) )
+while ( $listchar = mysqli_fetch_assoc( $result ) )
 {
   $x = $listchar['id']-10001;
   if ($x<10)
@@ -45,7 +45,7 @@ while ( $listchar = mysqli_fetch_array( $result ) )
 $query = "SELECT * FROM Soc_stats WHERE id>'10000'";
 $result = mysqli_query($db,$query);
 $x=0;
-while ( $listsoc = mysqli_fetch_array( $result ) )
+while ( $listsoc = mysqli_fetch_assoc( $result ) )
 {
   $x = $listsoc['id']-10000;
   $topClans[$x]=$listsoc;
@@ -55,7 +55,7 @@ $result99 = mysqli_query($db,"SELECT id, winner FROM Contests WHERE type='99' AN
 $lastBattleDone = mysqli_num_rows($result99);
 if ($lastBattleDone)
 {
-  $lb = mysqli_fetch_array($result99);
+  $lb = mysqli_fetch_assoc($result99);
   echo "<center><b>";
   if ($lb['winner'] == "Shadow")
   {
@@ -152,7 +152,7 @@ if ($lastBattleDone)
                     { 
                       if (!$users[$tid])
                       {
-                        $users[$tid] = mysqli_fetch_array(mysqli_query($db,"SELECT id, name, lastname, goodevil, society FROM Users WHERE id='".$tid."'"));
+                        $users[$tid] = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, name, lastname, goodevil, society FROM Users WHERE id='".$tid."'"));
                       }
                       $listchar=$users[$tid];
                       if ($listchar['id'] == $id) $classn="btn-info";
@@ -199,7 +199,7 @@ if ($lastBattleDone)
                   <table class='table table-responsive table-hover table-condensed table-clear small'>
                 <?php
                   $result = mysqli_query($db,"SELECT id, name, lastname, exp, goodevil, society, level FROM Users WHERE nation='".$i."' ORDER BY exp DESC LIMIT 0,3");
-                  while ($listchar = mysqli_fetch_array($result))
+                  while ($listchar = mysqli_fetch_assoc($result))
                   {
                       if ($listchar['id'] == $id) $classn="btn-info";
                       else $classn="btn-default";
@@ -254,7 +254,7 @@ if ($lastBattleDone)
                     { 
                       if (!$soc[$sid])
                       {
-                        $soc[$sid] = mysqli_fetch_array(mysqli_query($db,"SELECT id, name FROM Soc WHERE id='".$sid."'"));
+                        $soc[$sid] = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, name FROM Soc WHERE id='".$sid."'"));
                       }
                       $listsoc=$soc[$sid];
                       if ($listsoc['name'] == $char['society']) $classn="btn-info";
@@ -305,7 +305,7 @@ if ($lastBattleDone)
                   }
                   $x=0;
                   $result = mysqli_query($db,"SELECT id, myOrder, pop, name FROM Locations WHERE 1 ORDER BY ".$orderBy." LIMIT 0,10");
-                  while ($listloc = mysqli_fetch_array($result))
+                  while ($listloc = mysqli_fetch_assoc($result))
                   {
                       $classn="btn-default";
                 ?>

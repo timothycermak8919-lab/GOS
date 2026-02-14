@@ -39,7 +39,7 @@ $bizslot=mysqli_real_escape_string($db,$_REQUEST['bizslot']);
 if (!$resultnumb) $resultnumb = 0;
 $numbofresults = 20;
 $time=time();
-$ustats = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Users_stats WHERE id='$id'"));
+$ustats = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Users_stats WHERE id='$id'"));
 
 $wikilink = "Market";
 
@@ -47,10 +47,10 @@ $charip = unserialize($char['ip']);
 $alts = getAlts($charip); 
 
 $soc_name = $char['society'];
-$society = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Soc WHERE name='$soc_name' "));
+$society = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Soc WHERE name='$soc_name' "));
 $stance = unserialize($society['stance']);
 
-$mybq = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Profs WHERE owner='$id' AND location='$loc' AND type=0"));
+$mybq = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Profs WHERE owner='$id' AND location='$loc' AND type=0"));
 $allyMult=1;
 if ($mybq)
 {
@@ -69,14 +69,14 @@ if (!$is_market) $message = "There is no Marketplace in ".str_replace('-ap-','&#
 
 if ($bizid != '' && $bizslot != '')
 {
-  $bq = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Profs WHERE id='$bizid'"));
+  $bq = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Profs WHERE id='$bizid'"));
   $tbis = unserialize($bq['status']);
   
   if ($bq['location']==$loc)
   {
     if ($tbis[$bizslot][0]==1) // is offer
     {
-      $owner = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Users WHERE id='".$bq['owner']."'"));
+      $owner = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Users WHERE id='".$bq['owner']."'"));
       $username=$owner['name']."_".$owner['lastname'];
       if ($bq['owner'] != $id && !$alts[$username])
       {
@@ -117,7 +117,7 @@ if ($bizid != '' && $bizslot != '')
             $bqs= serialize($tbis);
             
             $ustats['items_from_market']++;
-            $ostats = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Users_stats WHERE id='$owner[id]'"));
+            $ostats = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Users_stats WHERE id='$owner[id]'"));
             $ostats['items_marketed']++;
             
             $result = mysqli_query($db,"UPDATE Users SET gold='$char[gold]' WHERE id='$id'");
@@ -147,7 +147,7 @@ if ( $s_costmin && $s_costmax && $is_market)
   $foundnum=0;
   $farr=[];
   $result = mysqli_query($db,"SELECT * FROM Profs WHERE ".$loc_search."type=0");  
-  while ($bq = mysqli_fetch_array( $result ) )
+  while ($bq = mysqli_fetch_assoc( $result ) )
   {
     $tbis = unserialize($bq['status']);
     for ($i=0; $i <9; $i++)
@@ -169,7 +169,7 @@ if ( $s_costmin && $s_costmax && $is_market)
                 $tstats = cparse($statstr,0);
                 if ($s_bonus == "" || $tstats[$s_bonus])
                 {
-                  $os = mysqli_fetch_array(mysqli_query($db,"SELECT society,jobs FROM Users WHERE id='".$bq['owner']."'"));
+                  $os = mysqli_fetch_assoc(mysqli_query($db,"SELECT society,jobs FROM Users WHERE id='".$bq['owner']."'"));
                   
                   $costmult = 1;
                   if ($char['society'] != "" && $os['society'] != "")

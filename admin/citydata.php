@@ -19,23 +19,23 @@ $orderRuler='';
 $chaosRuler='';
 
 // Ruled Defense bonus
-$defcity = mysqli_fetch_array(mysqli_query($db,"SELECT ruler, upgrades FROM Locations WHERE name='Tar Valon'"));
+$defcity = mysqli_fetch_assoc(mysqli_query($db,"SELECT ruler, upgrades FROM Locations WHERE name='Tar Valon'"));
 $defups = unserialize($defcity['upgrades']);
 if ($defups[7]>0) $defRuler = $defcity['ruler'];
 
 // Ruled Order bonus
-$ordcity = mysqli_fetch_array(mysqli_query($db,"SELECT ruler, upgrades FROM Locations WHERE name='Salidar'"));
+$ordcity = mysqli_fetch_assoc(mysqli_query($db,"SELECT ruler, upgrades FROM Locations WHERE name='Salidar'"));
 $ordups = unserialize($ordcity['upgrades']);
 if ($ordups[7]>0) $orderRuler = $ordcity['ruler'];
 
 // Ruled Chaos bonus
-$chaoscity = mysqli_fetch_array(mysqli_query($db,"SELECT ruler, upgrades FROM Locations WHERE name='Thakan&#39;dar'"));
+$chaoscity = mysqli_fetch_assoc(mysqli_query($db,"SELECT ruler, upgrades FROM Locations WHERE name='Thakan&#39;dar'"));
 $chaosups = unserialize($chaoscity['upgrades']);
 if ($chaosups[7]>0) $chaosRuler = $chaoscity['ruler'];
 
 $save_location = $location;
 $result_loc = mysqli_query($db,"SELECT * FROM Locations WHERE 1");
-while ( $listloc = mysqli_fetch_array( $result_loc ) )
+while ( $listloc = mysqli_fetch_assoc( $result_loc ) )
 {
 
   
@@ -45,8 +45,8 @@ while ( $listloc = mysqli_fetch_array( $result_loc ) )
 	echo "\n</br> Updating city rumors, top character, and seals for  ".$listloc['name']."...";
 
     // CHECK IF SEALS ARE BREAKIN
-    $cityRumors = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM messages WHERE id='50000'"));
-    $topchar = mysqli_fetch_array(mysqli_query($db,"SELECT id, level FROM Users WHERE 1 ORDER BY level DESC, exp DESC LIMIT 1"));
+    $cityRumors = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM messages WHERE id='50000'"));
+    $topchar = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, level FROM Users WHERE 1 ORDER BY level DESC, exp DESC LIMIT 1"));
     $numSeals = mysqli_num_rows(mysqli_query($db,"SELECT id FROM Items WHERE type=0"));
     $numBroken = mysqli_num_rows(mysqli_query($db,"SELECT id FROM Items WHERE type=0 AND owner='99999'"));
     $breakSeal = 0;
@@ -81,7 +81,7 @@ while ( $listloc = mysqli_fetch_array( $result_loc ) )
         {
           $sealNum=1;
           $result = mysqli_query($db,"SELECT * FROM Items WHERE type=0 ORDER BY last_moved");  
-          while ($tmpSeal = mysqli_fetch_array( $result ) )
+          while ($tmpSeal = mysqli_fetch_assoc( $result ) )
           {
             if ($tmpSeal['base'] != "broken seal")
             {
@@ -119,7 +119,7 @@ while ( $listloc = mysqli_fetch_array( $result_loc ) )
       {
         // Find all users in the city and give them extra stamina!
         $locUsers= mysqli_query($db,"SELECT id, stamina FROM Users WHERE location = '$listloc[name]'");
-        while ($locUser = mysqli_fetch_array($locUsers))
+        while ($locUser = mysqli_fetch_assoc($locUsers))
         {
           mysqli_query($db,"UPDATE Users SET stamina=stamina+".$town_bonuses['rM']." WHERE id='$locUser[id]'");
         }
@@ -151,7 +151,7 @@ while ( $listloc = mysqli_fetch_array( $result_loc ) )
 
       $WarWinner = "";
       $result2 = mysqli_query($db,"SELECT id, contestants, rules, reward, type, distro FROM Contests WHERE location='$listloc[name]' AND done='0' AND ends<='$endtime'");
-      while ($contest = mysqli_fetch_array( $result2 ) )
+      while ($contest = mysqli_fetch_assoc( $result2 ) )
       {
         echo "</br>\n Updating contest ".$contest['id']." | ";
         $contestants = unserialize($contest['contestants']);
@@ -184,7 +184,7 @@ while ( $listloc = mysqli_fetch_array( $result_loc ) )
             if ($contest['type']!= 10)
             {
               $cname = explode('_', $rname);
-              $winner= mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Users LEFT JOIN Users_stats ON Users.id=Users_stats.id WHERE Users.name='$cname[0]' AND Users.lastname='$cname[1]'"));
+              $winner= mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Users LEFT JOIN Users_stats ON Users.id=Users_stats.id WHERE Users.name='$cname[0]' AND Users.lastname='$cname[1]'"));
               if ($place==1)
               {
                 $first = $winner['name']." ".$winner['lastname'];
@@ -215,7 +215,7 @@ while ( $listloc = mysqli_fetch_array( $result_loc ) )
                   $jr-= $jshare;
                   mysqli_query($db,"UPDATE Users_stats SET win_tourney=win_tourney+1 WHERE id='$winner[id]'"); 
                 }
-                $society = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Soc WHERE name='$winner[soc_name]' "));
+                $society = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Soc WHERE name='$winner[soc_name]' "));
                 $area_rep = unserialize($society['area_rep']);
                 $area_rep[$listloc['id']] += 100;
                 if ($area_rep[$listloc['id']] > 500) $area_rep[$listloc['id']] = 500;
@@ -266,7 +266,7 @@ while ( $listloc = mysqli_fetch_array( $result_loc ) )
               if ($place==1)
               {
                 $cname = explode('_', $rname);
-                $winner= mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Soc WHERE name='$rname'"));
+                $winner= mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Soc WHERE name='$rname'"));
                 $first = $winner['name'];
                 
                 // Update Chaos
@@ -288,7 +288,7 @@ while ( $listloc = mysqli_fetch_array( $result_loc ) )
                 {
                   if ($c_n && $c_s==1)
                   {
-                    $ally= mysqli_fetch_array(mysqli_query($db,"SELECT id, support FROM Soc WHERE name='$c_n'"));
+                    $ally= mysqli_fetch_assoc(mysqli_query($db,"SELECT id, support FROM Soc WHERE name='$c_n'"));
                     $asupport=unserialize($ally['support']);
                     if ($asupport[$listloc['id']] == $winner['id'])
                     {
@@ -303,7 +303,7 @@ while ( $listloc = mysqli_fetch_array( $result_loc ) )
                 $wj+=$sj;
                 for ($s=0; $s<$numSupport; $s++)
                 {
-                  $sally= mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Soc WHERE id='$supporters[$s]'"));
+                  $sally= mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Soc WHERE id='$supporters[$s]'"));
                   $sascore = unserialize($sally['area_score']);
                   $sascore[$listloc['id']]=$sascore[$listloc['id']]+$sj;
                   $ssas = serialize($sascore);
@@ -320,7 +320,7 @@ while ( $listloc = mysqli_fetch_array( $result_loc ) )
               {
                 // everyone else loses a percentage of their Ji which goes directly to the winner (not spread to supporters)
                 $wascore = unserialize($winner['area_score']);
-                $loser= mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Soc WHERE name='$rname'"));
+                $loser= mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Soc WHERE name='$rname'"));
                 $lascore = unserialize($loser['area_score']);
                 $jpercent = 0.10;
                 if ($rules[0] == $loser['id']) $jpercent = 0.05;
@@ -353,7 +353,7 @@ while ( $listloc = mysqli_fetch_array( $result_loc ) )
       // Determine rulers
       echo "</br>\n Determine rulers. | ";
       $halfhour = time()-1800;    
-      $resultf = mysqli_fetch_array(mysqli_query($db,"SELECT COUNT(*) FROM Users WHERE location='$listloc[name]' AND depart<='$halfhour' "));
+      $resultf = mysqli_fetch_assoc(mysqli_query($db,"SELECT COUNT(*) FROM Users WHERE location='$listloc[name]' AND depart<='$halfhour' "));
       $numchar = $resultf[0];
       $listloc['pop']=getTownPop($upgrades,$numchar,$build_pop);
       $newruler= "No One";
@@ -365,7 +365,7 @@ while ( $listloc = mysqli_fetch_array( $result_loc ) )
       $armyup = 0;
 	  echo "</br> Current army: ".json_encode($listloc['army']);
       if ($listloc['ruler']==$defRuler) $armyup+=10;
-      while ($soc = mysqli_fetch_array( $result2 ) )
+      while ($soc = mysqli_fetch_assoc( $result2 ) )
       {
         $clan_id = $soc['id'];
         if (!$clanscores[$clan_id]) $clanscores[$clan_id]=0;
@@ -425,7 +425,7 @@ while ( $listloc = mysqli_fetch_array( $result_loc ) )
         {
           if (!$topfound)
           {
-            $soc = mysqli_fetch_array(mysqli_query($db,"SELECT id, name, members, align FROM `Soc` WHERE id = '$key'"));
+            $soc = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, name, members, align FROM `Soc` WHERE id = '$key'"));
             if ($value >= $topscore) 
             {
 			  echo "</br>\n New ruler: ".$soc['name'];
@@ -454,7 +454,7 @@ while ( $listloc = mysqli_fetch_array( $result_loc ) )
         
         if ($listloc['last_war'])
         {
-          $myWar = mysqli_fetch_array(mysqli_query($db,"SELECT id, starts, ends, contestants, results FROM Contests WHERE id='$listloc[last_war]' "));
+          $myWar = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, starts, ends, contestants, results FROM Contests WHERE id='$listloc[last_war]' "));
         }
         else
         {
@@ -496,7 +496,7 @@ while ( $listloc = mysqli_fetch_array( $result_loc ) )
           if ($listloc['ruler']!=$newruler)
           {
             // Update City Rumors
-            $cityRumors = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM messages WHERE id='50000'"));
+            $cityRumors = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM messages WHERE id='50000'"));
   
             $rumorMessages = unserialize($cityRumors['message']);
             $numRumors = count($rumorMessages);
@@ -516,7 +516,7 @@ while ( $listloc = mysqli_fetch_array( $result_loc ) )
               $result5 = mysqli_query($db,"DELETE FROM Items WHERE type=0 && owner='$sealid'");
             }
           }
-          $ruler =  mysqli_fetch_array(mysqli_query($db,"SELECT id, bank, stance FROM Soc WHERE name='$listloc[ruler]'"));
+          $ruler =  mysqli_fetch_assoc(mysqli_query($db,"SELECT id, bank, stance FROM Soc WHERE name='$listloc[ruler]'"));
           $stance = unserialize($ruler['stance']);
           if ($chaosRuler != '')
           {
@@ -536,9 +536,9 @@ while ( $listloc = mysqli_fetch_array( $result_loc ) )
         else // at war
         {
           $result = mysqli_query($db,"SELECT id, name, lastname, society FROM Users WHERE location='".$listloc['name']."'");
-          while ( $wlistchar = mysqli_fetch_array( $result ) )
+          while ( $wlistchar = mysqli_fetch_assoc( $result ) )
           {
-            $wsoc = mysqli_fetch_array(mysqli_query($db,"SELECT id, support FROM Soc WHERE name='$wlistchar[society]'"));
+            $wsoc = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, support FROM Soc WHERE name='$wlistchar[society]'"));
             $wid= $wsoc['id'];
             $issup = 1;
             $wsupport = unserialize($wsoc['support']);
@@ -573,7 +573,7 @@ while ( $listloc = mysqli_fetch_array( $result_loc ) )
       elseif ($town_bonuses['sQ']) $qalign=2;      
       // check for expired quests
       $result = mysqli_query($db,"SELECT * FROM Quests WHERE location='".$location['name']."' && done='0' && cat != 1");
-      while ($quest = mysqli_fetch_array( $result ) )
+      while ($quest = mysqli_fetch_assoc( $result ) )
       {        
         if ($quest['expire'] != -1 && $quest['expire']*3600 < time())
         {
@@ -607,7 +607,7 @@ mysqli_query($db,"UNLOCK TABLES;");
 
 //mysqli_query($db,"LOCK TABLES Estates WRITE;");
       $result2 = mysqli_query($db,"SELECT id, location, upgrades, owner, value, good FROM Estates WHERE level >= '2'");
-      while ($testate = mysqli_fetch_array( $result2 ) )
+      while ($testate = mysqli_fetch_assoc( $result2 ) )
       {
      
 

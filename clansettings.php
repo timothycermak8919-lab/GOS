@@ -36,7 +36,7 @@ $soc_name = $char[society];
 
 // KICK OFF PAGE IF NOT CLAN LEADER
 
-$society = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Soc WHERE name='$soc_name' "));
+$society = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Soc WHERE name='$soc_name' "));
 $subleaders = unserialize($society['subleaders']);
 $subs = $society['subs'];
 
@@ -85,7 +85,7 @@ if ($subtit)
 if ($addsub)
 {
   $result = mysqli_query($db,"SELECT * FROM Users WHERE id='$addsub'");
-  $char_sub = mysqli_fetch_array($result);
+  $char_sub = mysqli_fetch_assoc($result);
   $subleaders[$addsub]= array($char_sub[name],$char_sub[lastname]);
   $subleaders_str = serialize($subleaders);
   ++$subs;
@@ -130,7 +130,7 @@ if ($kick)
 $query = "UPDATE Users SET society='' WHERE id='$kick'";
 $result = mysqli_query($db,$query);
 $result = mysqli_query($db,"SELECT * FROM Users WHERE id='$kick'");
-$char_kick = mysqli_fetch_array($result);
+$char_kick = mysqli_fetch_assoc($result);
 // UPDATE NUMBER OF CLAN MEMBERS AND BLOCK
 $memnumb = $society[members] - 1;
 $blocked[$kick]=array($char_kick[name],$char_kick[lastname]);
@@ -326,7 +326,7 @@ $numpeople = mysqli_num_rows($result);
             $x = 0;
             while ($x < $numpeople)
             { 
-              $charnew = mysqli_fetch_array($result);
+              $charnew = mysqli_fetch_assoc($result);
               if ( strtolower($charnew[name]) != strtolower($char[name]) || strtolower($charnew[lastname]) != strtolower($char[lastname]) )
               {
                 $b=1;
@@ -389,7 +389,7 @@ $numpeople = mysqli_num_rows($result);
             $y = 0;
             while ($y < $numpeople)
             {
-              $charnew = mysqli_fetch_array($result);
+              $charnew = mysqli_fetch_assoc($result);
               if (( strtolower($charnew[name]) != strtolower($char[name]) || strtolower($charnew[lastname]) != strtolower($char[lastname]) ) && 
                 (strtolower($charnew[name]) != strtolower($society[leader]) && strtolower($charnew[lastname]) != strtolower($society[leaderlast]) ))
               {
@@ -440,7 +440,7 @@ $numpeople = mysqli_num_rows($result);
             $query = "SELECT * FROM Soc WHERE 1 ORDER BY score DESC, members DESC";
             $result2 = mysqli_query($db,$query);
             $stance = unserialize($society['stance']);
-            while ( $listchar = mysqli_fetch_array( $result2 ) )
+            while ( $listchar = mysqli_fetch_assoc( $result2 ) )
             {
               if ($stance[str_replace(" ","_",$listchar[name])] == 1)
               {
@@ -457,7 +457,7 @@ $numpeople = mysqli_num_rows($result);
           <?php
             $query = "SELECT * FROM Locations WHERE 1";
             $result2 = mysqli_query($db,$query);
-            while ( $listchar = mysqli_fetch_array( $result2 ) )
+            while ( $listchar = mysqli_fetch_assoc( $result2 ) )
             {
           ?>
           <option value="<?php echo $listchar[id]; ?>"><?php echo str_replace('-ap-','&#39;',$listchar[name]); ?></option>

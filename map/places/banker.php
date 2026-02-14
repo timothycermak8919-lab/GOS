@@ -3,7 +3,7 @@
   $bd = $town_bonuses['bD'];
   $max_deposit=($bd+80)/100;
   $min_out = 20-$bd;
-  $ustats = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Users_stats WHERE id='$id'"));
+  $ustats = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Users_stats WHERE id='$id'"));
   
   // do banking 
       $_POST['gold']=abs((int)$_POST['gold']);
@@ -56,7 +56,7 @@
               $soc_name = $char['society'];
               $query = "SELECT * FROM Soc WHERE name='$soc_name'";
               $result = mysqli_query($db,$query);
-              $society = mysqli_fetch_array($result);
+              $society = mysqli_fetch_assoc($result);
               $char['bankgold']-=intval($money);
               $society['bank']+=intval($money);
               $char['lastbank']=time();

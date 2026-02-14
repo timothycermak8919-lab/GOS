@@ -49,7 +49,7 @@ class MySQL {
     
     // fetch row
     public function fetchRow(): array|false {
-        return mysqli_fetch_array($this->result, MYSQL_ASSOC);
+        return mysqli_fetch_assoc($this->result);
     }
     
     // count rows

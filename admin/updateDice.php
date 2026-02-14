@@ -6,7 +6,7 @@ include_once('displayFuncs.php');
 
 $result = mysqli_query($db,"SELECT * FROM Locations");
 
-while ( $listloc = mysqli_fetch_array( $result ) )
+while ( $listloc = mysqli_fetch_assoc( $result ) )
 {
   if (time() - ($listloc[lastdice]*60) >= 60)
   {

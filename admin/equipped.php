@@ -7,7 +7,7 @@ $types = unserialize($char['type']);
 
 $fullness=0;
 $presult=mysqli_query($db,"SELECT * FROM Items WHERE owner='$char[id]' AND type>=19 AND istatus>0");
-while ($qitem = mysqli_fetch_array($presult))
+while ($qitem = mysqli_fetch_assoc($presult))
 {
   $stomach[$fullness++] = $qitem;
 }
@@ -17,11 +17,11 @@ $b = [];
 $c = [];
 $d = [];
 $e = [];
-$a = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Items WHERE owner='$char[id]' AND istatus='1' AND type<15"));
-$b = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Items WHERE owner='$char[id]' AND istatus='2' AND type<15"));
-$c = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Items WHERE owner='$char[id]' AND istatus='3' AND type<15"));
-$d = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Items WHERE owner='$char[id]' AND istatus='4' AND type<15"));
-$e = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Items WHERE owner='$char[id]' AND istatus='5' AND type<15"));
+$a = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Items WHERE owner='$char[id]' AND istatus='1' AND type<15"));
+$b = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Items WHERE owner='$char[id]' AND istatus='2' AND type<15"));
+$c = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Items WHERE owner='$char[id]' AND istatus='3' AND type<15"));
+$d = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Items WHERE owner='$char[id]' AND istatus='4' AND type<15"));
+$e = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Items WHERE owner='$char[id]' AND istatus='5' AND type<15"));
 
 // Find Active Skills CHAR ONE
 $skill_bonuses1 = "A0 B0";
@@ -134,7 +134,7 @@ if ($char2)
  
   $fullness2=0;
   $presult=mysqli_query($db,"SELECT * FROM Items WHERE owner='$char2[id]' AND type>=19 AND istatus>0");
-  while ($qitem = mysqli_fetch_array($presult))
+  while ($qitem = mysqli_fetch_assoc($presult))
   {
     $stomach2[$fullness2++] = $qitem;
   }
@@ -145,11 +145,11 @@ if ($char2)
   $e = -1;
 
   // Find Equipped Items CHAR 2
-  $a = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Items WHERE owner='$char2[id]' AND istatus='1' AND type<15"));
-  $b = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Items WHERE owner='$char2[id]' AND istatus='2' AND type<15"));
-  $c = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Items WHERE owner='$char2[id]' AND istatus='3' AND type<15"));
-  $d = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Items WHERE owner='$char2[id]' AND istatus='4' AND type<15"));
-  $e = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Items WHERE owner='$char2[id]' AND istatus='5' AND type<15"));
+  $a = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Items WHERE owner='$char2[id]' AND istatus='1' AND type<15"));
+  $b = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Items WHERE owner='$char2[id]' AND istatus='2' AND type<15"));
+  $c = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Items WHERE owner='$char2[id]' AND istatus='3' AND type<15"));
+  $d = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Items WHERE owner='$char2[id]' AND istatus='4' AND type<15"));
+  $e = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Items WHERE owner='$char2[id]' AND istatus='5' AND type<15"));
 
   // Find Active Skills CHAR 2
   $skill_bonuses2 = "A0 B0";

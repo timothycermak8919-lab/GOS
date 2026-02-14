@@ -3,7 +3,7 @@
 	include('places/info.php');
 	$no_query=1;
 	include('places/connect_info.php');
-	$char = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Users LEFT JOIN Users_data ON Users.id=Users_data.id WHERE Users.id='$id'"));
+	$char = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Users LEFT JOIN Users_data ON Users.id=Users_data.id WHERE Users.id='$id'"));
 	
 	if ($char['arrival']>time()) {header("Location: $server_name/map/traveling.php"); exit;} // ERROR CHECK
 	

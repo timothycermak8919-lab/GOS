@@ -17,7 +17,7 @@ $stmt = mysqli_prepare($db, $query);
 mysqli_stmt_bind_param($stmt, "s", $user);
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
-$codeResult = mysqli_fetch_array( $result );
+$codeResult = mysqli_fetch_assoc( $result );
 
 /* Allow access if a matching record was found and cookies enabled, else deny access. */
 if ($codeResult)

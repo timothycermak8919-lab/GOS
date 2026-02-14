@@ -17,7 +17,7 @@ if ($_POST[admin] == $admin_username && $_POST[pass] == $admin_password && $_POS
   $amount = intval($_POST[amount]);
   $query = "SELECT * FROM donate WHERE email='$email'";
   $result = mysqli_query($db, $query);
-  $result = mysqli_fetch_array($result);
+  $result = mysqli_fetch_assoc($result);
   if ($result[id]) {
     mysqli_query($db,"UPDATE donate SET amount='".($result[amount]+$amount)."' WHERE email='$email'");
   }
@@ -29,7 +29,7 @@ if ($_POST[admin] == $admin_username && $_POST[pass] == $admin_password && $_POS
   if ($result[amount]+$amount >= 5)
   {
     $resulte = mysqli_query($db,"SELECT id, donor, battlestoday FROM Users WHERE email='$email'");
-    while ($chare = mysqli_fetch_array($resulte))
+    while ($chare = mysqli_fetch_assoc($resulte))
     {
       echo $chare[id]."_".$chare[donor];
       if ($chare[donor] == 0)

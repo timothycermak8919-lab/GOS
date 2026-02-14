@@ -32,11 +32,11 @@ if ($message == '') {
 $aresult = mysqli_query($db, "SELECT * FROM Notes WHERE to_id='$id' AND del_to='0' AND type='5' ORDER BY sent DESC LIMIT 0, 20");
 $abox = [];
 $a_num = 0;
-while ($anote = mysqli_fetch_array($aresult)) {
+while ($anote = mysqli_fetch_assoc($aresult)) {
     $abox[$a_num++] = $anote;
 }
 
-$stats = mysqli_fetch_array(mysqli_query($db, "SELECT * FROM Users_stats WHERE id='$char[id]'"));
+$stats = mysqli_fetch_assoc(mysqli_query($db, "SELECT * FROM Users_stats WHERE id='$char[id]'"));
 
 if (!$tab) $tab = 1;
 
@@ -74,7 +74,7 @@ include('header.php');
                                     $senttime = "Seconds ago";
                                     $minpast = intval((time() - $abox[$y]['sent']) / 60);
                                     $senttime = displayTime($minpast, 1, 0);;
-                                    $sender = mysqli_fetch_array(mysqli_query($db, "SELECT id,name,lastname FROM Users WHERE id='" . $abox[$y]['from_id'] . "'"));
+                                    $sender = mysqli_fetch_assoc(mysqli_query($db, "SELECT id,name,lastname FROM Users WHERE id='" . $abox[$y]['from_id'] . "'"));
                                     $accord = "collapsea" . $y;
                                     ?>
                                     <div class="panel panel-default">

@@ -30,7 +30,7 @@ $query = "SELECT * FROM Accounts WHERE email = '$recoveryEmail'";
 
 /* query the database */
 $result = mysqli_query($db,$query);
-$result = mysqli_fetch_array( $result );
+$result = mysqli_fetch_assoc( $result );
 
 /* Allow access if a matching record was found and cookies enabled, else deny access. */
 if ($result)

@@ -4,7 +4,7 @@ mysqli_query($db,"LOCK TABLES Users WRITE, Soc WRITE, Contests WRITE");
 $check=intval(time()/3600);
 $cbs = (mysqli_query($db,"SELECT id, starts, contestants, results, participation FROM Contests WHERE type > 9 AND type != 99 AND starts <= $check AND done = 0"));
 
-while ($cb = mysqli_fetch_array($cbs))
+while ($cb = mysqli_fetch_assoc($cbs))
 {
   echo "Updating hourly participation for CB $cb[id]...";
   $bhour = $check-$cb[starts];

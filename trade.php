@@ -12,7 +12,7 @@ if (empty($_SESSION['csrf_token'])) {
 $itmlist="";
 $listsize=0;
 $iresult=mysqli_query($db,"SELECT * FROM Items WHERE owner='$id' AND type<15 AND type>0");
-while ($qitem = mysqli_fetch_array($iresult))
+while ($qitem = mysqli_fetch_assoc($iresult))
 {
   $itmlist[$listsize++] = $qitem;
 }

@@ -56,7 +56,7 @@ function createChar($username, $lastname, $email, $avatar, $startat, $vit)
 
   echo mysqli_error($db);
 
-  $char = mysqli_fetch_array(mysqli_query($db,"SELECT id,name FROM Users WHERE name = '$username' AND lastname = '$lastname' "));
+  $char = mysqli_fetch_assoc(mysqli_query($db,"SELECT id,name FROM Users WHERE name = '$username' AND lastname = '$lastname' "));
   $id=$char['id'];
   include("setitems.php");
 

@@ -22,7 +22,7 @@ else
 
 
 $result3 = mysqli_query($db,"SELECT * FROM Hordes WHERE ".$query." ORDER BY ends DESC LIMIT 1");
-$myHorde = mysqli_fetch_array( $result3 );
+$myHorde = mysqli_fetch_assoc( $result3 );
 
 
   $npc_info = unserialize($myHorde['npcs']);
@@ -158,27 +158,27 @@ $myHorde = mysqli_fetch_array( $result3 );
   
     if ($dhid)
     {
-      $dchamp[0] = mysqli_fetch_array(mysqli_query($db,"SELECT id, name, lastname FROM Users WHERE id='".$dhid."'"));
+      $dchamp[0] = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, name, lastname FROM Users WHERE id='".$dhid."'"));
     }
     if ($whid)
     {
-      $wchamp[0] = mysqli_fetch_array(mysqli_query($db,"SELECT id, name, lastname FROM Users WHERE id='".$whid."'"));
+      $wchamp[0] = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, name, lastname FROM Users WHERE id='".$whid."'"));
     }
     if ($daid)
     {
-      $dchamp[1] = mysqli_fetch_array(mysqli_query($db,"SELECT id, name, lastname FROM Users WHERE id='".$daid."'"));
+      $dchamp[1] = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, name, lastname FROM Users WHERE id='".$daid."'"));
     }
     if ($waid)
     {
-      $wchamp[1] = mysqli_fetch_array(mysqli_query($db,"SELECT id, name, lastname FROM Users WHERE id='".$waid."'"));
+      $wchamp[1] = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, name, lastname FROM Users WHERE id='".$waid."'"));
     }     
     if ($myHorde['finisher'])
     {
-      $fchamp['0'] = mysqli_fetch_array(mysqli_query($db,"SELECT id, name, lastname FROM Users WHERE id='".$myHorde['finisher']."'"));
+      $fchamp['0'] = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, name, lastname FROM Users WHERE id='".$myHorde['finisher']."'"));
     }
     if ($myHorde['afinisher'])
     {
-      $fchamp[1] = mysqli_fetch_array(mysqli_query($db,"SELECT id, name, lastname FROM Users WHERE id='".$myHorde['afinisher']."'"));
+      $fchamp[1] = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, name, lastname FROM Users WHERE id='".$myHorde['afinisher']."'"));
     }
   }
 $message = $hordemsg;  

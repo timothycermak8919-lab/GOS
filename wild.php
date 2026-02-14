@@ -73,10 +73,10 @@ $loc_query = $char['location'];
 $surrounding_area=$map_data[$char['location']];
 
 // LOAD SOCIETY TABLE
-$location = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Locations WHERE name='$loc_query'"));
+$location = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Locations WHERE name='$loc_query'"));
 
 // UPDATE NUMBER OF MEMEBERS
-$resultf = mysqli_fetch_array(mysqli_query($db,"SELECT COUNT(*) FROM Users WHERE location='$loc_query' "));
+$resultf = mysqli_fetch_assoc(mysqli_query($db,"SELECT COUNT(*) FROM Users WHERE location='$loc_query' "));
 $numchar = $resultf[0];
 $myHorde=0;
 ?>
@@ -91,7 +91,7 @@ $myHorde=0;
 
   <?php
     $result3 = mysqli_query($db,"SELECT * FROM Hordes WHERE done='0' AND location='$char[location]'");
-    while ($myHorde = mysqli_fetch_array( $result3 ) )
+    while ($myHorde = mysqli_fetch_assoc( $result3 ) )
     {
       $npc_info = unserialize($myHorde['npcs']);
       $hordemsg = "";
@@ -137,7 +137,7 @@ $myHorde=0;
           {
             if ($c_s[0] == 1)
             {
-              $quest = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Quests WHERE id='$c_n'"));
+              $quest = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Quests WHERE id='$c_n'"));
               if ($quest['expire'] > (time()/3600) || $quest['expire'] == -1)
               { 
                 if ($quest['type'] == 1)

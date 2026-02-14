@@ -25,7 +25,7 @@ $wikilink = "Quests";
 if ($accepted != '')
 {
   $noaccept = 0;
-  $quest = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Quests WHERE id='$accepted'"));
+  $quest = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Quests WHERE id='$accepted'"));
   $qgoals = unserialize($quest['goals']);
   $myquests[$accepted][0] = 1;
   $myquests[$accepted][1] = 0; 
@@ -50,7 +50,7 @@ if ($accepted != '')
     $curTime = intval(time()/3600);
     $query = "SELECT * FROM Quests WHERE expire >= '".$curTime."' ORDER BY expire ASC";
     $result = mysqli_query($db,$query);
-    while ($quest2 = mysqli_fetch_array( $result ) )
+    while ($quest2 = mysqli_fetch_assoc( $result ) )
     {
       $qid = $quest2['id'];
       $goals = unserialize($quest2['goals']);      
@@ -125,7 +125,7 @@ if ($is_town)
         <?php   
           $result = mysqli_query($db,"SELECT * FROM Quests WHERE location='".$char['location']."' && done='0' && cat != '1' ORDER BY expire ASC");
           $y=0;
-          while ($quest = mysqli_fetch_array( $result ) )
+          while ($quest = mysqli_fetch_assoc( $result ) )
           { 
             $qid = $quest['id']; 
             if (!$myquests[$qid][0])

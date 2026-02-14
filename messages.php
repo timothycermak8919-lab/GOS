@@ -30,7 +30,7 @@ mysqli_stmt_execute($stmt);
 $iresult = mysqli_stmt_get_result($stmt);
 $inbox = [];
 $in_num = 0;
-while ($inote = mysqli_fetch_array($iresult))
+while ($inote = mysqli_fetch_assoc($iresult))
 {
   $inbox[$in_num++] = $inote;
 }
@@ -41,7 +41,7 @@ mysqli_stmt_execute($stmt);
 $oresult = mysqli_stmt_get_result($stmt);
 $outbox = [];
 $out_num = 0;
-while ($onote = mysqli_fetch_array($oresult))
+while ($onote = mysqli_fetch_assoc($oresult))
 {
   $outbox[$out_num++] = $onote;
 }
@@ -137,7 +137,7 @@ if ($csrf_valid && $_REQUEST['trashallout'] )
 // ACCEPT TRADE
 if ($acceptTrade)
 {
-  $tnote = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Notes WHERE id='$note'"));
+  $tnote = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Notes WHERE id='$note'"));
   if ($tnote)
   {
     $data=explode('|',$tnote['special']);
@@ -146,7 +146,7 @@ if ($acceptTrade)
       if ($char['gold']-$data['2']>=0)
       {
         $x=0;
-        $qitem = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Items WHERE id='".$data[1]."'"));
+        $qitem = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Items WHERE id='".$data[1]."'"));
 
         if ($qitem['owner'] == $data['0'])
         {
@@ -185,7 +185,7 @@ else if ($csrf_valid && $note && time() - intval($char['lastpost']) > $wait_post
   mysqli_stmt_bind_param($stmt, "ss", $recipient[0], $recipient[1]);
   mysqli_stmt_execute($stmt);
   $result = mysqli_stmt_get_result($stmt);
-  $target = mysqli_fetch_array($result);
+  $target = mysqli_fetch_assoc($result);
   if ($target)
   {
     if (strlen($note) < 1000)
@@ -203,7 +203,7 @@ else if ($csrf_valid && $note && time() - intval($char['lastpost']) > $wait_post
         $root = 0;
         if ($rep_id)
         {
-          $repnote = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Notes WHERE id='$rep_id'"));
+          $repnote = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Notes WHERE id='$rep_id'"));
           if ($repnote['root'] != 0) $root= $repnote['root'];
           else $root= $repnote['id'];
         }
@@ -243,7 +243,7 @@ if ($csrf_valid && $_GET['trade'] && $_REQUEST['item'])
   $charip = unserialize($char['ip']);
   $alts = getAlts($charip);
   $recipient = explode(" ", $tradeto);
-  $target = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Users WHERE name = '$recipient[0]' AND lastname = '$recipient[1]'"));
+  $target = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Users WHERE name = '$recipient[0]' AND lastname = '$recipient[1]'"));
   if ($target)
   {
     $username = $target['name']."_".$target['lastname'];
@@ -263,7 +263,7 @@ if ($csrf_valid && $_GET['trade'] && $_REQUEST['item'])
         if ($tradeval>0)
         {
           $bypass_check=1;
-          $itm=mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Items WHERE id='".$_REQUEST['item']."'"));
+          $itm=mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Items WHERE id='".$_REQUEST['item']."'"));
           $item_name=iname($itm);
           $link="[<a href=messages.php?accept=1&name=".$char['name']."&last=".$char['lastname']."&note=>Accept Offer</a>]";
           $ilink="<a href=javascript:doPopUp(&#39;".$itm['base']."&#39;,&#39;".$itm['prefix']."&#39;,&#39;".$itm['suffix']."&#39;)>".$item_name."</a>";
@@ -278,7 +278,7 @@ if ($csrf_valid && $_GET['trade'] && $_REQUEST['item'])
                                             VALUES ('$id',  '$cid','0',     '0',   '3', '0', '".$mytime."','','$notesub','$note','$note_extra')");
 
           // Update the message's body with the message's own id
-          $request = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Notes WHERE sent='".$mytime."' AND from_id='".$char['id']."'"));
+          $request = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Notes WHERE sent='".$mytime."' AND from_id='".$char['id']."'"));
           $link="[<a href=messages.php?accept=1&name=".$char['name']."&last=".$char['lastname']."&note=".$request['id'].">Accept Offer</a>]";
           $request['body'] = "<i><b>Trade offer:</b></i> $link<br/><br/>One $ilink in return for ".displayGold($tradeval,1)."<br/><br/><img src=\"items/".str_replace(" ","",$itm['base']).".gif\" />";
           mysqli_query($db,"UPDATE Notes SET body='".$request['body']."' WHERE id='".$request['id']."'");
@@ -302,7 +302,7 @@ else
 if ($_GET['join'] != '' && $char[society])
 {
   // Send Invite
-  $societyo = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Soc WHERE name='$char[society]' "));
+  $societyo = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Soc WHERE name='$char[society]' "));
 
   if ($societyo[invite] == 1 || ($societyo[invite] == 2 && strtolower($societyo[leader]) == strtolower($char[name]) && strtolower($societyo[leaderlast]) == strtolower($char[lastname])))
   {
@@ -315,7 +315,7 @@ if ($_GET['join'] != '' && $char[society])
     $note_extra=$char[society];
 
     $recipient = explode(" ", $noteto);
-    $target = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Users WHERE name = '$recipient[0]' AND lastname = '$recipient[1]'"));
+    $target = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Users WHERE name = '$recipient[0]' AND lastname = '$recipient[1]'"));
     $mytime=time();
     if ($target)
     {
@@ -324,7 +324,7 @@ if ($_GET['join'] != '' && $char[society])
                                         VALUES ('$id',  '$cid','0',     '0',   '0', '0', '".$mytime."','','$notesub','$note','$note_extra')");
 
       // Update the message's body with the message's own id
-      $request = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Notes WHERE sent='".$mytime."' AND from_id='".$char[id]."'"));
+      $request = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Notes WHERE sent='".$mytime."' AND from_id='".$char[id]."'"));
       $link="<a href=joinclan.php?invite=1&name=$socname2&note=".$request[id]."&invite=".floor($mytime/400).">Accept Invitation</a>";
       $request[body] = "<b>Invitation to join $char[society]</b><br/><br/> $link";
       mysqli_query($db,"UPDATE Notes SET body='".$request[body]."' WHERE id='".$request[id]."'");
@@ -345,7 +345,7 @@ if ($message == '')
 $itmlist=[];
 $listsize=0;
 $iresult=mysqli_query($db,"SELECT * FROM Items WHERE owner='$id' AND type<15 AND type>0");
-while ($qitem = mysqli_fetch_array($iresult))
+while ($qitem = mysqli_fetch_assoc($iresult))
 {
   $itmlist[$listsize++] = $qitem;
 }
@@ -355,7 +355,7 @@ while ($qitem = mysqli_fetch_array($iresult))
 $iresult=mysqli_query($db,"SELECT * FROM Notes WHERE to_id='$id' AND del_to='0' AND type < 5 ORDER BY sent DESC LIMIT 0, 50");
 $inbox = [];
 $in_num = 0;
-while ($inote = mysqli_fetch_array($iresult))
+while ($inote = mysqli_fetch_assoc($iresult))
 {
   $inbox[$in_num++] = $inote;
 }
@@ -363,7 +363,7 @@ while ($inote = mysqli_fetch_array($iresult))
 $oresult=mysqli_query($db,"SELECT * FROM Notes WHERE from_id='$id' AND del_from='0' AND type < 4 AND subject!='Welcome to GoS!' ORDER BY sent DESC LIMIT 0, 50");
 $outbox = [];
 $out_num = 0;
-while ($onote = mysqli_fetch_array($oresult))
+while ($onote = mysqli_fetch_assoc($oresult))
 {
   $outbox[$out_num++] = $onote;
 }
@@ -410,7 +410,7 @@ include('header.php');
                     $senttime = "Seconds ago";
                     $minpast = intval((time()-$inbox[$y]['sent'])/60);
                     $senttime = displayTime($minpast,1,0);
-                    $sender = mysqli_fetch_array(mysqli_query($db,"SELECT id,name,lastname FROM Users WHERE id='".$inbox[$y]['from_id']."'"));
+                    $sender = mysqli_fetch_assoc(mysqli_query($db,"SELECT id,name,lastname FROM Users WHERE id='".$inbox[$y]['from_id']."'"));
                     $accord = "collapse".$y;
               ?>
                 <div class="panel panel-default">
@@ -474,7 +474,7 @@ include('header.php');
                     $minpast = intval((time()-$outbox[$y]['sent'])/60);
                     $senttime = displayTime($minpast,1,0);
 
-                    $receiver = mysqli_fetch_array(mysqli_query($db,"SELECT id,name,lastname FROM Users WHERE id='".$outbox[$y]['to_id']."'"));
+                    $receiver = mysqli_fetch_assoc(mysqli_query($db,"SELECT id,name,lastname FROM Users WHERE id='".$outbox[$y]['to_id']."'"));
                     $accord = "collapseo".$y;
               ?>
                 <div class="panel panel-default">
@@ -519,14 +519,14 @@ include('header.php');
               if ($tid)
               {
                 $result = mysqli_query($db,"SELECT name, lastname FROM Users WHERE id='$tid'");
-                $target = mysqli_fetch_array($result);
+                $target = mysqli_fetch_assoc($result);
                 $defaultto=$target['name']." ".$target['lastname'];
               }
               if ($rep_id)
               {
-                $repnote = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Notes WHERE id='$rep_id'"));
+                $repnote = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Notes WHERE id='$rep_id'"));
                 $defaultsub = "Re: ".str_replace("Re: ", "", $repnote['subject']);
-                $sender = mysqli_fetch_array(mysqli_query($db,"SELECT id,name,lastname FROM Users WHERE id='".$repnote['from_id']."'"));
+                $sender = mysqli_fetch_assoc(mysqli_query($db,"SELECT id,name,lastname FROM Users WHERE id='".$repnote['from_id']."'"));
                 $defaultto = $sender['name']." ".$sender['lastname'];
                 $repmessage = $repnote['body'];
               }
@@ -572,7 +572,7 @@ include('header.php');
             if ($tid)
             {
               $result = mysqli_query($db,"SELECT name, lastname FROM Users WHERE id='$tid'");
-              $target = mysqli_fetch_array($result);
+              $target = mysqli_fetch_assoc($result);
               $defaultto=$target['name']." ".$target['lastname'];
             }
           ?>

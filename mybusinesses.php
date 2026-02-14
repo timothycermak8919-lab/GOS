@@ -13,7 +13,7 @@ $loc_query = $char['location'];
 
 $bizinfo = array();
 $bizstats = array();
-$ustats = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Users_stats WHERE id='$id'"));
+$ustats = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Users_stats WHERE id='$id'"));
 $jobs = unserialize($char['jobs']);
 $jobs['99'] = getOfficeLevel($ustats['loc_ji'.$location['id']]);
 $biznum=mysqli_real_escape_string($db,$_POST['biznum']);
@@ -22,14 +22,14 @@ $bizval=mysqli_real_escape_string($db,$_POST['bizval']);
 $bizsub=mysqli_real_escape_string($db,$_POST['bizsub']);
 
 $soc_name = $char['society'];
-$society = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Soc WHERE name='$soc_name' "));
+$society = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Soc WHERE name='$soc_name' "));
 
 // Check for businesses to update BEFORE we do anything with the display
 $pquery = "SELECT * FROM Profs WHERE owner='".$id."'";
 $presult = mysqli_query($db,$pquery);  
 $bsubs = array(0,0,0);
 $ajobs = unserialize($listchar['jobs']);
-while ($bq = mysqli_fetch_array( $presult ) )
+while ($bq = mysqli_fetch_assoc( $presult ) )
 {
   $bstatus = unserialize($bq['status']);
   $bupgrades = unserialize($bq['upgrades']);
@@ -82,7 +82,7 @@ $bx = 0;
 // if local war, slow businesses by 50%
 if ($location['last_war'])
 {
-  $myWar = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Contests WHERE id='$location[last_war]' "));
+  $myWar = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Contests WHERE id='$location[last_war]' "));
 }
 else
 {
@@ -98,7 +98,7 @@ if ($myWar != 0) // Previous clan battle
 
 $listsize=0;
 $iresult=mysqli_query($db,"SELECT * FROM Items WHERE owner='$id' AND type<15 AND type>0 AND istatus <=0");
-while ($qitem = mysqli_fetch_array($iresult))
+while ($qitem = mysqli_fetch_assoc($iresult))
 {
   $itmlist[$listsize++] = $qitem;
 }  
@@ -113,7 +113,7 @@ $shopg = unserialize($location['shopg']);
 $myLocBiz[0] = '';
 $query = "SELECT * FROM Profs WHERE owner='$id' AND location='$loc_query'";
 $result = mysqli_query($db,$query);
-while ($bq = mysqli_fetch_array( $result ) )
+while ($bq = mysqli_fetch_assoc( $result ) )
 {
   $myLocBiz[$bq['type']]=1;
 }
@@ -127,7 +127,7 @@ for ($t=0; $t<11; $t++)
   {
     if ($firstbiz==-1) $firstbiz=$t;  
     $query = "SELECT * FROM Profs WHERE owner='$id' AND location='$loc_query' AND type='$t'";
-    $biz = mysqli_fetch_array(mysqli_query($db,$query));
+    $biz = mysqli_fetch_assoc(mysqli_query($db,$query));
     $upgrades[$t] = unserialize($biz['upgrades']);
     $status[$t] = unserialize($biz['status']);
     
@@ -398,7 +398,7 @@ for ($t=0; $t<11; $t++)
         {
           if ($status[$t][$s][0] == 2) // is it done?
           {
-            $destloc = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Locations WHERE id='".($status[$t][$s][1][2]+1)."'"));
+            $destloc = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Locations WHERE id='".($status[$t][$s][1][2]+1)."'"));
             $destgoods = unserialize($destloc['shipg']);
 
             $p1_loc = floor($status[$t][$s][1][0]/3);
@@ -655,7 +655,7 @@ for ($t=0; $t<11; $t++)
           }
           if ($rulerTotal)
           {
-            $ruler = mysqli_fetch_array(mysqli_query($db,"SELECT id, align, area_score FROM Soc WHERE name='$location[ruler]'"));
+            $ruler = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, align, area_score FROM Soc WHERE name='$location[ruler]'"));
             $area_score = unserialize($ruler['area_score']);    
             $area_score[$location['id']] = $area_score[$location['id']]+$rulerTotal;
             $area_score[$location['id']] = number_format($area_score[$location['id']],2,'.','');
@@ -668,7 +668,7 @@ for ($t=0; $t<11; $t++)
           $char['align'] += $alignTotal;
           
           $soc_name = $char['society'];
-          $society = mysqli_fetch_array(mysqli_query($db,"SELECT id, name, align FROM Soc WHERE name='$soc_name' "));
+          $society = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, name, align FROM Soc WHERE name='$soc_name' "));
           if ($society['id']) 
           {
             $society['align'] += $alignTotal;
@@ -748,7 +748,7 @@ for ($t=0; $t<11; $t++)
         {
           if ($status[$t][$s][0] == 2) // is it done?
           {
-            $destloc = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Locations WHERE id='".($status[$t][$s][1][2]+1)."'"));
+            $destloc = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Locations WHERE id='".($status[$t][$s][1][2]+1)."'"));
             $destgoods = unserialize($destloc['shipg']);
 
             $p1_loc = floor($status[$t][$s][1][0]/3);
@@ -865,7 +865,7 @@ for ($t=0; $t<11; $t++)
           }
           if ($rulerTotal)
           {
-            $ruler = mysqli_fetch_array(mysqli_query($db,"SELECT id, align, area_score FROM Soc WHERE name='$location[ruler]'"));
+            $ruler = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, align, area_score FROM Soc WHERE name='$location[ruler]'"));
             $area_score = unserialize($ruler['area_score']);    
             $area_score[$location['id']] = $area_score[$location['id']]+$rulerTotal;
             $area_score[$location['id']] = number_format($area_score[$location['id']],2,'.','');
@@ -878,7 +878,7 @@ for ($t=0; $t<11; $t++)
           $char['align'] += $alignTotal;
           
           $soc_name = $char['society'];
-          $society = mysqli_fetch_array(mysqli_query($db,"SELECT id, name, align FROM Soc WHERE name='$soc_name' "));
+          $society = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, name, align FROM Soc WHERE name='$soc_name' "));
           if ($society['id']) 
           {
             $society['align'] += $alignTotal;
@@ -1196,7 +1196,7 @@ for ($t=0; $t<11; $t++)
               $tdist = $ship_travel[$ship_ports[$location['id']-1]][$status[$t][$i][1][2]];
             
               $percomp= floor($timedone/(($tdist/$tspeed)*3600)*100);
-              $destloc = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Locations WHERE id='".($status[$t][$i][1][2]+1)."'"));
+              $destloc = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Locations WHERE id='".($status[$t][$i][1][2]+1)."'"));
               $destgoods = unserialize($destloc['shipg']);
               $p1_loc = floor($status[$t][$i][1][0]/3);
               $p1_num = $status[$t][$i][1][0]%3;
@@ -1319,7 +1319,7 @@ for ($t=0; $t<11; $t++)
         }
         else // shipping
         {
-          $destloc = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Locations WHERE id='".($status[$t][$i][1][2]+1)."'"));
+          $destloc = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Locations WHERE id='".($status[$t][$i][1][2]+1)."'"));
           $destgoods = unserialize($destloc['shipg']);
           $p1_loc = floor($status[$t][$i][1][0]/3);
           $p1_num = $status[$t][$i][1][0]%3;
@@ -1421,7 +1421,7 @@ for ($t=0; $t<11; $t++)
       echo "sdata.".str_replace(" ","_",$tmp_good)." = {};\n";
       echo "sdata.".str_replace(" ","_",$tmp_good).".port = ".$trade_goods[$tmp_good][0].";\n";     
     }
-    $tmploc = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Locations WHERE id='".($i+1)."'"));
+    $tmploc = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Locations WHERE id='".($i+1)."'"));
     $tmpsg = unserialize($tmploc['shipg']);
     echo "ports[$i] = new Array (6);\n";
     for ($j=0; $j < 8; $j++) // port prod num

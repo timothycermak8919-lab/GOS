@@ -5,7 +5,7 @@
 		include('info.php');
 		$no_query=1;
 		include('connect_info.php');
-		$char = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Users LEFT JOIN Users_data ON Users.id=Users_data.id WHERE Users.id='$id'"));
+		$char = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Users LEFT JOIN Users_data ON Users.id=Users_data.id WHERE Users.id='$id'"));
 		if ($char['num_res']>10) $num_to_action += intval(($char['num_res']-10)/2);
 		
 		if (($_GET['collect']-3.0)/67.0 == intval(($_GET['collect']-3.0)/67.0) && $char['r_numb'] != $_GET['collect']) {

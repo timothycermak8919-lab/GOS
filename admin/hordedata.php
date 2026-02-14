@@ -9,7 +9,7 @@ include_once('busiFuncs.php');
 $row = mysqli_fetch_assoc(mysqli_query($db,'SELECT SUM(vitality) AS value_sum FROM Users WHERE nation != 0')); 
 $totvit = $row['value_sum'];
 $resulth = mysqli_query($db,"SELECT id, level FROM Users WHERE nation != 0 ORDER BY level DESC, exp DESC LIMIT 1");
-$topchar = mysqli_fetch_array($resulth);
+$topchar = mysqli_fetch_assoc($resulth);
 $numBroken = mysqli_num_rows(mysqli_query($db,"SELECT id FROM Items WHERE type=0 AND owner='99999'"));
 $hhealth = $totvit*$topchar['level']/20;
 if ($hhealth < 1000) $hhealth = 1000;
@@ -31,7 +31,7 @@ if (floor($msgs['checktime']/6) < floor(time()/3600))
   
   if ($num_hordes)
   {
-    while ($myHorde = mysqli_fetch_array( $result3 ) )
+    while ($myHorde = mysqli_fetch_assoc( $result3 ) )
     {
 	 echo "</br>\nUpdating horde: ".json_encode($myHorde);
 		
@@ -52,7 +52,7 @@ if (floor($msgs['checktime']/6) < floor(time()/3600))
         if ($newdone==3)
         {
         
-		  $attacked = mysqli_fetch_array(mysqli_query($db,"SELECT id, bank, upgrades, shoplvls, shopg, name, chaos, army FROM Locations WHERE name='$myHorde[target]'"));
+		  $attacked = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, bank, upgrades, shoplvls, shopg, name, chaos, army FROM Locations WHERE name='$myHorde[target]'"));
           
           // Lose seal if it has one.
           $sealid = $attacked['id']+50000;
@@ -138,7 +138,7 @@ if (floor($msgs['checktime']/6) < floor(time()/3600))
 
           // All players in the targeted City get moved to the Wilderness area the horde attacked from. 
           $locusers = mysqli_query($db,"SELECT id, location FROM Users WHERE location='$attacked[name]'");
-          while ($luser= mysqli_fetch_array($locusers))
+          while ($luser= mysqli_fetch_assoc($locusers))
           {
             $luser['location']=$myHorde['location'];
             mysqli_query($db,"UPDATE Users SET location='$luser[location]' WHERE id='$luser[id]'");
@@ -147,7 +147,7 @@ if (floor($msgs['checktime']/6) < floor(time()/3600))
           // Each Estate in the Wilderness loses 2 highest level upgrades (selected randomly if tied).
           $hloc = $myHorde['location'];
           $eresult = mysqli_query($db,"SELECT id, upgrades FROM Estates WHERE location='$hloc'");
-          while ($lestate= mysqli_fetch_array($eresult))
+          while ($lestate= mysqli_fetch_assoc($eresult))
           {
             $eups = unserialize($lestate['upgrades']);
             for ($i=0; $i < 2; $i++)
@@ -178,7 +178,7 @@ if (floor($msgs['checktime']/6) < floor(time()/3600))
                  
           // All clans lose 10% of their Ji in the city.
           $sresult = mysqli_query($db,"SELECT id, area_score, name FROM Soc WHERE 1");
-          while ($lsoc = mysqli_fetch_array($sresult))
+          while ($lsoc = mysqli_fetch_assoc($sresult))
           {
             $tas = unserialize($lsoc['area_score']);
             $tas[$attacked['id']] = $tas[$attacked['id']]*.90;
@@ -191,7 +191,7 @@ if (floor($msgs['checktime']/6) < floor(time()/3600))
         $playerSeals = 0;
         $citySeals = 0;
         $result = mysqli_query($db,"SELECT * FROM Items WHERE type=0 ORDER BY last_moved");  
-        while ($tmpSeal = mysqli_fetch_array( $result ) )
+        while ($tmpSeal = mysqli_fetch_assoc( $result ) )
         {
           if ($tmpSeal['owner'] > 50000) $citySeals++;
           else $playerSeals++;
@@ -204,7 +204,7 @@ if (floor($msgs['checktime']/6) < floor(time()/3600))
           // Figure out the target
           $result = mysqli_query($db,"SELECT * FROM Locations WHERE 1 ORDER BY myOrder DESC");
           $l=0;
-          while ($tmploc = mysqli_fetch_array( $result ) )
+          while ($tmploc = mysqli_fetch_assoc( $result ) )
           {
             $locs[$l++] = $tmploc;
           }
@@ -300,7 +300,7 @@ if (floor($msgs['checktime']/6) < floor(time()/3600))
           }
           
           // Update City Rumors
-          $cityRumors = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM messages WHERE id='50000'"));
+          $cityRumors = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM messages WHERE id='50000'"));
           $rumorMessages = unserialize($cityRumors['message']);
           $numRumors = count($rumorMessages);
           $rumorMessages[$numRumors] = $myMsg;
@@ -320,7 +320,7 @@ if (floor($msgs['checktime']/6) < floor(time()/3600))
   }
 
   // Get last horde to determine when to start next 
-  $lastHorde = mysqli_fetch_array(mysqli_query($db,"SELECT id, next, location, target FROM Hordes WHERE type='1' ORDER BY starts DESC"));
+  $lastHorde = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, next, location, target FROM Hordes WHERE type='1' ORDER BY starts DESC"));
   // If at least one seal remains and either no previous horde or time to start a new horde, make a new one.
   echo "</br>\n Test for new horde generation: ";
   echo json_encode($lastHorde['next']*3600)."<".json_encode(time());
@@ -387,7 +387,7 @@ if (floor($msgs['checktime']/6) < floor(time()/3600))
     }
 
 
-    $htown = mysqli_fetch_array(mysqli_query($db,"SELECT id, name, chaos, army FROM Locations WHERE id='$htarget_id'"));
+    $htown = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, name, chaos, army FROM Locations WHERE id='$htarget_id'"));
 
     $surrounding_area = $map_data[$htown['name']];
     
@@ -418,7 +418,7 @@ if (floor($msgs['checktime']/6) < floor(time()/3600))
     }
     
     // Update City Rumors
-    $cityRumors = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM messages WHERE id='50000'"));
+    $cityRumors = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM messages WHERE id='50000'"));
 
     $rumorMessages = unserialize($cityRumors['message']);
     $numRumors = count($rumorMessages);

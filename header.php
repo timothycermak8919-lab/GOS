@@ -97,7 +97,7 @@
     {
 
       $myresult = mysqli_query($db,"SELECT * FROM Users LEFT JOIN Users_data ON Users.id=Users_data.id WHERE Users.id='$id'");
-      $char = mysqli_fetch_array($myresult);
+      $char = mysqli_fetch_assoc($myresult);
       $percent_up = 0; // Default to 0
       if ($char['exp_up_s'] != 0) { // Check if the divisor is not zero
           $percent_up = 100 - intval(100 * ($char['exp_up'] - $char['exp']) / $char['exp_up_s']);
@@ -294,7 +294,7 @@
             {
               if ($c_s[0] == 1)
               {
-                $hquest = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Quests WHERE id='$c_n'"));
+                $hquest = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Quests WHERE id='$c_n'"));
                 if ($hquest['expire'] > (time()/3600) || $hquest['expire'] == -1)
                 { 
                   if ($hquest['type'] == $quest_type_num["NPC"])
@@ -316,7 +316,7 @@
                   else if ($hquest['type'] == $quest_type_num["Escort"])
                   {
                     $hgoals = unserialize($hquest['goals']);
-                    $route = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Routes WHERE id='".$hgoals[1]."'"));
+                    $route = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Routes WHERE id='".$hgoals[1]."'"));
                     $rpath = unserialize($route['path']);
 					
                     if (strtolower($rpath[$myquests[$c_n][1]]) == strtolower($char['location']) && $myquests[$c_n][1]< $hgoals[0])
@@ -344,12 +344,12 @@
             $myLocBiz[999] = '';
 
             $tempResult = mysqli_query($db,"SELECT id, type FROM Profs WHERE owner='".$char['id']."' AND location='".$char['location']."'");
-            while ($bq = mysqli_fetch_array( $tempResult ) )
+            while ($bq = mysqli_fetch_assoc( $tempResult ) )
             {
               $myLocBiz[$bq['type']]=1;
             }
               
-            $locCheck = mysqli_fetch_array(mysqli_query($db,"SELECT id, name FROM Locations WHERE name='".$char['location']."'"));
+            $locCheck = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, name FROM Locations WHERE name='".$char['location']."'"));
             $clead = isClanLeader($char,$char['society'],1, $locCheck['id']);
         ?>  
         <li class="dropdown">
@@ -388,7 +388,7 @@
           }
           else
           {
-            $isHorde=mysqli_fetch_array( mysqli_query($db,"SELECT * FROM Hordes WHERE done='0' AND location='$char[location]'") );
+            $isHorde=mysqli_fetch_assoc( mysqli_query($db,"SELECT * FROM Hordes WHERE done='0' AND location='$char[location]'") );
         ?>
         <li class="dropdown">
           <a class="dropdown-toggle" data-toggle="dropdown" href="#">
@@ -476,7 +476,7 @@
             }
             if ($char['route'])
             {
-              $route = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Routes WHERE id='".$char['route']."'"));
+              $route = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Routes WHERE id='".$char['route']."'"));
               $rpath = unserialize($route['path']);
 
               if (strtolower($rpath[$char['routepoint']]) == strtolower($char['location']))

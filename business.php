@@ -36,7 +36,7 @@ $blendPrice = mysqli_real_escape_string($db,$_REQUEST['blendPrice']);
 
 
 $soc_name = $char['society'];
-$society = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Soc WHERE name='$soc_name' "));
+$society = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Soc WHERE name='$soc_name' "));
 
 $loc = $char['location'];
 $shopname = $town_shop_names[$loc][$shop-1];
@@ -61,7 +61,7 @@ $pro_minus[1] = (100+$fv)/100;
 $pro_minus[2] = (100+$hv)/100;
 $pro_minus[3] = (100+$dv)/100;
 
-$ustats = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Users_stats WHERE id='$id'"));
+$ustats = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Users_stats WHERE id='$id'"));
 
 if (!$shop || $shop < 1 || $shop > 4) {$shop = 1;}
 
@@ -77,7 +77,7 @@ $shopname = $town_shop_names[$loc][$shop-1];
 
 $listsize=0;
 $iresult=mysqli_query($db,"SELECT * FROM Items WHERE owner='$id' AND type<15 AND type>0");
-while ($qitem = mysqli_fetch_array($iresult))
+while ($qitem = mysqli_fetch_assoc($iresult))
 {
   $itmlist[$listsize++] = $qitem;
   
@@ -271,7 +271,7 @@ if ($combTer != '' && $combItm != '' && $is_town)
 
 $listsize=0;
 $iresult=mysqli_query($db,"SELECT * FROM Items WHERE owner='$id' AND type<15 AND type>0");
-while ($qitem = mysqli_fetch_array($iresult))
+while ($qitem = mysqli_fetch_assoc($iresult))
 {
   $itmlist[$listsize++] = $qitem;
 }
@@ -285,11 +285,11 @@ $b = [];
 $c = [];
 $d = [];
 $e = [];
-$a = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Items WHERE owner='$char[id]' AND istatus='1' AND type<15 AND type>0"));
-$b = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Items WHERE owner='$char[id]' AND istatus='2' AND type<15 AND type>0"));
-$c = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Items WHERE owner='$char[id]' AND istatus='3' AND type<15 AND type>0"));
-$d = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Items WHERE owner='$char[id]' AND istatus='4' AND type<15 AND type>0"));
-$e = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Items WHERE owner='$char[id]' AND istatus='5' AND type<15 AND type>0"));
+$a = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Items WHERE owner='$char[id]' AND istatus='1' AND type<15 AND type>0"));
+$b = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Items WHERE owner='$char[id]' AND istatus='2' AND type<15 AND type>0"));
+$c = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Items WHERE owner='$char[id]' AND istatus='3' AND type<15 AND type>0"));
+$d = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Items WHERE owner='$char[id]' AND istatus='4' AND type<15 AND type>0"));
+$e = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Items WHERE owner='$char[id]' AND istatus='5' AND type<15 AND type>0"));
 $estats = getstats($a,$b,$c,$d,$e,$skills);
 $askills = $skills." ".$estats[0];
 $pts_tot = 0;

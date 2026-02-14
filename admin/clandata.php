@@ -6,7 +6,7 @@ mysqli_query($db,"LOCK TABLES Users WRITE, Soc WRITE, Soc_stats WRITE, Locations
 // build base rep levels from estates for all clans
 $result= mysqli_query($db,"SELECT * FROM Estates WHERE 1");
 $esup = array();
-while ($estate = mysqli_fetch_array( $result ) )
+while ($estate = mysqli_fetch_assoc( $result ) )
 {
   if ($estate['supporting'] != "")
   {
@@ -24,7 +24,7 @@ while ($estate = mysqli_fetch_array( $result ) )
 }
 
 $result = mysqli_query($db,"SELECT * FROM Soc WHERE 1");
-while ( $listsoc = mysqli_fetch_array( $result ) )
+while ( $listsoc = mysqli_fetch_assoc( $result ) )
 {
   if (time()-($listsoc['lastupkeep']*3600) >= 3600 || 1)
   {
@@ -37,14 +37,14 @@ while ( $listsoc = mysqli_fetch_array( $result ) )
       $inactive_days = $listsoc['inactivity']*5;
       $delete_before = (time() - (86400*$inactive_days));
       $toRemove = mysqli_query($db,"SELECT * FROM Users WHERE society='".$listsoc['name']."' AND lastonline<'".$delete_before."' ");
-      while ($rchar = mysqli_fetch_array($toRemove))
+      while ($rchar = mysqli_fetch_assoc($toRemove))
       {
         //removeFromClan($rchar);
       }
     }
     
     // Update number of members
-    $resultf = mysqli_fetch_array(mysqli_query($db,"SELECT COUNT(*) FROM Users WHERE society='".$listsoc['name']."'"));
+    $resultf = mysqli_fetch_assoc(mysqli_query($db,"SELECT COUNT(*) FROM Users WHERE society='".$listsoc['name']."'"));
     $numchar = $resultf[0];
     if ($numchar!=$listsoc['members']) 
     {
@@ -79,7 +79,7 @@ while ( $listsoc = mysqli_fetch_array( $result ) )
     $offices = unserialize($listsoc['offices']);
     $area_rep = unserialize($listsoc['area_rep']);
     $lresult = mysqli_query($db,"SELECT id, name FROM Locations WHERE 1");  
-    while ($loc = mysqli_fetch_array( $lresult ) )
+    while ($loc = mysqli_fetch_assoc( $lresult ) )
     {
       $base = 0;
       $base += $esup[$loc['name']][$listsoc['id']]/2;

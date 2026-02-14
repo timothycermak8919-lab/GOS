@@ -22,7 +22,7 @@ else
 // if local war, divide bonuses in half.
 if ($location['last_war'])
 {
-  $myWar = mysqli_fetch_array(mysqli_query($db,"SELECT id, starts, ends FROM Contests WHERE id='$location[last_war]' "));
+  $myWar = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, starts, ends FROM Contests WHERE id='$location[last_war]' "));
 }
 else
 {
@@ -46,7 +46,7 @@ if ($char['id'])
 
   for ($tx=0; $tx<4; $tx++) 
   {
-    $tmpEstate = mysqli_fetch_array(mysqli_query($db,"SELECT id, upgrades FROM Estates WHERE location='$surrounding_area_temp[$tx]' AND owner='$char[id]'"));
+    $tmpEstate = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, upgrades FROM Estates WHERE location='$surrounding_area_temp[$tx]' AND owner='$char[id]'"));
     if ($tmpEstate['id'])
     {
       $tmpUps = unserialize($tmpEstate['upgrades']);

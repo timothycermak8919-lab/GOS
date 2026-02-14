@@ -57,7 +57,7 @@ if ($s_doit)
 {
   $itmlist = unserialize($char['itmlist']);
   $resultb = mysqli_query($db,"SELECT * FROM Market WHERE id='$s_delete' ORDER BY cost DESC");
-  $listchar = mysqli_fetch_array($resultb);
+  $listchar = mysqli_fetch_assoc($resultb);
   if ($char['location']==$listchar['location'] && $char['name']==$listchar['sname'] && $char['lastname']==$listchar['slastname'])
   {
     $query = "DELETE FROM Market WHERE id='$s_delete'";
@@ -154,7 +154,7 @@ include('header.php');
 <?php
   echo $div_img;
   $x=0;
-  while ( $listchar = mysqli_fetch_array( $resultb ))
+  while ( $listchar = mysqli_fetch_assoc( $resultb ))
   {
 ?>
 <table width="550" cellspacing="0" border="0" cellpadding="5" onMouseOver="this.bgColor='#111111';" onMouseOut="this.bgColor='#000000';">

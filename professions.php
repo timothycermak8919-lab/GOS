@@ -21,10 +21,10 @@ $proup=mysqli_real_escape_string($db,$_POST['proup']);
 $tab = mysqli_real_escape_string($db,$_GET['tab']);
 $col='#090909';
 
-$stats = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Users_stats WHERE id='$char[id]'"));
+$stats = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Users_stats WHERE id='$char[id]'"));
 
 // See if we have any Seals broken...
-$cityRumors = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM messages WHERE id='50000'"));
+$cityRumors = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM messages WHERE id='50000'"));
 $brokenSeals = 0;
 if ($cityRumors['checktime']> 0) $brokenSeals = 1;
 
@@ -62,7 +62,7 @@ if ($sell != "" && $sell > 0)
 {
   if (!$brokenSeals)
   {
-    $sbiz = mysqli_fetch_array( mysqli_query($db,"SELECT * FROM Profs WHERE id='$sell'") );
+    $sbiz = mysqli_fetch_assoc( mysqli_query($db,"SELECT * FROM Profs WHERE id='$sell'") );
     if ($sbiz['id'])
     {
       if ($sbiz['owner'] == $char['id'])
@@ -176,7 +176,7 @@ function swapinfo(pro)
               <?php
                 $query = "SELECT * FROM Profs WHERE owner='$id'";
                 $result = mysqli_query($db,$query);
-                while ($bq = mysqli_fetch_array( $result ) )
+                while ($bq = mysqli_fetch_assoc( $result ) )
                 {
                   $bstatus = unserialize($bq['status']);
                   $bupgrades = unserialize($bq['upgrades']);
@@ -236,7 +236,7 @@ function swapinfo(pro)
               <?php
                 $query = "SELECT * FROM Estates WHERE owner='$id'";
                 $result = mysqli_query($db,$query);
-                while ($est = mysqli_fetch_array( $result ) )
+                while ($est = mysqli_fetch_assoc( $result ) )
                 {
                   $estinv=mysqli_num_rows(mysqli_query($db,"SELECT * FROM Items WHERE owner='".(20000+$est['id'])."' AND type<15"));
                   $eups = unserialize($est['upgrades']);

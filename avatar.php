@@ -71,7 +71,7 @@ function getAlts(array $ips): array
         mysqli_stmt_execute($stmt);
         $result = mysqli_stmt_get_result($stmt);
         
-        if ($row = mysqli_fetch_array($result)) {
+        if ($row = mysqli_fetch_assoc($result)) {
             $users = json_decode($row['users'], true);
             if (is_array($users)) {
                 foreach ($users as $user) {
@@ -289,7 +289,7 @@ function deleteCharacter(string $confirmEmail, string $confirmPass): void
         mysqli_stmt_bind_param($stmt, 's', $societyName);
         mysqli_stmt_execute($stmt);
         $result = mysqli_stmt_get_result($stmt);
-        $society = mysqli_fetch_array($result);
+        $society = mysqli_fetch_assoc($result);
         mysqli_stmt_close($stmt);
         
         if ($society && $society['id']) {
@@ -336,7 +336,7 @@ function deleteCharacter(string $confirmEmail, string $confirmPass): void
                     mysqli_stmt_bind_param($stmt, 's', $societyName);
                     mysqli_stmt_execute($stmt);
                     $result = mysqli_stmt_get_result($stmt);
-                    if ($newLeader = mysqli_fetch_array($result)) {
+                    if ($newLeader = mysqli_fetch_assoc($result)) {
                         $stmt2 = mysqli_prepare($db, "UPDATE Soc SET leader = ?, leaderlast = ? WHERE name = ?");
                         mysqli_stmt_bind_param($stmt2, 'sss', $newLeader['name'], $newLeader['lastname'], $societyName);
                         mysqli_stmt_execute($stmt2);
@@ -354,7 +354,7 @@ function deleteCharacter(string $confirmEmail, string $confirmPass): void
             $result = mysqli_stmt_get_result($stmt);
             
             $currentTime = time();
-            while ($item = mysqli_fetch_array($result)) {
+            while ($item = mysqli_fetch_assoc($result)) {
                 $stmt2 = mysqli_prepare($db, "UPDATE Items SET owner = ?, last_moved = ?, istatus = 0 WHERE id = ?");
                 mysqli_stmt_bind_param($stmt2, 'iii', $vaultId, $currentTime, $item['id']);
                 mysqli_stmt_execute($stmt2);
@@ -381,7 +381,7 @@ function deleteCharacter(string $confirmEmail, string $confirmPass): void
                             mysqli_stmt_execute($stmt);
                             $result = mysqli_stmt_get_result($stmt);
                             
-                            if ($otherSoc = mysqli_fetch_array($result)) {
+                            if ($otherSoc = mysqli_fetch_assoc($result)) {
                                 $otherStance = json_decode($otherSoc['stance'], true);
                                 $otherStance[str_replace(' ', '_', $societyName)] = 0;
                                 $otherStanceSerialized = json_encode($otherStance);
@@ -419,7 +419,7 @@ function deleteCharacter(string $confirmEmail, string $confirmPass): void
     $stmt = mysqli_prepare($db, "SELECT id FROM Users WHERE name = 'The' AND lastname = 'Creator'");
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
-    if ($creator = mysqli_fetch_array($result)) {
+    if ($creator = mysqli_fetch_assoc($result)) {
         $creatorId = $creator['id'];
         $noteSubject = 'OB: ' . $charName . ' ' . $charLastname;
         $noteBody = 'Born: ' . ($char['born'] ?? 'Unknown') . '<br/>';
@@ -466,7 +466,7 @@ function deleteCharacter(string $confirmEmail, string $confirmPass): void
             mysqli_stmt_execute($stmt);
             $result = mysqli_stmt_get_result($stmt);
             
-            if ($ipLog = mysqli_fetch_array($result)) {
+            if ($ipLog = mysqli_fetch_assoc($result)) {
                 $users = json_decode($ipLog['users'], true);
                 if (is_array($users)) {
                     $users = array_filter($users, fn($user) => $user !== $fullname);

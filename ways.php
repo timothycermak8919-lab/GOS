@@ -26,7 +26,7 @@ if ( ($wdest != "" && $wdest != -1) || $_GET['area'])
   
   $x=0;
   $lpaths = mysqli_query($db,"SELECT * FROM Routes WHERE type='1' AND start='".$loc."' AND end='".$end."'");
-  while ($lpath = mysqli_fetch_array($lpaths))
+  while ($lpath = mysqli_fetch_assoc($lpaths))
   {
     $myPath = unserialize($lpath['path']);
     $foundPaths[$x][0] = "";
@@ -45,7 +45,7 @@ if ( ($wdest != "" && $wdest != -1) || $_GET['area'])
 
 if ($gdest != "" && $gdest != -1)
 {
-  $groute = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Routes WHERE id='".$gdest."'"));
+  $groute = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Routes WHERE id='".$gdest."'"));
   if ($groute)
   {
     $char['route'] = $gdest;

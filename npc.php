@@ -48,7 +48,7 @@ if ($location_array[$char['location']][2])
 }
 
 // Get Char data
-$stats = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Users_stats WHERE id='$char[id]'"));
+$stats = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Users_stats WHERE id='$char[id]'"));
 $myquests= unserialize($char['quests']);
 $qcomp = 0;
 
@@ -71,7 +71,7 @@ $myHorde=0;
 if ($horde)
 {
   $result = mysqli_query($db,"SELECT * FROM Hordes WHERE done='0' AND location='$char[location]'");
-  while ($tHorde = mysqli_fetch_array( $result ) )
+  while ($tHorde = mysqli_fetch_assoc( $result ) )
   {
     if ($tHorde['id']== $horde)
     {
@@ -118,7 +118,7 @@ if ($myquests)
 {
   if ($escortId && $myquests[$escortId][0] == 1)
   {
-    $quest = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Quests WHERE id='$escortId'"));
+    $quest = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Quests WHERE id='$escortId'"));
     $goals = unserialize($quest['goals']);
     if ($quest['expire'] > (time()/3600)|| $quest['expire'] == -1)
     {
@@ -129,7 +129,7 @@ if ($myquests)
   {
     if ($c_s[0] == 1)
     {
-      $quest = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Quests WHERE id='$c_n'"));
+      $quest = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Quests WHERE id='$c_n'"));
       $goals = unserialize($quest['goals']);
       if (($quest['expire'] > (time()/3600) || $quest['expire'] == -1)&& strtolower($goals[2]) == strtolower($char['location']))
       {
@@ -172,7 +172,7 @@ $doquest = 0;
 $hbattle = 0;
 if ($qid > 0)
 {
-  $doquest = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Quests WHERE id='$qid'"));
+  $doquest = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Quests WHERE id='$qid'"));
   $dqgoals = unserialize($doquest['goals']);
   $teid = $dqgoals[1];
   if ($doquest['type'] == $quest_type_num["Find"])
@@ -236,7 +236,7 @@ $elvl += $char['level'];
 $result= (mysqli_query($db,"SELECT id, upgrades FROM Estates WHERE row='$row' AND col='$col' AND location='$char[location]'"));
 $npcAlign=0;
 $bubble = 0;
-while ($testate = mysqli_fetch_array( $result ) )
+while ($testate = mysqli_fetch_assoc( $result ) )
 {
   $teups = unserialize($testate['upgrades']);
   if ($teups[4]> $eid)
@@ -298,7 +298,7 @@ $nat_bonus = getNatBonuses($nb,$wt_bonuses[$wild_types[$char['location']]],$nt_b
 
 // Estate bonuses
 $est_bonus = "";
-$myEstate= mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Estates WHERE owner='$id' AND location='$char[location]'"));
+$myEstate= mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Estates WHERE owner='$id' AND location='$char[location]'"));
 $estJiBonus = 1;
 if ($myEstate)
 {
@@ -415,7 +415,7 @@ if ($g_steal>95) $g_steal=95;
 
 // UPDATE SCORES FOR CLOSE LEVELS
   $soc_name = $char['society'];
-  $society = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Soc WHERE name='$soc_name' "));
+  $society = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Soc WHERE name='$soc_name' "));
   $area_score = unserialize($society['area_score']);
   $username = $char2['name']."_".$char2['lastname'];
   $score_up = number_format(1-.1*($char['level']-$elvl),2,'.','');
@@ -427,11 +427,11 @@ if ($g_steal>95) $g_steal=95;
     for ($x=0; $x<4; $x++)
     {
       $loc = $surrounding_area[$x];
-      $loc_query = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM `Locations` WHERE name = '$loc'"));
+      $loc_query = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM `Locations` WHERE name = '$loc'"));
       $atWar=1;
       if ($soc_name != "" && $loc_query['last_war'])
       { 
-        $myWar = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Contests WHERE id='$loc_query[last_war]' "));
+        $myWar = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Contests WHERE id='$loc_query[last_war]' "));
         if (!$myWar['done'] && !($myWar['starts'] > intval(time()/3600)))
         {
           // Get clan id's that might be involved in war.
@@ -477,13 +477,13 @@ if ($g_steal>95) $g_steal=95;
         {
           if ($c_s[0] == 1)
           {
-            $quest = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Quests WHERE id='$c_n'"));
+            $quest = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Quests WHERE id='$c_n'"));
             $goals = unserialize($quest['goals']);
             $qreward= unserialize($quest['reward']);
             if ($quest['type'] == $quest_type_num["Support"] && $goals[2] == $loc && $soc_name != $quest['offerer'] && $quest['done']==0) 
             {
               $sQuest = 1;
-              $societySup = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Soc WHERE name='".$quest['offerer']."' "));
+              $societySup = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Soc WHERE name='".$quest['offerer']."' "));
               $area_score_sup = unserialize($societySup['area_score']);
               if ($atWar==2) $warJi=$score_up3;    
               $area_score_sup[$loc_query['id']] += $score_up3;
@@ -541,7 +541,7 @@ if ($myquests)
   {
     if ($c_s[0] == 1)
     {
-      $quest = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Quests WHERE id='$c_n'"));
+      $quest = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Quests WHERE id='$c_n'"));
       if ($quest['expire'] > (time()/3600)|| $quest['expire'] == -1)
       {
         if ($quest['type'] == $quest_type_num["NPC"])
@@ -733,7 +733,7 @@ for ($t=1; $t < count($bresult); $t++)
   $bturns[$turn] += 1;
 }
 $iresult=mysqli_query($db,"SELECT * FROM Items WHERE owner='$char[id]' AND istatus>0 AND type<15");
-while ($qitem = mysqli_fetch_array($iresult))
+while ($qitem = mysqli_fetch_assoc($iresult))
 {
   $ichange=0;
   // armor or shield
@@ -775,7 +775,7 @@ if (($rand_val >= 60 && $winner == $player_word[0]))
   if ($invsize < $inv_max)  
   {
     // seal find requirements check
-    $topchar = mysqli_fetch_array(mysqli_query($db,"SELECT id, level FROM Users WHERE 1 ORDER BY level DESC, exp DESC LIMIT 1"));
+    $topchar = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, level FROM Users WHERE 1 ORDER BY level DESC, exp DESC LIMIT 1"));
     $findseal=0;
     $availSeals = getMaxSeals($topchar['level']);
     
@@ -922,9 +922,9 @@ $array_gen = generate_duel_text($bresult);
 $charip = unserialize($char['ip']); 
 $alts = getAlts($charip);
 $result10= mysqli_query($db,"SELECT id, owner, upgrades, level, inv FROM Estates WHERE row='$row' AND col='$col' AND location='$char[location]'");
-while ($testate = mysqli_fetch_array( $result10 ) )
+while ($testate = mysqli_fetch_assoc( $result10 ) )
 {
-  $eowner = mysqli_fetch_array(mysqli_query($db,"SELECT id, name, lastname, bankgold, society FROM Users WHERE id='$testate[owner]'"));
+  $eowner = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, name, lastname, bankgold, society FROM Users WHERE id='$testate[owner]'"));
   $username = $eowner['name']."_".$eowner['lastname'];
   $ally=0;
   if ($society['id'])
@@ -974,17 +974,17 @@ if (!$myHorde['id'])
   $dwpts=0;
 
   $lastBattle = 0;
-  $lastBattle = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Contests WHERE type='99' "));
+  $lastBattle = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Contests WHERE type='99' "));
   if ($lastBattle == 0)
   {
     for ($x=0; $x<$lnum; $x++)
     {
       $loc = $surrounding_area[$x];
-      $loc_query = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Locations WHERE name = '$loc'"));
+      $loc_query = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Locations WHERE name = '$loc'"));
       if ($loc_query['last_war'])
       {
         $wpts1 = 0;
-        $myWar = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Contests WHERE id='$loc_query[last_war]' "));
+        $myWar = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Contests WHERE id='$loc_query[last_war]' "));
         if (!$myWar['done'] && !($myWar['starts'] > intval(time()/3600)))
         {
           // Get clan id's that might be involved in war.
@@ -1127,9 +1127,9 @@ if ($myHorde)
     mysqli_query($db,"UPDATE Users_stats SET horde_finish='".$stats['horde_finish']."' WHERE id='".$char['id']."'");
     
     // All clans gain 3% of their Ji in the city.
-    $attacked = mysqli_fetch_array(mysqli_query($db,"SELECT id, name, myOrder, chaos, ruler, army FROM Locations WHERE name='$myHorde[target]'"));
+    $attacked = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, name, myOrder, chaos, ruler, army FROM Locations WHERE name='$myHorde[target]'"));
     $sresult = mysqli_query($db,"SELECT id, area_score, name FROM Soc WHERE 1");
-    while ($lsoc = mysqli_fetch_array($sresult))
+    while ($lsoc = mysqli_fetch_assoc($sresult))
     {
       $tas = unserialize($lsoc['area_score']);
       $tas[$attacked['id']] = $tas[$attacked['id']]*1.03;
@@ -1155,8 +1155,8 @@ if ($myHorde)
     mysqli_query($db,"UPDATE Users_stats SET army_finish='".$stats['army_finish']."' WHERE id='".$char['id']."'");
     
     // ruling clan's Ji decreased by 3%
-    $attacked = mysqli_fetch_array(mysqli_query($db,"SELECT id, name, myOrder, ruler FROM Locations WHERE name='$myHorde[target]'"));
-    $ruler = mysqli_fetch_array(mysqli_query($db,"SELECT id, area_score, name FROM Soc WHERE name='$attacked[ruler]'"));
+    $attacked = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, name, myOrder, ruler FROM Locations WHERE name='$myHorde[target]'"));
+    $ruler = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, area_score, name FROM Soc WHERE name='$attacked[ruler]'"));
     $tas = unserialize($ruler['area_score']);
     $tas[$attacked['id']] = $tas[$attacked['id']]*0.97;
     $sas= serialize($tas);

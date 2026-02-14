@@ -20,7 +20,7 @@ $winners = 0;
 $text = '';
 $query = "SELECT * FROM Locations WHERE name='$char[location]'";
 $result = mysqli_query($db,$query);
-$location = mysqli_fetch_array($result);
+$location = mysqli_fetch_assoc($result);
 if ($location['curr_dice']){ 
 	$curr_dice = unserialize($location['curr_dice']);
 }
@@ -50,7 +50,7 @@ if ($buyin)
     $query2 = "UPDATE Users SET gold='$gold' WHERE id='$char[id]'";
     $result2 = mysqli_query($db,$query2);
     $char['gold']=$gold;
-    $ustats = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Users_stats WHERE id='".$id."'"));
+    $ustats = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Users_stats WHERE id='".$id."'"));
     $ustats['dice_earn'] -= $wager;
     $result = mysqli_query($db,"UPDATE Users_stats SET dice_earn='".$ustats['dice_earn']."' WHERE id='".$id."'");
     //updateDice($curr_dice,$wager,$gtype);

@@ -1,4 +1,11 @@
 <?php
+// Helper function for PHP 8.2+ count() compatibility
+if (!function_exists('safe_count')) {
+    function safe_count($var): int {
+        return is_countable($var) ? count($var) : 0;
+    }
+}
+
 include_once('config.php');
 global $db;
 $db = @mysqli_connect($database_server, $database_username, $database_password, $database_name);
@@ -36,7 +43,7 @@ if ($session) {
     mysqli_stmt_bind_param($stmt, "si", $session, $currentTime);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
-    $account = mysqli_fetch_array($result);
+    $account = mysqli_fetch_assoc($result);
     
     if ($account) {
         $email = $account['email'];

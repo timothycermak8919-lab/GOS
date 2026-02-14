@@ -17,7 +17,7 @@ $wikilink = "Nearby";
 
 // See if character is in a City
 $isCity = 0;
-$loc = mysqli_fetch_array(mysqli_query($db,"SELECT id, name FROM Locations WHERE name='$char[location]'"));
+$loc = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, name FROM Locations WHERE name='$char[location]'"));
 if ($loc['id']) $isCity = 1;
 
 $dw=0;
@@ -36,7 +36,7 @@ else $query .= " WHERE Users.location='".$char['location']."'";
 
 // See if character is in a City
 $isCity = 0;
-$loc = mysqli_fetch_array(mysqli_query($db,"SELECT id, name FROM Locations WHERE name='$char[location]'"));
+$loc = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, name FROM Locations WHERE name='$char[location]'"));
 if ($loc['id']) $isCity = 1;
 
 //  HOW TO ORDER
@@ -52,7 +52,7 @@ if ($resultnumb == '') $resultnumb = 0;
 if (!$clansearch)
 {
 $soc_name = $char['society'];
-$society = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Soc WHERE name='$soc_name'"));
+$society = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Soc WHERE name='$soc_name'"));
 $stance = unserialize($society['stance']);
 }
 
@@ -71,11 +71,11 @@ $query1 = "SELECT name, lastname FROM Users WHERE name = '$search' AND lastname 
 
 /* query the database */
 $result5 = mysqli_query($db,$query1);
-if (!($searchchar = mysqli_fetch_array($result5)))
+if (!($searchchar = mysqli_fetch_assoc($result5)))
 {
 $query1 = "SELECT name, lastname FROM Users WHERE name LIKE '%$search%' AND lastname LIKE '%$slast%'";
 $result5 = mysqli_query($db,$query1);
-$searchchar = mysqli_fetch_array($result5);
+$searchchar = mysqli_fetch_assoc($result5);
 }
 /* Allow access if a matching record was found*/
 if ($searchchar)
@@ -100,7 +100,7 @@ if ($_GET['first'] == 1)
 $y = 0;
 while ($y < $numchar2 && ($thechar['name'] != $name || $thechar['lastname'] != $lastname) )
 {
-$thechar = mysqli_fetch_array($resultf);
+$thechar = mysqli_fetch_assoc($resultf);
 $y++;
 }
 $resultnumb = intval(($y-1)/$numbofresults) * $numbofresults;
@@ -158,7 +158,7 @@ $style="style='border-width: 0px; border-bottom: 1px solid #333333'";
   $x=0;
 
   
-  while ( $listchar = mysqli_fetch_array( $result ) )
+  while ( $listchar = mysqli_fetch_assoc( $result ) )
   {
     if ($listchar['id'] == $id) $classn="info";
     elseif ($listchar['lastonline'] >= time()-900) $classn="success";
@@ -186,7 +186,7 @@ $style="style='border-width: 0px; border-bottom: 1px solid #333333'";
             $hasSeal = mysqli_num_rows(mysqli_query($db,"SELECT id FROM Items WHERE type=0 && owner='$listchar[id]'"));
             if ($hasSeal)
               echo "<img src='images/classes/4.gif' height=18 width=18/>&nbsp;"; 
-            $lastBattle = mysqli_fetch_array(mysqli_query($db,"SELECT id, starts, ends, winner FROM Contests WHERE type='99' "));
+            $lastBattle = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, starts, ends, winner FROM Contests WHERE type='99' "));
             if ($lastBattle != 0)
             {
               if ($listchar['align'] > 0)

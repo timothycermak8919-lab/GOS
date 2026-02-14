@@ -21,7 +21,7 @@ include_once("admin/charFuncs.php");
 $iresult=mysqli_query($db,"SELECT * FROM Notes WHERE to_id='$id' AND del_to='0' AND type = 9 AND sent > '".(time()-432000)."' ORDER BY sent DESC");
 $inbox = [];
 $in_num = 0;
-while ($inote = mysqli_fetch_array($iresult))
+while ($inote = mysqli_fetch_assoc($iresult))
 {
   $inbox[$in_num++] = $inote;
 }
@@ -29,7 +29,7 @@ while ($inote = mysqli_fetch_array($iresult))
 $oresult=mysqli_query($db,"SELECT * FROM Notes WHERE from_id='$id' AND del_from='0' AND type < 9 ORDER BY sent DESC LIMIT 0, 30");
 $outbox = [];
 $out_num = 0;
-while ($onote = mysqli_fetch_array($oresult))
+while ($onote = mysqli_fetch_assoc($oresult))
 {
   $outbox[$out_num++] = $onote;
 }
@@ -106,7 +106,7 @@ if ($message == '')
 $iresult=mysqli_query($db,"SELECT * FROM Notes WHERE to_id='$id' AND del_to='0' AND type = 9 AND sent > '".(time()-432000)."' ORDER BY sent DESC");
 $inbox = [];
 $in_num = 0;
-while ($inote = mysqli_fetch_array($iresult))
+while ($inote = mysqli_fetch_assoc($iresult))
 {
   $inbox[$in_num++] = $inote;
 }
@@ -114,7 +114,7 @@ while ($inote = mysqli_fetch_array($iresult))
 $oresult=mysqli_query($db,"SELECT * FROM Notes WHERE from_id='$id' AND del_from='0' AND type = 9 ORDER BY sent DESC LIMIT 0, 30");
 $outbox = [];
 $out_num = 0;
-while ($onote = mysqli_fetch_array($oresult))
+while ($onote = mysqli_fetch_assoc($oresult))
 {
   $outbox[$out_num++] = $onote;
 }
@@ -180,7 +180,7 @@ include('header.php');
                     $senttime = "Seconds ago";
                     $minpast = intval((time()-$inbox[$y]['sent'])/60);
                     $senttime = displayTime($minpast,1,0);
-                    $sender = mysqli_fetch_array(mysqli_query($db,"SELECT id,name,lastname FROM Users WHERE id='".$inbox[$y]['from_id']."'"));
+                    $sender = mysqli_fetch_assoc(mysqli_query($db,"SELECT id,name,lastname FROM Users WHERE id='".$inbox[$y]['from_id']."'"));
                     $accord = "collapse".$y;                    
               ?>
                 <div class="panel panel-default">
@@ -241,7 +241,7 @@ include('header.php');
                     $senttime = "Seconds ago";
                     $minpast = intval((time()-$outbox[$y]['sent'])/60);
                     $senttime = displayTime($minpast,1,0);
-                    $receiver = mysqli_fetch_array(mysqli_query($db,"SELECT id,name,lastname FROM Users WHERE id='".$outbox[$y]['to_id']."'"));
+                    $receiver = mysqli_fetch_assoc(mysqli_query($db,"SELECT id,name,lastname FROM Users WHERE id='".$outbox[$y]['to_id']."'"));
                     $accord = "collapseo".$y;
               ?>
                 <div class="panel panel-default">

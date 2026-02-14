@@ -83,7 +83,7 @@ $soc_name = $char['society'];
 
 $query = "SELECT * FROM Soc WHERE name='$soc_name'";
 $result = mysqli_query($db,$query);
-$society = mysqli_fetch_array($result);
+$society = mysqli_fetch_assoc($result);
 $stance = unserialize($society['stance']);
 $subleaders = unserialize($society['subleaders']);
 
@@ -95,7 +95,7 @@ $upgrades = unserialize($society['upgrades']);
 
 // UPDATE NUMBER OF MEMEBERS
 
-$resultf = mysqli_fetch_array(mysqli_query($db,"SELECT COUNT(*) FROM Users WHERE society='$soc_name' "));
+$resultf = mysqli_fetch_assoc(mysqli_query($db,"SELECT COUNT(*) FROM Users WHERE society='$soc_name' "));
 $numchar = $resultf[0];
 $query = "UPDATE Soc SET members='$numchar' WHERE name='$soc_name' ";
 if ($numchar!=$society['members']) $result = mysqli_query($db,$query);
@@ -158,12 +158,12 @@ if ($upsupport)
   $tot_sup = 0;
   $max_sup = 0;
   $supTarget[0] = 0;
-  while ($loc = mysqli_fetch_array( $result ) )
+  while ($loc = mysqli_fetch_assoc( $result ) )
   {
     $varname="support".$loc['id'];
     $myWar = 0;
     $atWar = 0;
-    if ($loc['last_war']) $myWar = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Contests WHERE id='$loc[last_war]' "));
+    if ($loc['last_war']) $myWar = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Contests WHERE id='$loc[last_war]' "));
     if ($myWar && !$myWar['done'] && ($myWar['starts']<time()/3600)) $atWar=1;
     if ($support[$loc['id']] != $_POST[$varname] && !$atWar)
     {
@@ -226,7 +226,7 @@ if ($subtit)
 if ($addsub)
 {
   $result = mysqli_query($db,"SELECT * FROM Users WHERE id='$addsub'");
-  $char_sub = mysqli_fetch_array($result);
+  $char_sub = mysqli_fetch_assoc($result);
   $subleaders[$addsub]= array($char_sub['name'],$char_sub['lastname']);
   $subleaders_str = serialize($subleaders);
   $subs = count($subleaders);
@@ -270,7 +270,7 @@ if ($kick)
   $query = "UPDATE Users SET society='' WHERE id='$kick'";
   $result = mysqli_query($db,$query);
   $result = mysqli_query($db,"SELECT * FROM Users WHERE id='$kick'");
-  $char_kick = mysqli_fetch_array($result);
+  $char_kick = mysqli_fetch_assoc($result);
   // UPDATE NUMBER OF CLAN MEMBERS AND BLOCK
   $memnumb = $society['members'] - 1;
   $blocked[$kick]=array($char_kick['name'],$char_kick['lastname']);
@@ -370,9 +370,9 @@ if ($uprank)
 $result = mysqli_query($db,"SELECT id, name, lastname, level, soc_rank FROM Users WHERE society='$soc_name' ORDER BY lastname, name");
 $numchar = mysqli_num_rows($result);
 
-while ($cmember = mysqli_fetch_array($result))
+while ($cmember = mysqli_fetch_assoc($result))
 {
-  $cmem_stats = mysqli_fetch_array(mysqli_query($db,"SELECT id, ji, wins FROM Users_stats WHERE id='$cmember[id]'"));
+  $cmem_stats = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, ji, wins FROM Users_stats WHERE id='$cmember[id]'"));
   $memrank = 0;
   $br = 0; 
   if (strtolower($cmember['name']) == strtolower($society['leader']) && strtolower($cmember['lastname']) == strtolower($society['leaderlast']) ) 
@@ -666,7 +666,7 @@ window.onload=intitializeChat;
                 updateSocScores();
                 $clanreps = unserialize($society['area_rep']);
                 $result = mysqli_query($db,"SELECT * FROM Locations ORDER BY name");
-                while ($loc = mysqli_fetch_array( $result ) )
+                while ($loc = mysqli_fetch_assoc( $result ) )
                 {
                   $clans = array();
                   $locid = $loc['id'];
@@ -685,7 +685,7 @@ window.onload=intitializeChat;
                     {
                       if ($ruler_wins==0)
                       {
-                        $tsoc = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM `Soc` WHERE id = '".$key."'"));
+                        $tsoc = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM `Soc` WHERE id = '".$key."'"));
                         if ($ruler == $tsoc['name'])
                         {
                           $ruler_wins = $value;
@@ -717,7 +717,7 @@ window.onload=intitializeChat;
                       $query = "SELECT * FROM Soc WHERE 1 ORDER BY score DESC, members DESC";
                       $result2 = mysqli_query($db,$query);
                       $stance = unserialize($society['stance']);
-                      while ( $listchar = mysqli_fetch_array( $result2 ) )
+                      while ( $listchar = mysqli_fetch_assoc( $result2 ) )
                       {
                         if ($stance[str_replace(" ","_",$listchar['name'])] == 1 && $listchar['id'] != $society['id'])
                         {
@@ -733,7 +733,7 @@ window.onload=intitializeChat;
                       if ($supporting[$society['id']])
                       {
                         $ssid = $supporting[$society['id']];
-                        $ssoc = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM `Soc` WHERE id = '$ssid'"));
+                        $ssoc = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM `Soc` WHERE id = '$ssid'"));
                         echo "<a href='joinclan.php?name=".$ssoc['name']."'>".$ssoc['name']."</a>";
                       }
                       else
@@ -748,7 +748,7 @@ window.onload=intitializeChat;
                     $myWar = 0;
                     if ($loc['last_war'])
                     {
-                      $myWar = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Contests WHERE id='$loc[last_war]' "));
+                      $myWar = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Contests WHERE id='$loc[last_war]' "));
                     }          
                     if ($myWar) // previous war
                     {
@@ -950,7 +950,7 @@ window.onload=intitializeChat;
                         $x = 0;
                         while ($x < $numchar)
                         { 
-                          $charnew = mysqli_fetch_array($result);
+                          $charnew = mysqli_fetch_assoc($result);
                           if ( strtolower($charnew['name']) != strtolower($char['name']) || strtolower($charnew['lastname']) != strtolower($char['lastname']) )
                           {
                             $b1=1;
@@ -1015,7 +1015,7 @@ window.onload=intitializeChat;
                         $y = 0;
                         while ($y < $numchar)
                         {
-                          $charnew = mysqli_fetch_array($result);
+                          $charnew = mysqli_fetch_assoc($result);
                           if (( strtolower($charnew['name']) != strtolower($char['name']) || strtolower($charnew['lastname']) != strtolower($char['lastname']) ) && 
                             (strtolower($charnew['name']) != strtolower($society['leader']) && strtolower($charnew['lastname']) != strtolower($society['leaderlast']) ))
                           {

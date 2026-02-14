@@ -535,10 +535,10 @@ style = "
 <?php 
   $sortBy = 'id';
   $result = mysqli_query($db,"SELECT id, name, bank, pop, chaos, shoplvls, clan_scores, ruler, myOrder, army, isDestroyed FROM Locations ORDER BY $sortBy");  
-  while ($loc = mysqli_fetch_array( $result ) )
+  while ($loc = mysqli_fetch_assoc( $result ) )
   {
 	  
-	$society = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Soc WHERE name='$loc[ruler]' "));
+	$society = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Soc WHERE name='$loc[ruler]' "));
 	echo "<div style='display:none;' id='".$loc['name']."'>".json_encode($loc).'@'.json_encode($society['flag']).'@'.json_encode($society['sigil'])."</div>";
 
   }

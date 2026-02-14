@@ -998,13 +998,13 @@ function build_base_consume_list ($order)
 
 $clan_building_bonuses= "";
 $result = mysqli_query($db,"SELECT id, upgrades, name FROM Locations WHERE ruler='".$char['society']."' AND isDestroyed='0'");
-while ($town = mysqli_fetch_array( $result ) )
+while ($town = mysqli_fetch_assoc( $result ) )
 {
   $tmpUps = unserialize($town['upgrades']);
   $clan_building_bonuses .= getBuildClanBonuses($tmpUps, $unique_buildings[$town['name']], $unique_build_bonuses);
 }
 
-$location = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Locations WHERE name='$char[location]'"));
+$location = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Locations WHERE name='$char[location]'"));
 
 // setup bonuses for the current location
 include("locBonuses.php");
@@ -1078,14 +1078,14 @@ function updateSocScores()
 {
     global $db;
   $result = mysqli_query($db,"SELECT id, ruler, estate_support, name FROM Locations WHERE 1");
-  while ($loc = mysqli_fetch_array( $result ) )
+  while ($loc = mysqli_fetch_assoc( $result ) )
   {
     $clans = array();
     $locid = $loc['id'];
     $clanscores = [];
     $supporting=[];
     $result2 = mysqli_query($db,"SELECT id, support, area_score FROM Soc WHERE 1 ORDER BY score DESC");
-    while ($soc = mysqli_fetch_array( $result2 ) )
+    while ($soc = mysqli_fetch_assoc( $result2 ) )
     {
       $support = unserialize($soc['support']);
       $clan_id = $soc['id'];
@@ -1135,7 +1135,7 @@ function updateEstateSupport($estate_ji)
     global $db;
   $result= mysqli_query($db,"SELECT * FROM Estates WHERE 1");
   $esup = array();
-  while ($estate = mysqli_fetch_array( $result ) )
+  while ($estate = mysqli_fetch_assoc( $result ) )
   {
     if ($estate['supporting'] != "")
     {

@@ -444,7 +444,7 @@ function generate_random_quest(string $loc, string $qalign = ""): string
   else if ($type == $quest_type_num["Escort"])
   {
     $goals[0] = rand(1,5)*6;
-    $route = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Routes WHERE start='".$loc."' AND length >'".$goals[0]."' ORDER BY rand()"));
+    $route = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Routes WHERE start='".$loc."' AND length >'".$goals[0]."' ORDER BY rand()"));
     $goals[1] = $route['id'];
     $path = unserialize($route['path']);
     $goals[2] = $path[$goals[0]];

@@ -15,7 +15,7 @@ $loc_query = $char['location'];
 $soc_name = $char['society'];
 
 $shoplvls=unserialize($location['shoplvls']);
-$society = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Soc WHERE name='$soc_name' "));
+$society = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Soc WHERE name='$soc_name' "));
 $subleaders = unserialize($society['subleaders']);
 $subs = $society['subs'];
 $offices = unserialize($society['offices']);
@@ -235,7 +235,7 @@ if ($officer)
   if ($officer != '-1')
   {
     $result = mysqli_query($db,"SELECT * FROM Users WHERE id='$officer'");
-    $char_sub = mysqli_fetch_array($result);
+    $char_sub = mysqli_fetch_assoc($result);
     $offices[$location['id']]= array($char_sub['name'],$char_sub['lastname']);
   }
   else $offices[$location['id']]= array('1');
@@ -316,7 +316,7 @@ if ($transFrom)
   }
   else // From City
   {
-    $city = mysqli_fetch_array(mysqli_query($db,
+    $city = mysqli_fetch_assoc(mysqli_query($db,
               "SELECT id, name, grain, livestock, lumber, stone, fish, luxury, ruler FROM Locations WHERE id='$transFrom'"));
     if ($city['id'])
     {
@@ -375,7 +375,7 @@ include('header.php');
                 $x = 0;
                 while ($x < $numpeople)
                 { 
-                  $charnew = mysqli_fetch_array($result);
+                  $charnew = mysqli_fetch_assoc($result);
                   if ( strtolower($charnew['name']) != strtolower($char['name']) || strtolower($charnew['lastname']) != strtolower($char['lastname']) )
                   {
                     $b=1;
@@ -565,7 +565,7 @@ include('header.php');
                   {
                     if ($offices[$l])
                     {
-                      $city = mysqli_fetch_array(mysqli_query($db,
+                      $city = mysqli_fetch_assoc(mysqli_query($db,
                                 "SELECT id, name, grain, livestock, lumber, stone, fish, luxury, ruler FROM Locations WHERE id='$l'"));
                       if ($city['ruler']==$society['name'])
                       {

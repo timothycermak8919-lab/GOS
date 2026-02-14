@@ -44,7 +44,7 @@ $message = $loc_name." City Hall";
 $shoplvls=unserialize($location['shoplvls']);
 
 // KICK OFF PAGE IF NOT CLAN LEADER
-$society = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Soc WHERE name='$soc_name' "));
+$society = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Soc WHERE name='$soc_name' "));
 $subleaders = unserialize($society['subleaders']);
 $subs = $society['subs'];
 $offices = unserialize($society['offices']);
@@ -77,7 +77,7 @@ if ($offices[$location['id']]['0'] != '1')
 } 
 
 $b = 0;
-$ruler = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Soc WHERE name='$location[ruler]' "));
+$ruler = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Soc WHERE name='$location[ruler]' "));
 if ($location['ruler'] == $society['name'])
 {
   $rulerscore = $locscore;
@@ -98,7 +98,7 @@ $maxw=mysqli_real_escape_string($db,$_POST['maxw']);
 $bought=mysqli_real_escape_string($db,$_POST['bought']);
 $buildup=mysqli_real_escape_string($db,$_POST['buildup']);
 
-$ustats = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Users_stats WHERE id='$id'"));
+$ustats = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Users_stats WHERE id='$id'"));
 
 $myLocBiz = array (0,0,0,0,0,0,0,0,0,0,0,0,0);
 $myLocBiz[99]=0;
@@ -107,7 +107,7 @@ $myTotBiz[99]=0;
 $query = "SELECT * FROM Profs WHERE owner='$id'";
 $result = mysqli_query($db,$query);
 $most_biz=0;
-while ($bq = mysqli_fetch_array( $result ) )
+while ($bq = mysqli_fetch_assoc( $result ) )
 {
   $myTotBiz[$bq['type']]++;
   if($most_biz<$myTotBiz[$bq['type']]) $most_biz = $myTotBiz[$bq['type']];
@@ -167,7 +167,7 @@ if ($bought != '' && $bought != '-1')
         $myLocBiz[0] = '';
         $query = "SELECT * FROM Profs WHERE owner='$id' AND location='$loc_query'";
         $result = mysqli_query($db,$query);
-        while ($bq = mysqli_fetch_array( $result ) )
+        while ($bq = mysqli_fetch_assoc( $result ) )
         {
           $myLocBiz[$bq['type']]=1;
         }
@@ -301,12 +301,12 @@ if ($_POST['maketourney'])
         $sql = "INSERT INTO Contests (type,    location,    starts,    ends,    done,distro,    contestants,rules,   results   ,reward)
                               VALUES ('$ttype','$loc_query','$tstarts','$tends','0', '$pdistro','$players', '$rules','$players','$rewards')";
         $resultt = mysqli_query($db,$sql);
-        $myTourney = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Contests WHERE location='$loc_query' AND starts='$tstarts'"));
+        $myTourney = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Contests WHERE location='$loc_query' AND starts='$tstarts'"));
         mysqli_query($db,"UPDATE Locations SET last_tourney='$myTourney[id]', bank='$location[bank]' WHERE name='$loc_query'");
         $message = "Tournament Announced!";
         
         // Update City Rumors
-        $cityRumors = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM messages WHERE id='50000'"));
+        $cityRumors = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM messages WHERE id='50000'"));
 
         $rumorMessages = unserialize($cityRumors['message']);
         $numRumors = count($rumorMessages);
@@ -328,7 +328,7 @@ if ($_POST['maketourney'])
 // sign up
 if ($_POST['signup'])
 {
-  $myTourney = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Contests WHERE id='$location[last_tourney]' "));
+  $myTourney = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Contests WHERE id='$location[last_tourney]' "));
   $rules = unserialize($myTourney['rules']);
   if ($myTourney['starts'] > intval(time()/3600)) 
   {
@@ -337,7 +337,7 @@ if ($_POST['signup'])
       $lastdone=0;
       if ($char['lastcontest'])
       {
-        $lastTourney = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Contests WHERE id='$char[lastcontest]' "));
+        $lastTourney = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Contests WHERE id='$char[lastcontest]' "));
         $lastdone=$lastTourney['done'];
       }
       else
@@ -380,7 +380,7 @@ if ($_POST['makewar'] && $slead)
   $lastdone=0;
   if ($society['last_war'])
   {
-    $lastWar = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Contests WHERE id='$society[last_war]' "));
+    $lastWar = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Contests WHERE id='$society[last_war]' "));
     if (($lastWar['ends']+24) <= intval(time()/3600)) $lastdone=1;
   }
   else
@@ -425,7 +425,7 @@ if ($_POST['makewar'] && $slead)
       $sql = "INSERT INTO Contests (type,    location,    starts,    ends,    done,distro,    contestants,rules,   participation,results,   reward)
                             VALUES ('$ttype','$loc_query','$tstarts','$tends','0', '$pdistro','$sc',      '$rules','$sp',        '$players','$rewards')";
       $resultt = mysqli_query($db,$sql);
-      $myWar = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Contests WHERE location='$loc_query' AND starts='$tstarts'"));
+      $myWar = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Contests WHERE location='$loc_query' AND starts='$tstarts'"));
       $location['last_war']=$myWar['id'];
       mysqli_query($db,"UPDATE Locations SET last_war='$myWar[id]' WHERE name='$loc_query'");
       $swars[$myWar['id']]=0;
@@ -446,7 +446,7 @@ if ($_POST['makewar'] && $slead)
       $message = "Clan Battle Announced!";
     
       // Update City Rumors
-      $cityRumors = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM messages WHERE id='50000'"));
+      $cityRumors = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM messages WHERE id='50000'"));
 
       $rumorMessages = unserialize($cityRumors['message']);
       $numRumors = count($rumorMessages);
@@ -465,14 +465,14 @@ if ($_POST['makewar'] && $slead)
 
 if ($_POST['joinwar'] && $slead)
 {
-  $myWar = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Contests WHERE id='$location[last_war]' "));
+  $myWar = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Contests WHERE id='$location[last_war]' "));
   $rules = unserialize($myWar['rules']);
   if ($myWar['starts'] > intval(time()/3600)) 
   {
       $lastdone=0;
       if ($society['last_war'])
       {
-        $lastWar = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Contests WHERE id='$society[last_war]' "));
+        $lastWar = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Contests WHERE id='$society[last_war]' "));
         if (($lastWar['ends']+24) <= intval(time()/3600)) $lastdone=1;
       }
       else
@@ -609,7 +609,7 @@ include('header.php');
         <?php
           if ($location['last_tourney'])
           {
-            $myTourney = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Contests WHERE id='$location[last_tourney]' "));
+            $myTourney = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Contests WHERE id='$location[last_tourney]' "));
           }
           else
           {
@@ -680,7 +680,7 @@ include('header.php');
                 $lastdone=0;
                 if ($char['lastcontest'])
                 {
-                  $lastTourney = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Contests WHERE id='$char[lastcontest]' "));
+                  $lastTourney = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Contests WHERE id='$char[lastcontest]' "));
                   $lastdone=$lastTourney['done'];
                 }
                 else
@@ -874,7 +874,7 @@ include('header.php');
           $myWar = 0;
           $rules = [];
           $lastBattle = 0;
-          $lastBattle = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Contests WHERE type='99' "));
+          $lastBattle = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Contests WHERE type='99' "));
           if ($lastBattle != 0)
           {
             $myWar = $lastBattle;
@@ -882,7 +882,7 @@ include('header.php');
           }
           else if ($location['last_war'])
           {
-            $myWar = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Contests WHERE id='$location[last_war]' "));
+            $myWar = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Contests WHERE id='$location[last_war]' "));
             $bType = "Clan";
           }
     
@@ -999,7 +999,7 @@ include('header.php');
               $jiRisk = 0;
               if ($myWar['winner'] == null)
               {
-                $tsoc = mysqli_fetch_array(mysqli_query($db,"SELECT id, area_score FROM `Soc` WHERE id = '$rid[$rname]'"));
+                $tsoc = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, area_score FROM `Soc` WHERE id = '$rid[$rname]'"));
                 $area_score = unserialize($tsoc['area_score']);
                 $jpercent = 0.10;
                 if ($rules[0] == $rid[$rname]) $jpercent = 0.05;
@@ -1026,7 +1026,7 @@ include('header.php');
           $lastdone=0;
           if ($society['last_war'])
           {
-            $lastWar = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Contests WHERE id='$society[last_war]' "));
+            $lastWar = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Contests WHERE id='$society[last_war]' "));
             if (($lastWar['ends']+24) <= intval(time()/3600)) $lastdone=1;
           }
           else
@@ -1050,7 +1050,7 @@ include('header.php');
             }
             if ($society['last_war'])
             {
-              $lastWar = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Contests WHERE id='$society[last_war]' "));
+              $lastWar = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Contests WHERE id='$society[last_war]' "));
               if (($lastWar['ends']+24) <= intval(time()/3600)) $lastdone=1;
             }
             else

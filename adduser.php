@@ -115,7 +115,7 @@ elseif (strlen($lastname) > 2 && strlen($lastname) < 20 && strlen($username) > 2
     
     //$query = "SELECT * FROM donate WHERE email='$email'";
     //$result = mysqli_query($db,$query);
-    //$donors = mysqli_fetch_array($result);
+    //$donors = mysqli_fetch_assoc($result);
 
     // DONOR FIX
     //if (($donors['id'] && $donors['amount'] >= 5)) 
@@ -129,7 +129,7 @@ elseif (strlen($lastname) > 2 && strlen($lastname) < 20 && strlen($username) > 2
     if ($donor) $btoday = 70; else $btoday = 70;
 // END DONOR FIX
      
-   $creator = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Users WHERE name = 'The' AND lastname = 'Creator' "));
+   $creator = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Users WHERE name = 'The' AND lastname = 'Creator' "));
     if ($creator['id'])
     {
       $creationtime = intval($creator['born']/3600);
@@ -153,10 +153,10 @@ elseif (strlen($lastname) > 2 && strlen($lastname) < 20 && strlen($username) > 2
     echo mysqli_error($db);
     $query = "SELECT * FROM Users WHERE name = '$username' AND lastname = '$lastname' ";
     $result = mysqli_query($db,$query);
-    $char = mysqli_fetch_array($result);
+    $char = mysqli_fetch_assoc($result);
     $id=$char['id'];
     
-    $creator = mysqli_fetch_array(mysqli_query($db,"SELECT id, name, lastname FROM Users WHERE name = 'The' AND lastname = 'Creator' "));
+    $creator = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, name, lastname FROM Users WHERE name = 'The' AND lastname = 'Creator' "));
     $cid = $creator['id'];
 
     $notesub = "Welcome to GoS!";
@@ -185,7 +185,7 @@ elseif (strlen($lastname) > 2 && strlen($lastname) < 20 && strlen($username) > 2
       setcookie("lastname", "$lastname", time()+99999999, "/");
       // IF 100th character, optimize database
       $result = mysqli_query($db, "SELECT name, id FROM Users WHERE name='$username' AND lastname='$lastname'");
-      $new_id = mysqli_fetch_array($result);
+      $new_id = mysqli_fetch_assoc($result);
       if ($new_id['id']/100 == intval($new_id['id']/100)) {mysqli_query($db,"OPTIMIZE TABLE Users"); mysqli_query($db,"OPTIMIZE TABLE Users_data");}
       // REDIRECT
       header("Location: $server_name/bio.php?time=$born");

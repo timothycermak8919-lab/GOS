@@ -10,7 +10,7 @@ include_once("charFuncs.php");
 
 
 //BREAK ANY POSSIBLE SEALS IF LB TIME IS UP
-$cityRumors = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM messages WHERE id='50000'"));
+$cityRumors = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM messages WHERE id='50000'"));
 if ($cityRumors['checktime'] > 0)
 {
   $minFromBreak = intval(((time()/60)-$cityRumors['checktime']*60));
@@ -32,7 +32,7 @@ $curtime=time();
 $check=intval(time()/3600);
 $qcheck = intval(time()/900);
 $lastBattleDone = mysqli_num_rows(mysqli_query($db,"SELECT id FROM Contests WHERE type='99' AND done='1'"));
-$msgs = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM messages WHERE id='0'"));
+$msgs = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM messages WHERE id='0'"));
 $funtime = 1;
 
 echo "Updating Users...";
@@ -40,7 +40,7 @@ mysqli_query($db,"LOCK TABLES Users WRITE, Users_data WRITE;");
 $charq = mysqli_query($db,"SELECT * FROM Users WHERE 1");
 
 //Loop through characters
-while ($char = mysqli_fetch_array($charq))
+while ($char = mysqli_fetch_assoc($charq))
 {
   $id = $char['id'];
 
@@ -177,7 +177,7 @@ while ($char = mysqli_fetch_array($charq))
       }
       if ($pro_stats['cV']) 
       {
-        $resultf = mysqli_fetch_array(mysqli_query($db,"SELECT COUNT(*) FROM Users WHERE location='$char[location]' "));
+        $resultf = mysqli_fetch_assoc(mysqli_query($db,"SELECT COUNT(*) FROM Users WHERE location='$char[location]' "));
         $numchar = $resultf[0];
         $char['gold'] += $hourspast*$jobs[3]*$numchar*10;
       }
@@ -220,7 +220,7 @@ mysqli_query($db,"UNLOCK TABLES;");
 // UPDATE CLAN BATTLE PARTICIPATION
 mysqli_query($db,"LOCK TABLES Contests WRITE, Soc WRITE, Users WRITE, Users_data WRITE;");
 $cbs = (mysqli_query($db,"SELECT id, starts, ends, contestants, results, location, participation FROM Contests WHERE starts <= $check AND done = 0"));
-while ($cb = mysqli_fetch_array($cbs))
+while ($cb = mysqli_fetch_assoc($cbs))
 {
   echo "Update participation in CB $cb[id]...";
   $qago = ($qcheck-1)*900;
@@ -238,11 +238,11 @@ while ($cb = mysqli_fetch_array($cbs))
     foreach ($cb_clans as $cid => $cdata)
     {
       // Calculate the sum of the levels of all members of the clan
-      $clan = mysqli_fetch_array(mysqli_query($db,"SELECT id, name FROM Soc WHERE id='$cid' "));
+      $clan = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, name FROM Soc WHERE id='$cid' "));
       $clan_levels = 0;
       $clan_mems = 0;
       $members = (mysqli_query($db,"SELECT id, level FROM Users WHERE society = '".$clan['name']."'"));
-      while ($member = mysqli_fetch_array($members))
+      while ($member = mysqli_fetch_assoc($members))
       { 
         $clan_mems++;
         $clan_levels += $member['level'];
@@ -253,7 +253,7 @@ while ($cb = mysqli_fetch_array($cbs))
       for ($l= 0; $l < 5; $l++)
       {
         $members = (mysqli_query($db,"SELECT id, soc_rank, level FROM Users WHERE society = '".$clan['name']."' AND location= '".$areas[$l]."' AND depart <= '$qago' "));
-        while ($member = mysqli_fetch_array($members))
+        while ($member = mysqli_fetch_assoc($members))
         {
           // Calculate the participation points from this individual member
           $a_bonus = ($member['level']/$clan_levels)*200;

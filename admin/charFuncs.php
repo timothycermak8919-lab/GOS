@@ -360,7 +360,7 @@ function getAlts ($ips)
 			mysqli_stmt_bind_param($stmt, "s", $ips[$i]);
 			mysqli_stmt_execute($stmt);
 			$result = mysqli_stmt_get_result($stmt);
-			$ip_log = mysqli_fetch_array($result);
+			$ip_log = mysqli_fetch_assoc($result);
 			$users= unserialize($ip_log['users']);
 			if(is_array($users)){
 				for ($j=0; $j < count($users); $j++)
@@ -377,7 +377,7 @@ function getAlts ($ips)
   mysqli_stmt_bind_param($stmt, "s", $email);
   mysqli_stmt_execute($stmt);
   $result = mysqli_stmt_get_result($stmt);
-  while ($char = mysqli_fetch_array($result)){
+  while ($char = mysqli_fetch_assoc($result)){
     $fullName = $char['name'] . "_" .$char['lastname'];
     $alts[$fullName] = 1;
   }
@@ -504,7 +504,7 @@ function removeFromClan($rchar)
 {
     global $db;
   $soc_name = $rchar['society'];
-  $society = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Soc WHERE name='$soc_name' "));
+  $society = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Soc WHERE name='$soc_name' "));
 
   // CHECK IF LEADER CHANGES
   if (strtolower($rchar['name']) == strtolower($society['leader']) && strtolower($rchar['lastname']) == strtolower($society['leaderlast']) )
@@ -545,7 +545,7 @@ function removeFromClan($rchar)
     }
     else 
     {
-      $user = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Users WHERE society='".$rchar['society']."' ORDER BY exp DESC LIMIT 1"));
+      $user = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Users WHERE society='".$rchar['society']."' ORDER BY exp DESC LIMIT 1"));
       mysqli_query($db,"UPDATE Soc SET leader='".$user['name']."', leaderlast='".$user['lastname']."' WHERE name='".$rchar['society']."'");
     }
   }
@@ -556,7 +556,7 @@ function removeFromClan($rchar)
   // return all vault items
   $vid = 10000+$society['id'];
   $iresult=mysqli_query($db,"SELECT id, owner FROM Items WHERE owner='$rchar[id]' AND society='".$society['id']."'");
-  while ($qitem = mysqli_fetch_array($iresult))
+  while ($qitem = mysqli_fetch_assoc($iresult))
   {
     $result = mysqli_query($db,"UPDATE Items SET owner='".$vid."', last_moved='".time()."', istatus='0' WHERE id='".$qitem['id']."'");
   }
@@ -573,7 +573,7 @@ function removeFromClan($rchar)
       if ($c_s != 0)
       {
         $soc_name2 = str_replace("_"," ",$c_n);
-        $society2 = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Soc WHERE name='$soc_name2' "));
+        $society2 = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Soc WHERE name='$soc_name2' "));
         $stance2 = unserialize($society2['stance']);
         $stance2['str_replace(" ","_",$soc_name)'] = 0;
         $changed_stance2 = serialize($stance2);

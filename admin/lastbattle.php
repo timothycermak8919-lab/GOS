@@ -26,7 +26,7 @@ function destroyCity($listloc)
        
   
   // Update City Rumors
-  $cityRumors = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM messages WHERE id='50000'"));
+  $cityRumors = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM messages WHERE id='50000'"));
   $rumorMessages = unserialize($cityRumors['message']);
   $numRumors = count($rumorMessages);
         
@@ -68,7 +68,7 @@ function destroyAttackedCity($myHorde)
   
           
   // Update City Rumors
-  $cityRumors = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM messages WHERE id='50000'"));
+  $cityRumors = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM messages WHERE id='50000'"));
   $rumorMessages = unserialize($cityRumors['message']);
     
   $numRumors = count($rumorMessages);      
@@ -140,7 +140,7 @@ function createMegaHorde($htown, $tnpc, $hhealth, $hstime, $hwild, $timesDefende
   
         
   // Update City Rumors
-  $cityRumors = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM messages WHERE id='50000'"));
+  $cityRumors = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM messages WHERE id='50000'"));
   $rumorMessages = unserialize($cityRumors['message']);
   $numRumors = count($rumorMessages);
           
@@ -170,12 +170,12 @@ if ($numBroken >= 7) // if all seals are broken
 	$row = mysqli_fetch_assoc(mysqli_query($db,'SELECT SUM(vitality) AS value_sum FROM Users WHERE nation != 0')); 
 	$totvit = $row['value_sum'];
 	$resulth = mysqli_query($db,"SELECT id, level FROM Users WHERE nation != 0 ORDER BY level DESC, exp DESC LIMIT 1");
-	$topchar = mysqli_fetch_array($resulth);
+	$topchar = mysqli_fetch_assoc($resulth);
 	$hhealth = $totvit*$topchar['level']/20;
 	if ($hhealth < 1000) $hhealth = 1000;
 
 
-  $cityRumors = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM messages WHERE id='50000'"));
+  $cityRumors = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM messages WHERE id='50000'"));
   
 
   $hoursFromBreak = intval(((time()/3600)-$cityRumors['checktime']));
@@ -231,10 +231,10 @@ if ($numBroken >= 7) // if all seals are broken
       
        // points for remaining or destroyed cities
       $reresult = mysqli_query($db,"SELECT id, ruler FROM Locations WHERE isDestroyed='0'");
-      while ($remcity = mysqli_fetch_array($reresult))
+      while ($remcity = mysqli_fetch_assoc($reresult))
       {
         // Check what the alignment of the city's ruler is.
-        $soc = mysqli_fetch_array(mysqli_query($db,"SELECT id, name, members, align FROM `Soc` WHERE name='" . $remcity['ruler'] . "'"));
+        $soc = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, name, members, align FROM `Soc` WHERE name='" . $remcity['ruler'] . "'"));
         $rulerAlign = getClanAlignment($soc['align'], $soc['members']);
       
         if ($rulerAlign > 0) $lpoints += 500; // 500 to Light for each remaining city ruled by a Light clan
@@ -251,43 +251,43 @@ if ($numBroken >= 7) // if all seals are broken
       #echo "l: ".$lpoints."; s: ".$spoints."|";
     
       // 1000 points for highest level player
-      $topExp = mysqli_fetch_array(mysqli_query($db,"SELECT id, align FROM Users WHERE nation!='0' ORDER BY exp DESC LIMIT 0,1 "));
+      $topExp = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, align FROM Users WHERE nation!='0' ORDER BY exp DESC LIMIT 0,1 "));
       if ($topExp['align'] > 0) $lpoints += 1000;
       else $spoints += 1000;
       #echo "l: ".$lpoints."; s: ".$spoints."|";
       
       // 1000 points for most ji player
-      $topJi = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Users LEFT JOIN Users_stats ON Users.id=Users_stats.id WHERE (Users.nation!='0') ORDER BY ji DESC, exp DESC LIMIT 0,1"));
+      $topJi = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Users LEFT JOIN Users_stats ON Users.id=Users_stats.id WHERE (Users.nation!='0') ORDER BY ji DESC, exp DESC LIMIT 0,1"));
       if ($topJi['align'] > 0) $lpoints += 1000;
       else $spoints += 1000;
       #echo "l: ".$lpoints."; s: ".$spoints."|";
             
       // 1000 points for most achieved player
-      $topAchieve = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Users LEFT JOIN Users_stats ON Users.id=Users_stats.id WHERE (Users.nation!='0') ORDER BY achieved DESC, exp DESC LIMIT 0,1"));
+      $topAchieve = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Users LEFT JOIN Users_stats ON Users.id=Users_stats.id WHERE (Users.nation!='0') ORDER BY achieved DESC, exp DESC LIMIT 0,1"));
       if ($topAchieve['align'] > 0) $lpoints += 1000;
       else $spoints += 1000;
       #echo "l: ".$lpoints."; s: ".$spoints."|";
 
       // 1000 points for most wins player
-      $topWins = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Users LEFT JOIN Users_stats ON Users.id=Users_stats.id WHERE (Users.nation!='0') ORDER BY wins DESC, exp DESC LIMIT 0,1"));
+      $topWins = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Users LEFT JOIN Users_stats ON Users.id=Users_stats.id WHERE (Users.nation!='0') ORDER BY wins DESC, exp DESC LIMIT 0,1"));
       if ($topWins['align'] > 0) $lpoints += 1000;
       else $spoints += 1000;
       #echo "l: ".$lpoints."; s: ".$spoints."|";
  
       // 1000 points for highest net worth player
-      $topWorth = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Users LEFT JOIN Users_stats ON Users.id=Users_stats.id WHERE (Users.nation!='0') ORDER BY net_worth DESC, exp DESC LIMIT 0,1"));
+      $topWorth = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Users LEFT JOIN Users_stats ON Users.id=Users_stats.id WHERE (Users.nation!='0') ORDER BY net_worth DESC, exp DESC LIMIT 0,1"));
       if ($topWorth['align'] > 0) $lpoints += 1000;
       else $spoints += 1000;
       #echo "l: ".$lpoints."; s: ".$spoints."|"; 
 
       // 1000 points for most quests complete
-      $topQuests = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Users LEFT JOIN Users_stats ON Users.id=Users_stats.id WHERE (Users.nation!='0') ORDER BY quests_done DESC, exp DESC LIMIT 0,1"));
+      $topQuests = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Users LEFT JOIN Users_stats ON Users.id=Users_stats.id WHERE (Users.nation!='0') ORDER BY quests_done DESC, exp DESC LIMIT 0,1"));
       if ($topQuests['align'] > 0) $lpoints += 1000;
       else $spoints += 1000;
       #echo "l: ".$lpoints."; s: ".$spoints."|";
       
       // 1000 points for clan with the most Ji
-      $topJiClan = mysqli_fetch_array(mysqli_query($db,"SELECT id, members, align FROM Soc WHERE 1 ORDER BY score DESC LIMIT 0,1 "));
+      $topJiClan = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, members, align FROM Soc WHERE 1 ORDER BY score DESC LIMIT 0,1 "));
       $socAlign = getClanAlignment($topJiClan['align'], $topJiClan['members']);
       if ($socAlign > 0) $lpoints += 1000;
       else if ($socAlign < 0) $spoints += 1000;
@@ -327,7 +327,7 @@ if ($numBroken >= 7) // if all seals are broken
       
     
       // Update City Rumors
-      $cityRumors = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM messages WHERE id='50000'"));
+      $cityRumors = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM messages WHERE id='50000'"));
 
       $rumorMessages = unserialize($cityRumors['message']);
       $numRumors = count($rumorMessages);
@@ -353,7 +353,7 @@ if ($numBroken >= 7) // if all seals are broken
   
       // Destroy the city with the lowest population.
       $result = mysqli_query($db,"SELECT id, name, myOrder, army FROM Locations WHERE 1 ORDER BY pop ASC, myOrder ASC LIMIT 1"); 
-      while ( $listloc = mysqli_fetch_array( $result ) )
+      while ( $listloc = mysqli_fetch_assoc( $result ) )
       {
         echo "Destroy " . $listloc["name"] . "<br/>";
         // Destroy the city
@@ -363,7 +363,7 @@ if ($numBroken >= 7) // if all seals are broken
     
       // Destroy the city with the lowest order
       $result = mysqli_query($db,"SELECT id, name, myOrder, army FROM Locations WHERE isDestroyed='0' ORDER BY myOrder ASC LIMIT 1"); 
-      while ( $listloc = mysqli_fetch_array( $result ) )
+      while ( $listloc = mysqli_fetch_assoc( $result ) )
       {
         echo "Destroy " . $listloc["name"] . "<br/>";
         // Destroy the city
@@ -374,7 +374,7 @@ if ($numBroken >= 7) // if all seals are broken
       // Target the 2 cities with the lowest order and the city with the highest order.
       $city = 1;
       $result = mysqli_query($db,"SELECT id, name, myOrder, army FROM Locations WHERE isDestroyed='0' ORDER BY myOrder ASC"); 
-      while ( $listloc = mysqli_fetch_array( $result ) )
+      while ( $listloc = mysqli_fetch_assoc( $result ) )
       {
         if ($city == 1 || $city == 2 || $city == $citiesLeft)
         {
@@ -403,11 +403,11 @@ if ($numBroken >= 7) // if all seals are broken
       }
   
       // Find city with the lowest order that's ruled by the clan with highest alignment that rules a city.
-      $lightClan = mysqli_fetch_array(mysqli_query($db,"SELECT id, name FROM Soc WHERE ruled > 0 ORDER BY align DESC LIMIT 1"));
+      $lightClan = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, name FROM Soc WHERE ruled > 0 ORDER BY align DESC LIMIT 1"));
       $result = mysqli_query($db,"SELECT * FROM Locations WHERE ruler='" . $lightClan['name'] . "' AND isDestroyed='0' ORDER BY myOrder ASC");
     
       $lcc=0;
-      while ( ($listloc = mysqli_fetch_array( $result ) )&& $lcc == 0)
+      while ( ($listloc = mysqli_fetch_assoc( $result ) )&& $lcc == 0)
       {
         $result3 = mysqli_query($db,"SELECT id FROM Hordes WHERE type='3' AND done < '2' AND target = '" . $listloc['name'] . "'");
         $isTargeted = mysqli_num_rows($result3); 
@@ -430,7 +430,7 @@ if ($numBroken >= 7) // if all seals are broken
       $num_hordes = mysqli_num_rows($result3);
     
       $result2 = mysqli_query($db,"SELECT id, name, myOrder, army FROM Locations WHERE isDestroyed='0' ORDER BY RAND() ASC");
-      while (( $listloc = mysqli_fetch_array( $result2 ) ) && ($num_hordes < $minHordes))
+      while (( $listloc = mysqli_fetch_assoc( $result2 ) ) && ($num_hordes < $minHordes))
       {
         // Make some random mega hordes
         $result3 = mysqli_query($db,"SELECT id FROM Hordes WHERE type='3' AND done < '2' AND target = '" . $listloc['name'] . "'");
@@ -463,10 +463,10 @@ if ($numBroken >= 7) // if all seals are broken
 
   if ($num_hordes)
   {
-    $theLB = mysqli_fetch_array(mysqli_query($db,"SELECT id, results, contestants FROM Contests WHERE type='99'"));
+    $theLB = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, results, contestants FROM Contests WHERE type='99'"));
     $lb_results = unserialize($theLB['results']);
     $lb_sides = unserialize($theLB['contestants']);
-    while ($myHorde = mysqli_fetch_array( $result3 ) )
+    while ($myHorde = mysqli_fetch_assoc( $result3 ) )
     {
       // If past time for horde to end, end the horde.
       if ($myHorde['ends']*3600<=time())
@@ -548,10 +548,10 @@ if ($numBroken >= 7) // if all seals are broken
       $hstime = $myStart;
 	  echo "</br> GOT HERE WITH TIME: ";
 	  echo $hstime;
-      while ($myHorde = mysqli_fetch_array( $result3 ) )
+      while ($myHorde = mysqli_fetch_assoc( $result3 ) )
       {
         // Create a new horde targing the same city from the same wilderness.
-        $htown = mysqli_fetch_array(mysqli_query($db,"SELECT id, name, myOrder, army FROM Locations WHERE name='" . $myHorde['target'] . "'"));
+        $htown = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, name, myOrder, army FROM Locations WHERE name='" . $myHorde['target'] . "'"));
         // ensure our horde isn't a bubble of evil
         $tnpc = "Bubble of Evil";
 
@@ -569,7 +569,7 @@ if ($numBroken >= 7) // if all seals are broken
     {
       $hstime = $myStart;
 
-      while ($myHorde = mysqli_fetch_array( $result3 ) )
+      while ($myHorde = mysqli_fetch_assoc( $result3 ) )
       {
         // Create a new hordes targeting all 3 other cities around the wilderness from new wilderness areas.
         // If already a horde targeting that city, the city is already destroyed, or if all other wilderness
@@ -583,7 +583,7 @@ if ($numBroken >= 7) // if all seals are broken
           // If not the same city we just defeated.   
           if ($loc != $myHorde['target'])
           {         
-            $htown = mysqli_fetch_array(mysqli_query($db,"SELECT id, name, myOrder, army,  FROM Locations WHERE name='" . $loc . "'"));
+            $htown = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, name, myOrder, army,  FROM Locations WHERE name='" . $loc . "'"));
             if ($htown['isDestroyed'] == 0) // If not a destroyed city.
             {
               $inSameTown = mysqli_num_rows(mysqli_query($db,"SELECT id FROM Hordes WHERE type='3' AND target='" . $htown['name'] . "' AND done<2"));
@@ -609,7 +609,7 @@ if ($numBroken >= 7) // if all seals are broken
     $num_cities = mysqli_num_rows($result2);   
     if ($minHordes > $num_cities) $minHordes = $num_cities;
 	$hstime = $myStart;
-    while (( $listloc = mysqli_fetch_array( $result2 ) ) && ($num_hordes < $minHordes))
+    while (( $listloc = mysqli_fetch_assoc( $result2 ) ) && ($num_hordes < $minHordes))
     {
       // Make some random mega hordes
       $result3 = mysqli_query($db,"SELECT id FROM Hordes WHERE type='3' AND done < '2' AND target = '" . $listloc['name'] . "'");
@@ -630,8 +630,8 @@ if ($numBroken >= 7) // if all seals are broken
   } // time to start new hordes
 
   // Handle hourly Horn bonuses.
-  $curHorn = mysqli_fetch_array( mysqli_query($db,"SELECT id, owner FROM Items WHERE type='-1' ORDER BY last_moved" ));
-  $theLB = mysqli_fetch_array(mysqli_query($db,"SELECT id, results, contestants FROM Contests WHERE type='99' AND done='0'"));
+  $curHorn = mysqli_fetch_assoc( mysqli_query($db,"SELECT id, owner FROM Items WHERE type='-1' ORDER BY last_moved" ));
+  $theLB = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, results, contestants FROM Contests WHERE type='99' AND done='0'"));
   if ($curHorn['owner'] && $theLB['id']) // Make sure we have a Horn and the LB is still going.
   {
     $lb_results = unserialize($theLB['results']);
@@ -663,7 +663,7 @@ if ($numBroken >= 7) // if all seals are broken
     if ($hoursFromBreak == $p1Start) $hornPts = 800;
     else if ($hoursFromBreak == $LBEnd) $hornPts = 2500;
     
-    $owner = mysqli_fetch_array(mysqli_query($db,"SELECT id, align FROM Users WHERE id='" . $curHorn['owner'] . "'"));
+    $owner = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, align FROM Users WHERE id='" . $curHorn['owner'] . "'"));
     if ($owner['align'] > 0)
     {
       $lb_results[1][3] += $hornPts;
@@ -684,7 +684,7 @@ if ($numBroken >= 7) // if all seals are broken
   // Handle end of Phase 4
   $endtime = intval(time()/3600);
   $result2 = mysqli_query($db,"SELECT id, contestants, rules, reward, type, distro FROM Contests WHERE type='99' AND done='0' AND ends<='" . $endtime . "'");
-  while ($contest = mysqli_fetch_array( $result2 ) )
+  while ($contest = mysqli_fetch_assoc( $result2 ) )
   {
     $contestants = unserialize($contest['contestants']);
     $rules = unserialize($contest['rules']);
@@ -715,7 +715,7 @@ if ($numBroken >= 7) // if all seals are broken
         mysqli_query($db,"UPDATE Contests SET done=1, winner='" . $first . "' WHERE id='" . $contest['id'] . "'"); 
         
         // Update City Rumors
-        $cityRumors = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM messages WHERE id='50000'"));
+        $cityRumors = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM messages WHERE id='50000'"));
         $rumorMessages = unserialize($cityRumors['message']);
         $numRumors = count($rumorMessages);
 

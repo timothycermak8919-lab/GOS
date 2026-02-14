@@ -31,7 +31,7 @@ if (!$char['society']) header("Location: $server_name/viewclans.php?autologin=$t
 // LOAD SOCIETY TABLE
 $query = "SELECT * FROM Soc WHERE name='$soc_name'";
 $result = mysqli_query($db,$query);
-$society = mysqli_fetch_array($result);
+$society = mysqli_fetch_assoc($result);
 
 $action = mysqli_real_escape_string($db,$_POST['action']);
 $sortBy=  mysqli_real_escape_string($db,$_POST['sort']);
@@ -44,7 +44,7 @@ $invSort = sortItems($char['sort_vault']);
 $vid = 10000+$society['id'];
 $listsize = 0;
 $iresult=mysqli_query($db,"SELECT * FROM Items WHERE society='".$society['id']."' ".$invSort);
-while ($qitem = mysqli_fetch_array($iresult))
+while ($qitem = mysqli_fetch_assoc($iresult))
 {
   $itmlist[$listsize++] = $qitem;
 }
@@ -74,7 +74,7 @@ if ($action==1) // withdraw
 {
   $num_itmso=0;
   $iresult=mysqli_query($db,"SELECT * FROM Items WHERE owner='$id' AND type<15");
-  while ($qitem = mysqli_fetch_array($iresult))
+  while ($qitem = mysqli_fetch_assoc($iresult))
   {
     $itmlistchar[$num_itmso++] = $qitem;
   }
@@ -87,7 +87,7 @@ if ($action==1) // withdraw
     $tmpItm = mysqli_real_escape_string($db,$_POST[$x]);
     if ($tmpItm)
     {
-      $sitem=mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Items WHERE id='$tmpItm'"));
+      $sitem=mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Items WHERE id='$tmpItm'"));
       if ($sitem['owner'] == $vid)
       {
         $dlist[$q]=$sitem; 
@@ -128,7 +128,7 @@ elseif ($action==2) // return
     $tmpItm =mysqli_real_escape_string($db,$_POST[$x]);
     if ($tmpItm)
     {
-      $sitem=mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Items WHERE id='$tmpItm'"));
+      $sitem=mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Items WHERE id='$tmpItm'"));
       if ($b || ($sitem['owner'] == $char['id']))
       {
         $q++;
@@ -166,7 +166,7 @@ elseif ($action==3) // sell
       $tmpItm = mysqli_real_escape_string($db,$_POST[$x]);
       if ($tmpItm)
       {
-        $sitem=mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Items WHERE id='$tmpItm'"));
+        $sitem=mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Items WHERE id='$tmpItm'"));
         if ($sitem['owner']== $vid)
         {
           if ($sitem['type'] > 13) $value += intval(0.25*$item_base[$sitem['name']][2]);
@@ -205,7 +205,7 @@ elseif ($action==3) // sell
 $itmlist=[];
 $listsize = 0;
 $iresult=mysqli_query($db,"SELECT * FROM Items WHERE society='".$society['id']."' ".$invSort);
-while ($qitem = mysqli_fetch_array($iresult))
+while ($qitem = mysqli_fetch_assoc($iresult))
 {
   $itmlist[$listsize++] = $qitem;
 }
@@ -306,7 +306,7 @@ include('header.php');
                 }
                 else 
                 {
-                  $iown=mysqli_fetch_array(mysqli_query($db,"SELECT id, name, lastname FROM Users WHERE id='".$itmlist[$itemtoblit]['owner']."'"));
+                  $iown=mysqli_fetch_assoc(mysqli_query($db,"SELECT id, name, lastname FROM Users WHERE id='".$itmlist[$itemtoblit]['owner']."'"));
                    echo "Used by ".ucwords($iown['name'])." ".ucwords($iown['lastname']);
                 }
 ?>

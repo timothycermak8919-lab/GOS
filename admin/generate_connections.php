@@ -42,7 +42,7 @@ function generateShortestPaths($loc, $level, $found)
   else
   {
     $lpaths = mysqli_query($db,"SELECT * FROM Routes WHERE type='1' AND start='".$loc."' AND length='".$level."'");
-    while ($lpath = mysqli_fetch_array($lpaths))
+    while ($lpath = mysqli_fetch_assoc($lpaths))
     {
       $found = genShortPaths(unserialize($lpath['path']), $found);
     }    

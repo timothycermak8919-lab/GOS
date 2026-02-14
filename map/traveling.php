@@ -7,7 +7,7 @@
   include_once('../admin/busiFuncs.php');
   include_once('../admin/locFuncs.php');
   
-  $char = mysqli_fetch_array(mysqli_query($db,"SELECT * FROM Users LEFT JOIN Users_data ON Users.id=Users_data.id WHERE Users.id='$id'"));
+  $char = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Users LEFT JOIN Users_data ON Users.id=Users_data.id WHERE Users.id='$id'"));
   $error=0;
   
   $surrounding_area=$map_data[$char['location']];

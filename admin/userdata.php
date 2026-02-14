@@ -8,7 +8,7 @@ $stmt = mysqli_prepare($db, "SELECT * FROM Users LEFT JOIN Users_data ON Users.i
 mysqli_stmt_bind_param($stmt, "i", $id);
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
-$char = mysqli_fetch_array($result);
+$char = mysqli_fetch_assoc($result);
 $curtime=time();
 $jobs_data = $char['jobs'] ?? null; // Use null coalescing operator to handle potential non-existence
 $jobs = $jobs_data ? json_decode($jobs_data, true) : []; // json_decode instead of unserialize
@@ -91,7 +91,7 @@ $stmt = mysqli_prepare($db, "SELECT * FROM Users_stats WHERE id=?");
 mysqli_stmt_bind_param($stmt, "i", $char['id']);
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
-$stats = mysqli_fetch_array($result);
+$stats = mysqli_fetch_assoc($result);
 if ($char['align'] > $stats['align_high']) 
 {
   $stmt = mysqli_prepare($db, "UPDATE Users_stats SET align_high=? WHERE id=?");
@@ -115,7 +115,7 @@ $amsg = "You have completed an Achievement!<br/>";
 $stmt = mysqli_prepare($db, "SELECT id, name, lastname FROM Users WHERE name = 'The' AND lastname = 'Creator'");
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($result);
-$creator = mysqli_fetch_array($result);
+$creator = mysqli_fetch_assoc($result);
 $cid = $creator['id'];
 foreach ($achievements as $branch => $ainfo)
 {

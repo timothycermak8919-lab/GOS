@@ -12,7 +12,7 @@ $sD=0;
 $tD=0;
 $wD=0;
 
-while ($donor = mysqli_fetch_array($result))
+while ($donor = mysqli_fetch_assoc($result))
 {
   if ($donor[amount] >= 10)
   {
