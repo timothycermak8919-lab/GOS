@@ -6,23 +6,40 @@ if (!function_exists('safe_count')) {
     }
 }
 
+// Enable output buffering
+ob_start();
+
 include_once('config.php');
 global $db;
 
+// Debug output to browser
+$debugOutput = '';
+
 // Debug logging
 error_log('[DEBUG] admin/connect.php - Attempting database connection');
+$debugOutput .= '[DEBUG] admin/connect.php - Attempting database connection<br>';
 error_log('[DEBUG] Server: ' . ($database_server ?? 'UNSET'));
 error_log('[DEBUG] Database: ' . ($database_name ?? 'UNSET'));
 error_log('[DEBUG] Username: ' . ($database_username ?? 'UNSET'));
+$debugOutput .= '[DEBUG] Server: ' . ($database_server ?? 'UNSET') . '<br>';
+$debugOutput .= '[DEBUG] Database: ' . ($database_name ?? 'UNSET') . '<br>';
+$debugOutput .= '[DEBUG] Username: ' . ($database_username ?? 'UNSET') . '<br>';
+$debugOutput .= '[DEBUG] Server Name: ' . ($server_name ?? 'UNSET') . '<br>';
 
 $db = @mysqli_connect($database_server, $database_username, $database_password, $database_name);
 if (!$db) {
     $error = mysqli_connect_error();
     error_log('[DEBUG] Database connection FAILED: ' . $error);
+    $debugOutput .= '[DEBUG] Database connection FAILED: ' . $error . '<br>';
+    echo $debugOutput;
     echo "<br><b>Could not connect to the MySQL database. Please try again in a few minutes.</b>";
     exit;
 }
 error_log('[DEBUG] Database connection SUCCESS');
+$debugOutput .= '[DEBUG] Database connection SUCCESS<br>';
+
+// Show debug output
+// echo $debugOutput;
 $time = time();
 $div_img = "<table border='0' cellpadding='0' cellspacing='0' width='550' height='1' background=\"images/divider.gif\"><tr><td></td></tr></table>";
 
