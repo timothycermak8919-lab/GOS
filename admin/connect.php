@@ -9,7 +9,17 @@ if (!function_exists('safe_count')) {
 // Enable output buffering
 ob_start();
 
-include_once('config.php');
+// Show any include errors
+error_reporting(E_ALL);
+
+// Try to include config.php and catch any errors
+$includeError = '';
+try {
+    include_once('config.php');
+} catch (Throwable $e) {
+    $includeError = $e->getMessage();
+}
+
 global $db;
 
 // Debug output to browser
@@ -18,28 +28,35 @@ $debugOutput = '';
 // Debug logging
 error_log('[DEBUG] admin/connect.php - Attempting database connection');
 $debugOutput .= '[DEBUG] admin/connect.php - Attempting database connection<br>';
-error_log('[DEBUG] Server: ' . ($database_server ?? 'UNSET'));
-error_log('[DEBUG] Database: ' . ($database_name ?? 'UNSET'));
-error_log('[DEBUG] Username: ' . ($database_username ?? 'UNSET'));
+
+if ($includeError) {
+    $debugOutput .= '[ERROR] Include error: ' . $includeError . '<br>';
+}
+
 $debugOutput .= '[DEBUG] Server: ' . ($database_server ?? 'UNSET') . '<br>';
 $debugOutput .= '[DEBUG] Database: ' . ($database_name ?? 'UNSET') . '<br>';
 $debugOutput .= '[DEBUG] Username: ' . ($database_username ?? 'UNSET') . '<br>';
 $debugOutput .= '[DEBUG] Server Name: ' . ($server_name ?? 'UNSET') . '<br>';
 
-$db = @mysqli_connect($database_server, $database_username, $database_password, $database_name);
+// Try to connect
+$db = @mysqli_connect($database_server ?? 'localhost', $database_username ?? '', $database_password ?? '', $database_name ?? '');
 if (!$db) {
     $error = mysqli_connect_error();
     error_log('[DEBUG] Database connection FAILED: ' . $error);
     $debugOutput .= '[DEBUG] Database connection FAILED: ' . $error . '<br>';
     echo $debugOutput;
-    echo "<br><b>Could not connect to the MySQL database. Please try again in a few minutes.</b>";
     exit;
 }
 error_log('[DEBUG] Database connection SUCCESS');
 $debugOutput .= '[DEBUG] Database connection SUCCESS<br>';
 
-// Show debug output
-// echo $debugOutput;
+// Output debug info
+echo $debugOutput;
+
+// Exit to show debug - REMOVE THIS AFTER DEBUGGING
+exit;
+
+// Continue with normal code below...
 $time = time();
 $div_img = "<table border='0' cellpadding='0' cellspacing='0' width='550' height='1' background=\"images/divider.gif\"><tr><td></td></tr></table>";
 
