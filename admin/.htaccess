@@ -63,3 +63,19 @@ Order deny,allow
 # RewriteCond %{HTTP_REFERER} !^http://www.gameofstones.app [NC]
 # END IWORX hotlink
 
+# Enable PHP processing
+<IfModule mod_php7.c>
+  php_flag display_errors On
+  php_value error_reporting E_ALL
+</IfModule>
+
+<IfModule mod_php.c>
+  php_flag display_errors On
+  php_value error_reporting E_ALL
+</IfModule>
+
+# Handle PHP files
+AddType application/x-httpd-php .php
+AddType application/x-httpd-php .php5
+AddType application/x-httpd-php .php7
+AddType application/x-httpd-php .php8
