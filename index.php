@@ -1,25 +1,7 @@
 <?php
-// TEMPORARY DEBUG - Remove after debugging
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
-// Enable output buffering to prevent "headers already sent" issues
-ob_start();
-
-// Log debug info
-error_log('[DEBUG] index.php starting');
-
-// Check if char directory exists
-$charDir = __DIR__ . '/char';
-if (!is_dir($charDir)) {
-    error_log('[DEBUG] char directory does not exist: ' . $charDir);
-}
-
-// Try to include - but don't fail hard if missing
+// Check if char directory and logo exist before including
 if (file_exists('char/logo.png')) {
     include('char/logo.png');
-} else {
-    error_log('[DEBUG] char/logo.png does not exist');
 }
 
 include("admin/connect.php");
