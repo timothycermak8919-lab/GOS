@@ -2,11 +2,13 @@
 <IfModule mod_php7.c>
   php_flag display_errors On
   php_value error_reporting E_ALL
+  php_flag output_buffering On
 </IfModule>
 
 <IfModule mod_php.c>
   php_flag display_errors On
   php_value error_reporting E_ALL
+  php_flag output_buffering On
 </IfModule>
 
 # Try to handle PHP files

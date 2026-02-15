@@ -1,4 +1,5 @@
 <?php
+ob_start();
 // Enable error display
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
@@ -8,17 +9,10 @@ if (file_exists('char/logo.png')) {
     include('char/logo.png');
 }
 
-echo "<!-- DEBUG: index.php started --><br>";
-
 include("admin/connect.php");
-
-echo "<!-- DEBUG: after connect.php --><br>";
-
 $id = $_COOKIE['id'] ?? null;
 $session = $_COOKIE['session'] ?? null;
 $time = time();
-
-echo "<!-- DEBUG: session=$session, id=$id --><br>";
 
 // If we have a valid session token
 if ($session) {

@@ -114,7 +114,7 @@ $maAchieved=0;
 $amsg = "You have completed an Achievement!<br/>";
 $stmt = mysqli_prepare($db, "SELECT id, name, lastname FROM Users WHERE name = 'The' AND lastname = 'Creator'");
 mysqli_stmt_execute($stmt);
-$result = mysqli_stmt_get_result($result);
+$result = mysqli_stmt_get_result($stmt);
 $creator = mysqli_fetch_assoc($result);
 $cid = $creator['id'];
 foreach ($achievements as $branch => $ainfo)

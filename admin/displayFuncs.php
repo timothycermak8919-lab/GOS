@@ -507,9 +507,10 @@ function getTownPop(array $upgrades, int $town_pop, array $build_pop): int
   return $pop;
 }
 
-function getJobBonuses(string $pro, int $plvl): string
+function getJobBonuses(string $pro, ?int $plvl = null): string
 {
 $stats = '';
+if ($plvl === null) $plvl = 0;
 $halfUp = round($plvl/2);
 $halfDown= floor($plvl/2);
 $mult2=2*$plvl;

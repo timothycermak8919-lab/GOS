@@ -2,17 +2,14 @@
 error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING);
 include_once("admin/charFuncs.php");
 
-// Debug: Check session status
+// Check session status
 if (session_status() === PHP_SESSION_NONE) {
-    error_log("[DEBUG] Session not started in createAccount.php - attempting to start");
     session_start();
 }
-error_log("[DEBUG] createAccount.php - Session status: " . session_status() . ", CSRF token present: " . (isset($_SESSION['csrf_token']) ? 'yes' : 'no'));
 
 // Generate CSRF token
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-    error_log("[DEBUG] Generated new CSRF token in createAccount.php");
 }
 ?>
 <script language="Javascript">

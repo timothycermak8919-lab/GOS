@@ -44,7 +44,7 @@ $result = mysqli_query($db,$query);
 // Create New Table
 $query = "CREATE TABLE IF NOT EXISTS `Accounts` (
   `email` text NOT NULL,
-  `password` char(40) DEFAULT NULL,
+  `password` varchar(255) DEFAULT NULL,
   `session_token` varchar(64) DEFAULT NULL,
   `session_expires` int(11) DEFAULT NULL,
   KEY `session_token` (`session_token`),

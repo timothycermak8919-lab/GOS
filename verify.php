@@ -9,13 +9,6 @@ if ($user === null || empty($user)) {
     exit; // Ensure that no further code is executed after the redirect
 }
 
-// Debug: Check session status
-if (session_status() === PHP_SESSION_NONE) {
-    error_log("[DEBUG] Session not started in verify.php - attempting to start");
-    session_start();
-}
-error_log("[DEBUG] verify.php - Session status: " . session_status() . ", CSRF token present: " . (isset($_SESSION['csrf_token']) ? 'yes' : 'no'));
-
 // Validate CSRF token
 if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
     // Invalid CSRF token - log this attempt and redirect
@@ -48,31 +41,390 @@ if (!is_null($result) && $account = mysqli_fetch_assoc($result))
     $storedPassword = $account['password'];
     $validPassword = false;
     
-    // Debug: Log password hash format for analysis
-    $hashPrefix = substr($storedPassword, 0, 4);
-    if ($hashPrefix === '$2y$' || $hashPrefix === '$2a$') {
-        error_log("[DEBUG] Password for " . $email . " uses modern password_hash (prefix: $hashPrefix)");
-    } elseif (substr($storedPassword, 0, 5) === 'sha1(') {
-        error_log("[DEBUG] Password for " . $email . " uses legacy SHA1 wrapper format");
-    } elseif (strlen($storedPassword) === 40 && ctype_xdigit($storedPassword)) {
-        error_log("[DEBUG] Password for " . $email . " uses raw SHA1 hex (40 chars) - LEGACY - VULNERABLE");
-    } else {
-        error_log("[DEBUG] Password for " . $email . " has unknown format: " . substr($storedPassword, 0, 10) . "...");
-    }
-    
     // Check if it's a modern password_hash (starts with $2y$ or $2a$)
-    if ($hashPrefix === '$2y$' || $hashPrefix === '$2a$') {
+    $hashPrefix = substr($storedPassword, 0, 4);
+    if ($hashPrefix === '$2y
+            $updateStmt = mysqli_prepare($db, $updateQuery);
+            mysqli_stmt_bind_param($updateStmt, "ss", $newHash, $email);
+            mysqli_stmt_execute($updateStmt);
+        }
+
+        $mode = 0;
+        if ($_POST["mode"]) $mode = mysqli_real_escape_string($db,$_POST["mode"]);
+
+        // Generate secure session token
+        $sessionToken = bin2hex(random_bytes(32));
+        
+        // Store session token in database
+        $updateSessionQuery = "UPDATE Accounts SET session_token = ?, session_expires = ? WHERE email = ?";
+        $updateSessionStmt = mysqli_prepare($db, $updateSessionQuery);
+        $expires = time() + 3600; // 1 hour expiry
+        mysqli_stmt_bind_param($updateSessionStmt, "sis", $sessionToken, $expires, $email);
+        mysqli_stmt_execute($updateSessionStmt);
+        
+        // Set secure cookies with proper flags
+        setcookie("session", $sessionToken, [
+            'expires' => time() + 3600,
+            'path' => '/',
+            'secure' => true,
+            'httponly' => true,
+            'samesite' => 'Strict'
+        ]);
+        setcookie("mode", $mode, [
+            'expires' => time() + 3600,
+            'path' => '/',
+            'secure' => true,
+            'httponly' => true,
+            'samesite' => 'Strict'
+        ]);
+
+
+        $query = "SELECT * FROM Users WHERE email = ?";
+        $stmt = mysqli_prepare($db, $query);
+        mysqli_stmt_bind_param($stmt, "s", $email);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+
+
+        if (mysqli_num_rows($result) > 0) {
+
+            $char = mysqli_fetch_assoc($result);
+            $id = $char['id'];
+            $user = $char['name'];
+            $lastname = $char['lastname'];
+            setcookie("id", $id, [
+                'expires' => time() + 3600,
+                'path' => '/',
+                'secure' => true,
+                'httponly' => true,
+                'samesite' => 'Strict'
+            ]);
+            setcookie("name", $user, [
+                'expires' => time() + 3600,
+                'path' => '/',
+                'secure' => true,
+                'httponly' => true,
+                'samesite' => 'Strict'
+            ]);
+            setcookie("lastname", $lastname, [
+                'expires' => time() + 3600,
+                'path' => '/',
+                'secure' => true,
+                'httponly' => true,
+                'samesite' => 'Strict'
+            ]);
+                
+            // Regenerate CSRF token for the new session
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+            
+            header("Location: $server_name/bio.php?time=$time");
+            exit;
+        } else {
+            header("Location: $server_name/create.php");
+            exit;
+        }
+    } else {
+        // Invalid password - redirect to login with error
+        error_log("[DEBUG] Invalid password attempt for " . $email . " from IP: " . $_SERVER['REMOTE_ADDR']);
+        header("Location: $server_name/login.php?error=1");
+        exit;
+    }
+} else {
+    // No account found
+    error_log("[DEBUG] No account found for email: " . $email . " from IP: " . $_SERVER['REMOTE_ADDR']);
+    header("Location: $server_name/login.php?error=1");
+    exit;
+}
+?>
+ || $hashPrefix === '$2a
+            $updateStmt = mysqli_prepare($db, $updateQuery);
+            mysqli_stmt_bind_param($updateStmt, "ss", $newHash, $email);
+            mysqli_stmt_execute($updateStmt);
+        }
+
+        $mode = 0;
+        if ($_POST["mode"]) $mode = mysqli_real_escape_string($db,$_POST["mode"]);
+
+        // Generate secure session token
+        $sessionToken = bin2hex(random_bytes(32));
+        
+        // Store session token in database
+        $updateSessionQuery = "UPDATE Accounts SET session_token = ?, session_expires = ? WHERE email = ?";
+        $updateSessionStmt = mysqli_prepare($db, $updateSessionQuery);
+        $expires = time() + 3600; // 1 hour expiry
+        mysqli_stmt_bind_param($updateSessionStmt, "sis", $sessionToken, $expires, $email);
+        mysqli_stmt_execute($updateSessionStmt);
+        
+        // Set secure cookies with proper flags
+        setcookie("session", $sessionToken, [
+            'expires' => time() + 3600,
+            'path' => '/',
+            'secure' => true,
+            'httponly' => true,
+            'samesite' => 'Strict'
+        ]);
+        setcookie("mode", $mode, [
+            'expires' => time() + 3600,
+            'path' => '/',
+            'secure' => true,
+            'httponly' => true,
+            'samesite' => 'Strict'
+        ]);
+
+
+        $query = "SELECT * FROM Users WHERE email = ?";
+        $stmt = mysqli_prepare($db, $query);
+        mysqli_stmt_bind_param($stmt, "s", $email);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+
+
+        if (mysqli_num_rows($result) > 0) {
+
+            $char = mysqli_fetch_assoc($result);
+            $id = $char['id'];
+            $user = $char['name'];
+            $lastname = $char['lastname'];
+            setcookie("id", $id, [
+                'expires' => time() + 3600,
+                'path' => '/',
+                'secure' => true,
+                'httponly' => true,
+                'samesite' => 'Strict'
+            ]);
+            setcookie("name", $user, [
+                'expires' => time() + 3600,
+                'path' => '/',
+                'secure' => true,
+                'httponly' => true,
+                'samesite' => 'Strict'
+            ]);
+            setcookie("lastname", $lastname, [
+                'expires' => time() + 3600,
+                'path' => '/',
+                'secure' => true,
+                'httponly' => true,
+                'samesite' => 'Strict'
+            ]);
+                
+            // Regenerate CSRF token for the new session
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+            
+            header("Location: $server_name/bio.php?time=$time");
+            exit;
+        } else {
+            header("Location: $server_name/create.php");
+            exit;
+        }
+    } else {
+        // Invalid password - redirect to login with error
+        error_log("[DEBUG] Invalid password attempt for " . $email . " from IP: " . $_SERVER['REMOTE_ADDR']);
+        header("Location: $server_name/login.php?error=1");
+        exit;
+    }
+} else {
+    // No account found
+    error_log("[DEBUG] No account found for email: " . $email . " from IP: " . $_SERVER['REMOTE_ADDR']);
+    header("Location: $server_name/login.php?error=1");
+    exit;
+}
+?>
+) {
         $validPassword = password_verify($password, $storedPassword);
     } else {
         // Legacy support for SHA1 hashed passwords
-        error_log("[DEBUG] Falling back to legacy SHA1 verification for " . $email . " - SECURITY WARNING");
         $validPassword = (sha1($password) === $storedPassword);
     }
     
     if ($validPassword) {
         // Upgrade legacy SHA1 password to password_hash on successful login
-        if ($hashPrefix !== '$2y$' && $hashPrefix !== '$2a$') {
-            error_log("[DEBUG] Upgrading legacy password to password_hash for " . $email);
+        if ($hashPrefix !== '$2y
+            $updateStmt = mysqli_prepare($db, $updateQuery);
+            mysqli_stmt_bind_param($updateStmt, "ss", $newHash, $email);
+            mysqli_stmt_execute($updateStmt);
+        }
+
+        $mode = 0;
+        if ($_POST["mode"]) $mode = mysqli_real_escape_string($db,$_POST["mode"]);
+
+        // Generate secure session token
+        $sessionToken = bin2hex(random_bytes(32));
+        
+        // Store session token in database
+        $updateSessionQuery = "UPDATE Accounts SET session_token = ?, session_expires = ? WHERE email = ?";
+        $updateSessionStmt = mysqli_prepare($db, $updateSessionQuery);
+        $expires = time() + 3600; // 1 hour expiry
+        mysqli_stmt_bind_param($updateSessionStmt, "sis", $sessionToken, $expires, $email);
+        mysqli_stmt_execute($updateSessionStmt);
+        
+        // Set secure cookies with proper flags
+        setcookie("session", $sessionToken, [
+            'expires' => time() + 3600,
+            'path' => '/',
+            'secure' => true,
+            'httponly' => true,
+            'samesite' => 'Strict'
+        ]);
+        setcookie("mode", $mode, [
+            'expires' => time() + 3600,
+            'path' => '/',
+            'secure' => true,
+            'httponly' => true,
+            'samesite' => 'Strict'
+        ]);
+
+
+        $query = "SELECT * FROM Users WHERE email = ?";
+        $stmt = mysqli_prepare($db, $query);
+        mysqli_stmt_bind_param($stmt, "s", $email);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+
+
+        if (mysqli_num_rows($result) > 0) {
+
+            $char = mysqli_fetch_assoc($result);
+            $id = $char['id'];
+            $user = $char['name'];
+            $lastname = $char['lastname'];
+            setcookie("id", $id, [
+                'expires' => time() + 3600,
+                'path' => '/',
+                'secure' => true,
+                'httponly' => true,
+                'samesite' => 'Strict'
+            ]);
+            setcookie("name", $user, [
+                'expires' => time() + 3600,
+                'path' => '/',
+                'secure' => true,
+                'httponly' => true,
+                'samesite' => 'Strict'
+            ]);
+            setcookie("lastname", $lastname, [
+                'expires' => time() + 3600,
+                'path' => '/',
+                'secure' => true,
+                'httponly' => true,
+                'samesite' => 'Strict'
+            ]);
+                
+            // Regenerate CSRF token for the new session
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+            
+            header("Location: $server_name/bio.php?time=$time");
+            exit;
+        } else {
+            header("Location: $server_name/create.php");
+            exit;
+        }
+    } else {
+        // Invalid password - redirect to login with error
+        error_log("[DEBUG] Invalid password attempt for " . $email . " from IP: " . $_SERVER['REMOTE_ADDR']);
+        header("Location: $server_name/login.php?error=1");
+        exit;
+    }
+} else {
+    // No account found
+    error_log("[DEBUG] No account found for email: " . $email . " from IP: " . $_SERVER['REMOTE_ADDR']);
+    header("Location: $server_name/login.php?error=1");
+    exit;
+}
+?>
+ && $hashPrefix !== '$2a
+            $updateStmt = mysqli_prepare($db, $updateQuery);
+            mysqli_stmt_bind_param($updateStmt, "ss", $newHash, $email);
+            mysqli_stmt_execute($updateStmt);
+        }
+
+        $mode = 0;
+        if ($_POST["mode"]) $mode = mysqli_real_escape_string($db,$_POST["mode"]);
+
+        // Generate secure session token
+        $sessionToken = bin2hex(random_bytes(32));
+        
+        // Store session token in database
+        $updateSessionQuery = "UPDATE Accounts SET session_token = ?, session_expires = ? WHERE email = ?";
+        $updateSessionStmt = mysqli_prepare($db, $updateSessionQuery);
+        $expires = time() + 3600; // 1 hour expiry
+        mysqli_stmt_bind_param($updateSessionStmt, "sis", $sessionToken, $expires, $email);
+        mysqli_stmt_execute($updateSessionStmt);
+        
+        // Set secure cookies with proper flags
+        setcookie("session", $sessionToken, [
+            'expires' => time() + 3600,
+            'path' => '/',
+            'secure' => true,
+            'httponly' => true,
+            'samesite' => 'Strict'
+        ]);
+        setcookie("mode", $mode, [
+            'expires' => time() + 3600,
+            'path' => '/',
+            'secure' => true,
+            'httponly' => true,
+            'samesite' => 'Strict'
+        ]);
+
+
+        $query = "SELECT * FROM Users WHERE email = ?";
+        $stmt = mysqli_prepare($db, $query);
+        mysqli_stmt_bind_param($stmt, "s", $email);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+
+
+        if (mysqli_num_rows($result) > 0) {
+
+            $char = mysqli_fetch_assoc($result);
+            $id = $char['id'];
+            $user = $char['name'];
+            $lastname = $char['lastname'];
+            setcookie("id", $id, [
+                'expires' => time() + 3600,
+                'path' => '/',
+                'secure' => true,
+                'httponly' => true,
+                'samesite' => 'Strict'
+            ]);
+            setcookie("name", $user, [
+                'expires' => time() + 3600,
+                'path' => '/',
+                'secure' => true,
+                'httponly' => true,
+                'samesite' => 'Strict'
+            ]);
+            setcookie("lastname", $lastname, [
+                'expires' => time() + 3600,
+                'path' => '/',
+                'secure' => true,
+                'httponly' => true,
+                'samesite' => 'Strict'
+            ]);
+                
+            // Regenerate CSRF token for the new session
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+            
+            header("Location: $server_name/bio.php?time=$time");
+            exit;
+        } else {
+            header("Location: $server_name/create.php");
+            exit;
+        }
+    } else {
+        // Invalid password - redirect to login with error
+        error_log("[DEBUG] Invalid password attempt for " . $email . " from IP: " . $_SERVER['REMOTE_ADDR']);
+        header("Location: $server_name/login.php?error=1");
+        exit;
+    }
+} else {
+    // No account found
+    error_log("[DEBUG] No account found for email: " . $email . " from IP: " . $_SERVER['REMOTE_ADDR']);
+    header("Location: $server_name/login.php?error=1");
+    exit;
+}
+?>
+) {
             $newHash = password_hash($password, PASSWORD_DEFAULT);
             $updateQuery = "UPDATE Accounts SET password = ? WHERE email = ?";
             $updateStmt = mysqli_prepare($db, $updateQuery);
