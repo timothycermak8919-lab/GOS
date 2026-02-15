@@ -13,5 +13,5 @@ $server_name = "http://" . ($_SERVER['SERVER_NAME'] ?? 'localhost');
 $admin_username = "";
 $admin_password = "";
 
-$debug_mode = false;
+$debug_mode = true;
 ?> 
