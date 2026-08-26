@@ -42,7 +42,11 @@ include_once('hordedata.php');
 
 // DO LAST BATTLE STUFF
 echo "Updating Last Battle...";
-mysqli_query($db,"LOCK TABLES Hordes WRITE, Contests WRITE, Locations WRITE, Estates WRITE, messages WRITE, Items WRITE, Profs WRITE, Users WRITE;");
+// Every table touched inside this lock has to be named: once LOCK TABLES is
+// held, MySQL rejects any query against a table that is not in the list.
+// lastbattle.php reads Soc directly, and the locFuncs/displayFuncs helpers it
+// pulls in read Soc and Users_stats, so the Last Battle aborted every hour.
+mysqli_query($db,"LOCK TABLES Hordes WRITE, Contests WRITE, Locations WRITE, Estates WRITE, messages WRITE, Items WRITE, Profs WRITE, Users WRITE, Soc WRITE, Users_stats WRITE;");
 // Get the number of Broken Seals
 $numBroken = mysqli_num_rows(mysqli_query($db,"SELECT id FROM Items WHERE type=0 AND owner='99999'"));
 echo("</br>\nSEALS BROKEN: ".$numBroken);
