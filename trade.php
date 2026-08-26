@@ -1,4 +1,11 @@
 <?php
+// The CSRF token lives in the session, so it has to be started before the token
+// is read or compared. header.php starts it far too late - the check below ran
+// against a freshly generated value and rejected every submission.
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 /* establish a connection with the database */
 include_once("admin/connect.php");
 include_once("admin/userdata.php");

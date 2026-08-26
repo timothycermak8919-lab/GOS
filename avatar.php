@@ -11,6 +11,13 @@
  * @version 2.0 - Refactored with security improvements
  */
 
+// The CSRF token lives in the session, so it has to be started before the token
+// is read or compared. header.php starts it far too late - the check below ran
+// against a freshly generated value and rejected every submission.
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 // Constants
 define('AVATAR_UPLOAD_DIR', 'avatar_uploads/');
 define('ALLOWED_IMAGE_TYPES', ['jpg', 'jpeg', 'png', 'gif', 'webp', 'jfif']);

@@ -413,6 +413,16 @@ if (!$char['born']) {
                                 <input type='hidden' name='ddd' value='0' id='ddd'/>
                             </form>
 
+                            <script type='text/javascript'>
+                              // duel.php takes the opponent from POST enemyid, so submit the form
+                              // above rather than linking with a query parameter it never reads.
+                              function submitFormDuel(id)
+                              {
+                                document.duelform.enemyid.value = id;
+                                document.duelform.submit();
+                              }
+                            </script>
+
                             <div class="panel panel-warning">
                                 <div class="panel-heading">
                                     <h3 class="panel-title">Actions</h3>
@@ -773,7 +783,7 @@ if (!$char['born']) {
                                                     <?php
                                                 } else {
                                                     ?>
-                                                    <a href="duel.php?type=99&target=<?php echo $fid ?>"
+                                                    <a href="javascript:submitFormDuel(<?php echo $fid ?>)"
                                                        class="btn btn-sm btn-danger">Duel <?php echo $listchar['name'] . " " . $listchar['lastname'] ?></a>
                                                     <?php
                                                 }
@@ -830,7 +840,7 @@ if (!$char['born']) {
                                                     <?php
                                                 } else {
                                                     ?>
-                                                    <a href="duel.php?type=99&target=<?php echo $fid ?>"
+                                                    <a href="javascript:submitFormDuel(<?php echo $fid ?>)"
                                                        class="btn btn-sm btn-danger"><?php echo $listchar['name'] . " " . $listchar['lastname'] ?></a>
                                                     <?php
                                                 }
@@ -896,7 +906,7 @@ if (!$char['born']) {
                                                     <?php
                                                 } else {
                                                     ?>
-                                                    <a href="duel.php?type=99&target=<?php echo $fid ?>"
+                                                    <a href="javascript:submitFormDuel(<?php echo $fid ?>)"
                                                        class="btn btn-sm btn-danger btn-block"><?php echo $listchar['name'] . " " . $listchar['lastname'] ?></a>
                                                     <?php
                                                 }
