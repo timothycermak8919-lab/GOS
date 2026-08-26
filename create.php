@@ -4,23 +4,21 @@ $skipVerify = 1;
 include_once("admin/connect.php");
 include_once("admin/config.php");
 
-//Make sure they have a valid login
-$query = "SELECT * FROM Accounts WHERE email = '$email' AND password = '$password'";
-$result = mysqli_query($db,$query);
-if (mysqli_num_rows($result) <= 0) {
+//Make sure they have a valid login. connect.php validates the session token and
+//only populates $email when it is valid; $password only exists during the login
+//POST, so it cannot be part of this check.
+$result = false;
+if (!empty($email)) {
+  $stmt = mysqli_prepare($db, "SELECT email FROM Accounts WHERE email = ?");
+  mysqli_stmt_bind_param($stmt, "s", $email);
+  mysqli_stmt_execute($stmt);
+  $result = mysqli_stmt_get_result($stmt);
+}
+if (!$result || mysqli_num_rows($result) <= 0) {
   $time = time();
   header("Location: $server_name/index2.php?time=$time");
   exit;
 } 
-
-
-
-$query = "SELECT * FROM Accounts WHERE email = '$email' AND password = '$password'";
-$result = mysqli_query($db,$query);
-if (mysqli_num_rows($result) == 0) {
-	header("Location: $server_name/createAccount.php");
-	exit;
-}
 
 
 error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING);

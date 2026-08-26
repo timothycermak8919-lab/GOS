@@ -23,8 +23,8 @@
 		<br>
 		Population: 
 		<?php
-			$result = mysqli_fetch_assoc(mysqli_query($db,"SELECT COUNT(*) FROM Users WHERE location='".$char['location']."'"));
-			echo $result[0]."<br><br><font class='foottext'>";
+			$result = mysqli_fetch_assoc(mysqli_query($db,"SELECT COUNT(*) AS num FROM Users WHERE location='".$char['location']."'"));
+			echo $result['num']."<br><br><font class='foottext'>";
 		?>
 		<br>
 		

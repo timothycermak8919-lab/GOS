@@ -96,7 +96,7 @@ function displayGold ($money, $text=0)
         }
         else $message="You do not have that much money";
       }
-      if ($message) echo "window.onLoad=parent.UpdateTop('$message',".$char[gold].");";    
+      if ($message) echo "window.onLoad=parent.UpdateTop('$message',".$char['gold'].");";    
     ?>
   </SCRIPT>
   </head>

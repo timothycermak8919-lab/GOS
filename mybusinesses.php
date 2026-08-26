@@ -1119,14 +1119,14 @@ for ($t=0; $t<11; $t++)
             if ($t<7)
             {
               $status[$t][$i][4]=5;
-              $qualbonus = $upgrades[$t][1][1]*5 + $upgrades[$t][1][2]*3+$town_bonuses[cQ];;
+              $qualbonus = $upgrades[$t][1][1]*5 + $upgrades[$t][1][2]*3+$town_bonuses['cQ'];;
               $qualnum=$jobs[$t]*5+$qualbonus+rand(1,50);
               $status[$t][$i][5]=floor($qualnum/25);
               if ($status[$t][$i][5] < 0) $status[$t][$i][5] = 0;
               elseif ($status[$t][$i][5] > 3) $status[$t][$i][5] = 3;              
             }
             $sstatus = serialize($status[$t]);
-            mysqli_query($db,"UPDATE Profs SET status='".$sstatus."' WHERE id='".$biz[id]."'");          
+            mysqli_query($db,"UPDATE Profs SET status='".$sstatus."' WHERE id='".$biz['id']."'");          
             $i--;
           }
           else 

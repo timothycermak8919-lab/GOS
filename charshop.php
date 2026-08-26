@@ -20,7 +20,7 @@ $itmlist = unserialize($char['itmlist']);
 $wikilink = "Market";
 
 // SELECT AMOUNT TO SELL FOR
-if (!($s_cost > 0) && $_GET[sellit] && $itmlist[$s_item][0] && $location_array[$char['location']][2])
+if (!($s_cost > 0) && $_GET['sellit'] && $itmlist[$s_item][0] && $location_array[$char['location']][2])
 {
   include('header.php');
   $worth = item_val(itp($item_base[$itmlist[$s_item][0]][0]." ".$item_ix[$itmlist[$s_item][1]]." ".$item_ix[$itmlist[$s_item][2]],$item_base[$itmlist[$s_item][0]][1]));
@@ -44,8 +44,8 @@ else
 
 if ($s_collect)
 {
-  $id = $char[id];
-  $collectgold = $char[gold] + $char[shopgold];
+  $id = $char['id'];
+  $collectgold = $char['gold'] + $char['shopgold'];
   $querya = "UPDATE Users SET gold='$collectgold', shopgold='0' WHERE id='$id' ";
   $result = mysqli_query($db,$querya);
   header("Location: $server_name/charshop.php?time=$curtime");
@@ -64,12 +64,12 @@ if ($s_doit)
     $result5 = mysqli_query($db,$query);
     $message = "Offer Removed";
     $z = 0;
-    while (($itmlist[$z][0] != $listchar[base] || $itmlist[$z][1] != $listchar[prefix] || $itmlist[$z][2] != $listchar[suffix] || $itmlist[$z][3] != -1) && $z < count($itmlist)) $z++;
+    while (($itmlist[$z][0] != $listchar['base'] || $itmlist[$z][1] != $listchar['prefix'] || $itmlist[$z][2] != $listchar['suffix'] || $itmlist[$z][3] != -1) && $z < count($itmlist)) $z++;
 
     if ($itmlist[$z][3] == -1)
     {
       $itmlist[$z][3] = 0;
-      $id = $char[id];
+      $id = $char['id'];
       $itmlist2 = serialize($itmlist);
       $query = "UPDATE Users_data SET itmlist='$itmlist2' WHERE id='$id' ";
       $result = mysqli_query($db,$query);
@@ -95,7 +95,7 @@ if ($s_cost && $numchar < 25 && $location_array[$char['location']][2])
   if ($itmlist[$s_item][3] != -1 && $itmlist[$s_item][3] != -2 && $itmlist[$s_item][0] != '')
   {
     $itmlist[$s_item][3] = -1;
-    $id = $char[id];
+    $id = $char['id'];
     $itmlist2 = serialize($itmlist);
     $query = "UPDATE Users_data SET itmlist='$itmlist2' WHERE id='$id' ";
     $result = mysqli_query($db,$query);
@@ -119,17 +119,17 @@ include('header.php');
 <center><font class="foottext">
 <table class="blank" border="0"><tr>
 <?php
-  if ($char[shopgold]) {
+  if ($char['shopgold']) {
 ?>
   <td><img src="images/till.gif"></td>
 <?php } ?>
   <td width="10">&nbsp;</td>
   <td><font class="foottext">
 <?php
-  if ($char[shopgold]) 
+  if ($char['shopgold']) 
   {
-    echo "There is ".number_format($char[shopgold])." g in your shop till ";
-    if ($char[shopgold]) echo "[<a href='charshop.php?time=$time&collect=1'>Collect</a>]";
+    echo "There is ".number_format($char['shopgold'])." g in your shop till ";
+    if ($char['shopgold']) echo "[<a href='charshop.php?time=$time&collect=1'>Collect</a>]";
   }
   else echo "&nbsp;";
 ?>
@@ -160,7 +160,7 @@ include('header.php');
 <table width="550" cellspacing="0" border="0" cellpadding="5" onMouseOver="this.bgColor='#111111';" onMouseOut="this.bgColor='#000000';">
   <tr>
     <td width="25">&nbsp;</td>
-    <td width="200"><font class="foottext"><center><b><A HREF="javascript:popUp('itemstat.php?<?php echo "base=".$listchar[base]."&prefix=".$listchar[prefix]."&suffix=".$listchar[suffix]; ?>')"><?php echo $listchar['name']; ?></a></b></td>
+    <td width="200"><font class="foottext"><center><b><A HREF="javascript:popUp('itemstat.php?<?php echo "base=".$listchar['base']."&prefix=".$listchar['prefix']."&suffix=".$listchar['suffix']; ?>')"><?php echo $listchar['name']; ?></a></b></td>
     <td width="100"><font class="foottext"><center><?php echo displayGold($listchar['cost']); ?></center></td>
     <td width="100"><font class="foottext"><center><?php echo str_replace('-ap-','&#39;',$listchar['location']); /*ucwords($item_type[$item_base[$listchar['base']][1]]);*/ ?></td>
     <td width="50">&nbsp;</td>

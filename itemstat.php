@@ -5,14 +5,16 @@
 <?php
 include_once("admin/itemFuncs.php");
 include_once("admin/displayFuncs.php");
-$base=str_replace("_"," ",$_GET['base']);
-$prefix=str_replace("_"," ",$_GET['prefix']);
-$suffix=str_replace("_"," ",$_GET['suffix']);
-$lvl=$_GET['lvl'];
-$sex=$_GET['sex'];
+$base=str_replace("_"," ",$_GET['base'] ?? '');
+$prefix=str_replace("_"," ",$_GET['prefix'] ?? '');
+$suffix=str_replace("_"," ",$_GET['suffix'] ?? '');
+$lvl=$_GET['lvl'] ?? 0;
+$sex=$_GET['sex'] ?? 0;
 $cond = 100;
-if ($_GET['cond'] != '') $cond = $_GET['cond'];
-if ($_GET['gender']) $sex=$_GET['gender'];
+if (($_GET['cond'] ?? '') != '') $cond = intval($_GET['cond']);
+if ($_GET['gender'] ?? '') $sex=$_GET['gender'];
+// This popup is only meaningful for a known item base.
+if (!isset($item_base[$base])) { echo "</head><body>Unknown item.</body></html>"; exit; }
 
 
 ?>
@@ -34,7 +36,7 @@ $weapon = $weapon." ".getTerMod($ter_bonuses,$item_base[$base][1],$prefix,$suffi
 if ($item_base[$base][1] < 14) $worth = item_val($weapon);
 else $worth = $item_base[$base][2];
 
-if ($_GET[data]) echo "<font class=littletext>".$weapon;
+if ($_GET['data']) echo "<font class=littletext>".$weapon;
 $char_stats = cparse($weapon,0);
 
 

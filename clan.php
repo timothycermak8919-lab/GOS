@@ -95,8 +95,8 @@ $upgrades = unserialize($society['upgrades']);
 
 // UPDATE NUMBER OF MEMEBERS
 
-$resultf = mysqli_fetch_assoc(mysqli_query($db,"SELECT COUNT(*) FROM Users WHERE society='$soc_name' "));
-$numchar = $resultf[0];
+$resultf = mysqli_fetch_assoc(mysqli_query($db,"SELECT COUNT(*) AS num FROM Users WHERE society='$soc_name' "));
+$numchar = $resultf['num'];
 $query = "UPDATE Soc SET members='$numchar' WHERE name='$soc_name' ";
 if ($numchar!=$society['members']) $result = mysqli_query($db,$query);
 

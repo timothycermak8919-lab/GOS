@@ -11,10 +11,17 @@
 
   if (!$skipVerify) {
 
-    //Verify we have a correct email/pass combo 
-    $headerQuery = "SELECT * FROM Accounts WHERE email = '$email' AND password = '$password'";
-    $headerResult = mysqli_query($db,$headerQuery);
-    if (mysqli_num_rows($headerResult) <= 0) {
+    // connect.php validates the session token and only populates $email for a
+    // valid, unexpired session. The password is only ever available during the
+    // login POST, so matching on it here rejected every logged-in request.
+    $headerResult = false;
+    if (!empty($email)) {
+      $headerStmt = mysqli_prepare($db, "SELECT email FROM Accounts WHERE email = ?");
+      mysqli_stmt_bind_param($headerStmt, "s", $email);
+      mysqli_stmt_execute($headerStmt);
+      $headerResult = mysqli_stmt_get_result($headerStmt);
+    }
+    if (!$headerResult || mysqli_num_rows($headerResult) <= 0) {
       if (!headers_sent()) {
         $time = time();
         header("Location: $server_name/index2.php?time=$time"); exit;
@@ -304,7 +311,7 @@
                   if ($hquest['type'] == $quest_type_num["NPC"])
                   {
                     $hgoals = unserialize($hquest['goals']);
-                    if (strtolower($hgoals[2]) == strtolower($char['location']) && $myquests[$c_n][1]< $hgoals[0])
+                    if (strtolower($hgoals[2] ?? '') == strtolower($char['location'] ?? '') && $myquests[$c_n][1]< $hgoals[0])
                     {
                       $hunt =1;
                     }
@@ -312,7 +319,7 @@
                   else if ($hquest['type'] == $quest_type_num["Horde"])
                   {
                     $hgoals = unserialize($hquest['goals']);
-                    if (strtolower($hgoals[2]) == strtolower($char['location']) && $myquests[$c_n][1] > 0)
+                    if (strtolower($hgoals[2] ?? '') == strtolower($char['location'] ?? '') && $myquests[$c_n][1] > 0)
                     {
                        $hunt = 1;
                     }
@@ -323,7 +330,7 @@
                     $route = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Routes WHERE id='".$hgoals[1]."'"));
                     $rpath = unserialize($route['path']);
 					
-                    if (strtolower($rpath[$myquests[$c_n][1]]) == strtolower($char['location']) && $myquests[$c_n][1]< $hgoals[0])
+                    if (strtolower($rpath[$myquests[$c_n][1]] ?? '') == strtolower($char['location'] ?? '') && $myquests[$c_n][1]< $hgoals[0])
                     {
                       if (!in_array($char['location'], $townnames) && $myquests[$c_n][2] < 1)
                       {
@@ -483,7 +490,7 @@
               $route = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Routes WHERE id='".$char['route']."'"));
               $rpath = unserialize($route['path']);
 
-              if (strtolower($rpath[$char['routepoint']]) == strtolower($char['location']))
+              if (strtolower($rpath[$char['routepoint']] ?? '') == strtolower($char['location'] ?? ''))
               {
                 echo "<li><a onClick='submitWaysTravelForm(".$route['id'].");'>Guiding to ".$route['end']."</a></li>";
               }

@@ -8,7 +8,7 @@ include_once("admin/itemFuncs.php");
 include_once("admin/questFuncs.php");
 include_once("admin/userdata.php");
 include_once("admin/locFuncs.php");
-$id = mysqli_real_escape_string($db,$_GET['id']);
+$questId = intval($_GET['id'] ?? 0);
 $goodevil=$char['goodevil'];
 if ($goodevil >1) $goodevil= 1;
 ?>
@@ -20,19 +20,20 @@ if ($goodevil >1) $goodevil= 1;
 <font face="VERDANA"><font class="bigtext"><center><br>
 
 <?php
-$quest =  mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Quests WHERE id=$id"));
+$quest = $questId ? mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Quests WHERE id=$questId")) : null;
+if (!$quest) { echo "<br>Quest not found.</center></body></html>"; exit; }
 
-$qtype = $quest_type[$quest[type]];
-if ($quest[expire] != -1)
+$qtype = $quest_type[$quest['type']];
+if ($quest['expire'] != -1)
 {
-  $expire = ($quest[expire]*3600) - time();
+  $expire = ($quest['expire']*3600) - time();
   if ($expire < 3600) $extime= number_format($expire/60)." minutes";
   elseif ($expire < 86400) $extime = number_format($expire/3600)." hours";
   else $extime = number_format($expire/86400)." days";
 }
-if ($quest[reqs] != "0")
+if ($quest['reqs'] != "0")
 {
-  $reqs=cparse($quest[reqs],0);
+  $reqs=cparse($quest['reqs'],0);
   $show_reqs=  show_quest_reqs($reqs);
 }
 else 
@@ -40,8 +41,8 @@ else
   $show_reqs = "None";
 }
 $goals = unserialize($quest['goals']);
-$show_goals=  show_quest_goals($item_base,$item_type_pl,$enemy_list,$goodevil,$goals,$quest['type'], $quest['offerer'], $quest['special'], $npc_nation_data);
-$qreward= unserialize($quest[reward]);
+$show_goals=  show_quest_goals($quest['align'],$goals,$quest['type'], $quest['offerer'], $quest['special']);
+$qreward= unserialize($quest['reward']);
 if ($qreward[0]=="G")
 { $reward = displayGold($qreward[1]); }
 elseif ($qreward[0] == "LI")
@@ -60,7 +61,7 @@ elseif ($qreward[0] == "GP")
 <table border="1" cellpadding="10" rules="rows" cellspacing="0" bgcolor="#0f0f0f" bordercolor="#555555" width="90%">
   <tr>
     <td>
-      <center><font class="littletext"><b><?php echo str_replace('-ap-','&#39;',$quest[name]) ?></b><font class="littletext"><br>
+      <center><font class="littletext"><b><?php echo str_replace('-ap-','&#39;',$quest['name']) ?></b><font class="littletext"><br>
     </td>
   </tr>
 </table>
@@ -93,7 +94,7 @@ elseif ($qreward[0] == "GP")
     </td>    
   </tr>
 <?php } ?>  
-<?php if ($quest[expire] != -1) { ?>
+<?php if ($quest['expire'] != -1) { ?>
   <tr>
     <td align='right'>
       <font class="littletext">Expires:

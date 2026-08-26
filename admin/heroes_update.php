@@ -86,11 +86,26 @@ if (!$lastBattleDone)
   {
     for ($z=1; $z<=20; $z++)
     {
-		if(!is_int($heroes[$z]['top_estate'])){
-			$heroes[$z]['top_estate']=0;
-		}
-		if(!is_int($heroes[$z]['top_business'])){
-			$heroes[$z]['top_business']=0;
+		// Only the ranks that actually had players get populated above, so every
+		// other column below would go into the UPDATE as '' and be rejected
+		// outright by MySQL strict mode. Default them all to 0 instead.
+		$hero_stat_cols = array(
+			'xp', 'ji', 'achieved', 'wins', 'duel_wins', 'enemy_wins', 'ally_wins', 'off_wins',
+			'npc_wins', 'shadow_wins', 'military_wins', 'ruffian_wins', 'channeler_wins',
+			'animal_wins', 'exotic_wins', 'quests_done', 'play_quests_done', 'find_quests_done',
+			'npc_quests_done', 'item_quests_done', 'horde_quests_done', 'escort_quests_done',
+			'my_quests_done', 'coin', 'bankcoin', 'coin_donated', 'duel_earn', 'dice_earn',
+			'item_earn', 'quest_earn', 'prof_earn', 'top_estate', 'tot_estate', 'top_business',
+			'tot_business', 'net_worth', 'align_high', 'align_low', 'win_tourney', 'horde_wins',
+			'army_wins'
+		);
+		if (!isset($heroes[$z]) || !is_array($heroes[$z])) $heroes[$z] = array();
+		foreach ($hero_stat_cols as $hero_col)
+		{
+			if (!isset($heroes[$z][$hero_col]) || !is_numeric($heroes[$z][$hero_col]))
+			{
+				$heroes[$z][$hero_col] = 0;
+			}
 		}
       mysqli_query($db,"UPDATE Users_stats SET xp='".$heroes[$z]['xp']."', ji='".$heroes[$z]['ji']."', achieved='".$heroes[$z]['achieved']."', wins='".$heroes[$z]['wins']."', duel_wins='".$heroes[$z]['duel_wins']."', enemy_wins='".$heroes[$z]['enemy_wins']."', ally_wins='".$heroes[$z]['ally_wins']."', off_wins='".$heroes[$z]['off_wins']."', npc_wins='".$heroes[$z]['npc_wins']."', shadow_wins='".$heroes[$z]['shadow_wins']."', military_wins='".$heroes[$z]['military_wins']."', ruffian_wins='".$heroes[$z]['ruffian_wins']."', channeler_wins='".$heroes[$z]['channeler_wins']."', animal_wins='".$heroes[$z]['animal_wins']."', exotic_wins='".$heroes[$z]['exotic_wins']."', quests_done='".$heroes[$z]['quests_done']."', play_quests_done='".$heroes[$z]['play_quests_done']."', find_quests_done='".$heroes[$z]['find_quests_done']."', npc_quests_done='".$heroes[$z]['npc_quests_done']."', item_quests_done='".$heroes[$z]['item_quests_done']."', horde_quests_done='".$heroes[$z]['horde_quests_done']."', escort_quests_done='".$heroes[$z]['escort_quests_done']."', my_quests_done='".$heroes[$z]['my_quests_done']."', coin='".$heroes[$z]['coin']."', bankcoin='".$heroes[$z]['bankcoin']."', coin_donated='".$heroes[$z]['coin_donated']."', duel_earn='".$heroes[$z]['duel_earn']."', dice_earn='".$heroes[$z]['dice_earn']."', item_earn='".$heroes[$z]['item_earn']."', quest_earn='".$heroes[$z]['quest_earn']."', prof_earn='".$heroes[$z]['prof_earn']."', top_estate='".$heroes[$z]['top_estate']."', tot_estate='".$heroes[$z]['tot_estate']."', top_business='".$heroes[$z]['top_business']."', tot_business='".$heroes[$z]['tot_business']."', net_worth='".$heroes[$z]['net_worth']."', align_high='".$heroes[$z]['align_high']."', align_low='".$heroes[$z]['align_low']."', win_tourney='".$heroes[$z]['win_tourney']."', horde_wins='".$heroes[$z]['horde_wins']."', army_wins='".$heroes[$z]['army_wins']."' WHERE id='".($z+10000)."'");
 	}

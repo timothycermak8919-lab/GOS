@@ -16,7 +16,7 @@ if (strtolower($name) != "the" && strtolower($lastname) != "creator"  && !$debug
 else
 {
 // Drop Old Table
-$query  = 'DROP TABLE Market';
+$query  = 'DROP TABLE IF EXISTS Market';
 $result = mysqli_query($db,$query);
 echo "<b>Results</b><br><br>Drop Old Table: $result";
 
@@ -38,8 +38,8 @@ $query = 'CREATE TABLE Market( '.
 $result = mysqli_query($db,$query);
 echo "<br>Create New Table: $result";
 }
-// Close Database
-mysqli_close($db);
+// Do not close $db here: master_reset.php includes this script and the shared
+// connection is still needed by the resets that follow (PHP closes it at exit).
 ?>
 
 <br><br>

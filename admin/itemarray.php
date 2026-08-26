@@ -730,13 +730,13 @@ function item_val_old($string)
 {
   $array = cparse($string,0);
 
-  $damage = 0.45*($array[A] + $array[B] + $array[rA] + $array[rB] + $array[oA] + $array[oB] + $array[D] + $array[E] + $array[rD] + $array[rE] + $array[oD] + $array[oE]);
+  $damage = 0.45*($array['A'] + $array['B'] + $array['rA'] + $array['rB'] + $array['oA'] + $array['oB'] + $array['D'] + $array['E'] + $array['rD'] + $array['rE'] + $array['oD'] + $array['oE']);
 
-  $percent = 3*$array[P] + $array[N] + $array[rN] + $array[oN] + $array[O] + $array[rO] + $array[oO] + 2*$array[C] + 2.5*$array[G] - 1.5*$array[H] + 15*$array[S] + 15*$array[U];
+  $percent = 3*$array['P'] + $array['N'] + $array['rN'] + $array['oN'] + $array['O'] + $array['rO'] + $array['oO'] + 2*$array['C'] + 2.5*$array['G'] - 1.5*$array['H'] + 15*$array['S'] + 15*$array['U'];
 
   if ($damage) $damage = $damage*(100+$percent)/100;
   elseif ($percent) $damage = 50*(100+$percent)/100;
-  $damage += 2.5*$array[T];
+  $damage += 2.5*$array['T'];
 
   $worth = intval(($damage + ((1/9)*$damage*$damage*$damage ))*10);
 
@@ -911,19 +911,19 @@ function check_quest_reqs($reqs_stats, $char)
   $class_type = array ('1' => "Warrior",'10' => "Woodsman",'20' => "Aiel",'30' => "Channeler",'40' => "Ogier",'50' => "Shadowspawn",);
 
   $reqs_met = 1;
-  if ($reqs_stats['L'] && $reqs_stats['L'] > $char[level])
+  if ($reqs_stats['L'] && $reqs_stats['L'] > $char['level'])
   { $reqs_met = 0; }
   if ($reqs_stats['C']) 
   {
     if ($reqs_stats['C'] == 1 || $reqs_stats['C']%10 == 0) // generic class
     {
-      if (floor($reqs_stats['C']/10) != floor($char[type]/10))
+      if (floor($reqs_stats['C']/10) != floor($char['type']/10))
       { $reqs_met = 0; }
     }
-    else if (floor($reqs_stats['C']/2) != floor($char[type]/2)) // specific class
+    else if (floor($reqs_stats['C']/2) != floor($char['type']/2)) // specific class
     { $reqs_met = 0; }
   }
-  if (($reqs_stats['S']==1 && $char[sex] != 0) || ($reqs_stats['S']==2 && $char[sex] != 1))
+  if (($reqs_stats['S']==1 && $char['sex'] != 0) || ($reqs_stats['S']==2 && $char['sex'] != 1))
   { $reqs_met = 0; }
   
   return $reqs_met;
@@ -1073,7 +1073,7 @@ function generate_random_quest($item_base, $users, $loc)
     for ($i = 0; $i < count($users); $i++)
     {
       $char = $users[$i];
-      $lvltot += $char[level];
+      $lvltot += $char['level'];
     }
     if (count($users))
     {
@@ -1160,16 +1160,16 @@ function generate_random_quest($item_base, $users, $loc)
     $qname = "Troubles around ".$loc.": Attacks in ".$goals[2]; 
   }
   
-  $quest[name]=$qname;
-  $quest[type]=$type;
-  $quest[location]= $loc;
-  $quest[offerer] = "townsfolk";
-  $quest[num_avail]= $num_avail;
-  $quest[started]= $started;
-  $quest[expire]=$expire;
-  $quest[goals]=serialize($goals);
-  $quest[reward]=serialize($reward);
-  $quest[reqs]=0;
+  $quest['name']=$qname;
+  $quest['type']=$type;
+  $quest['location']= $loc;
+  $quest['offerer'] = "townsfolk";
+  $quest['num_avail']= $num_avail;
+  $quest['started']= $started;
+  $quest['expire']=$expire;
+  $quest['goals']=serialize($goals);
+  $quest['reward']=serialize($reward);
+  $quest['reqs']=0;
   
   return serialize($quest);
 }

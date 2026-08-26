@@ -67,7 +67,8 @@ mysqli_stmt_bind_param($stmt, "s", $socname);
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 $society = mysqli_fetch_assoc($result);
-$classes = json_decode($char['type'], true);
+$classes = unserialize($char['type'] ?? '');
+if (!is_array($classes)) $classes = [];
 
 // FIXED: SQL injection vulnerability - use prepared statement
 $charId = $char['id'];
@@ -111,10 +112,10 @@ mysqli_stmt_execute($resultb);
 $resultb = mysqli_stmt_get_result($resultb);
 $fullname = $charother['name'] . "_" . $charother['lastname'];
 
-$charip = json_decode($charother['ip'], true);
+$charip = unserialize($charother['ip'] ?? '');
 $alts = getAlts($charip);
 
-$user_ips = json_decode($charother['ip'], true);
+$user_ips = unserialize($charother['ip'] ?? '');
 
 $uips_count=0;
 if(is_array($user_ips)){
@@ -126,7 +127,7 @@ for ($i = 0; $i < $uips_count; $i++) {
 }
 if (!$found) {
     $user_ips[$uips_count] = $ipaddy;
-    $user_ips2 = json_encode($user_ips);
+    $user_ips2 = serialize($user_ips);
     if ($charother['id']!=""){
         // FIXED: SQL injection vulnerability - use prepared statement
         $stmt = mysqli_prepare($db, "UPDATE Users SET ip=? WHERE id=?");
@@ -156,16 +157,19 @@ if ($char['id'] == $charother['id']) // only update IPs on your own profile
             $ip_users[$ip_count] = $fullname;
             $ip_users2 = json_encode($ip_users);
             $ip_count++;
-            // FIXED: SQL injection vulnerability - use prepared statement
-            $ip_test = $ip_users['test']++;
-            $stmt = mysqli_prepare($db, "UPDATE IP_logs SET users=?, num=?, test=? WHERE addy=?");
-            mysqli_stmt_bind_param($stmt, "siis", $ip_users2, $ip_count, $ip_test, $ipaddy);
+            // $ip_users is a list of character names, so there was no 'test' key
+            // to increment; nothing reads IP_logs.test, so leave the column alone.
+            $stmt = mysqli_prepare($db, "UPDATE IP_logs SET users=?, num=? WHERE addy=?");
+            mysqli_stmt_bind_param($stmt, "sis", $ip_users2, $ip_count, $ipaddy);
             mysqli_stmt_execute($stmt);
-        } else if ($ip_log['maxnum'] == 2 && $char['donor'] > 0)
-            // FIXED: SQL injection vulnerability - use prepared statement
+        } else if ($ip_log['maxnum'] == 2 && $char['donor'] > 0) {
+            // Without these braces the bind_param/execute below ran unconditionally
+            // against whichever statement $stmt still held, which raised an
+            // ArgumentCountError against the 4-placeholder UPDATE above.
             $stmt = mysqli_prepare($db, "UPDATE IP_logs SET maxnum=? WHERE addy=?");
             mysqli_stmt_bind_param($stmt, "is", $maxalts, $ipaddy);
             mysqli_stmt_execute($stmt);
+        }
     } else {
         $ip_users['0'] = $fullname;
         $ip_users2 = json_encode($ip_users);
@@ -309,7 +313,7 @@ if (!$char['born']) {
                             $npc6_wins = number_format($stats['exotic_wins']);
                             $npc6_per = "(" . intval(100 * $stats['exotic_wins'] / ($stats['exotic_npcs'] + 0.0001) + 0.5) . "%) ";
 
-                            $stance = json_decode($societyo['stance'], true);
+                            $stance = unserialize($societyo['stance'] ?? '');
                             $associated = "";
                             if ($stance[str_replace(" ", "_", $char['society'])] == 1 && $char['society'] != $charother['society'] && $char['society']) $associated = "ally ";
                             if ($stance[str_replace(" ", "_", $char['society'])] == 2 && !$is_same) $associated = "enemy ";
@@ -324,7 +328,7 @@ if (!$char['born']) {
                                     if ($society['subtitle'] != "") $soctit = $society['subtitle'];
                                     $societyn = "<img src='images/SocSub.gif' height=20 width=28> " . $soctit . " of ";
                                 } elseif ($char['soc_rank'] > 0) {
-                                    $cranks = json_decode($society['ranks'], true);
+                                    $cranks = unserialize($society['ranks'] ?? '');
                                     $societyn = $cranks[7 - $char['soc_rank']]['0'] . " of ";
                                 } else {
                                     $societyn = "Member of ";
@@ -420,7 +424,7 @@ if (!$char['born']) {
                                         if (!$is_same)
                                         {
                                         // BATTLE
-                                        $find_battle = json_decode($charother['find_battle'], true);
+                                        $find_battle = unserialize($charother['find_battle'] ?? '');
                                         $numbahs = array("Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Ten");
 
                                         if ($char['location'] == $charother['location']) {
@@ -631,13 +635,13 @@ if (!$char['born']) {
 
                         $onlineList = "";
                         $pmonth = 0;
-                        $charip = json_decode($charother['ip'], true);
+                        $charip = unserialize($charother['ip'] ?? '');
                         $alts = getAlts($charip);
                         foreach ($alts as $username => $alt) {
-                            $stmt = mysqli_prepare($db, "SELECT id, name, lastname, level, exp, gold, location, stamina, stamaxa, battlestoday, newmsg, newlog, donor FROM Users WHERE name = ?");
+                            $stmt = mysqli_prepare($db, "SELECT id, name, lastname, level, exp, gold, location, stamina, stamaxa, battlestoday, newmsg, newlog, donor FROM Users WHERE name = ? AND lastname = ?");
                             $explode = explode("_", $username);
-                            $altName = $explode[0];
-                            $altLast = $explode[1];
+                            $altName = $explode[0] ?? '';
+                            $altLast = $explode[1] ?? '';
                             mysqli_stmt_bind_param($stmt, "ss", $altName, $altLast);
                             mysqli_stmt_execute($stmt);
                             $result = mysqli_stmt_get_result($stmt);

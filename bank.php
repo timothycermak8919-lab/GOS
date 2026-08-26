@@ -1,4 +1,13 @@
 <?php
+// This file is a fragment: world.php includes it (and town.php includes bank.php),
+// so $db/$char come from the including page. Requested directly it has no database
+// handle and used to fatal, so send the visitor to the page that includes it.
+if (!isset($db) || !$db) {
+    if (!headers_sent()) { header("Location: world.php"); }
+    exit;
+}
+?>
+<?php
 $bd = $town_bonuses['bD'];
 $max_deposit=($bd+80)/100;
       $tot_dep = floor(($char['gold']+$char['bankgold'])*$max_deposit)-$char['bankgold'];

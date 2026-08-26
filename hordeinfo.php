@@ -24,12 +24,26 @@ else
 $result3 = mysqli_query($db,"SELECT * FROM Hordes WHERE ".$query." ORDER BY ends DESC LIMIT 1");
 $myHorde = mysqli_fetch_assoc( $result3 );
 
+// There may be no horde at this location. Render a friendly message rather than
+// dereferencing a missing row (previously fataled on count() of a failed unserialize).
+if (!$myHorde)
+{
+  $message = "Horde Info";
+  include('header.php');
+  echo "<div class='row solid-back'><div class='col-sm-12'><br/>"
+     . "<p align='center'>There is no horde activity to report at this location.</p>"
+     . "<br/></div></div>";
+  include('footer.htm');
+  exit;
+}
 
   $npc_info = unserialize($myHorde['npcs']);
-  
-  
+  if (!is_array($npc_info)) $npc_info = array();
+
+
   $hordemsg = "";
-  for ($n=0; $n < count($npc_info); $n++)
+  $npc_count = count($npc_info);
+  for ($n=0; $n < $npc_count; $n++)
   {
     if ($n==0) $hordemsg .= "A "; else $hordemsg.= " vs. A ";
     $hordemsg .= $horde_types[$npc_info[$n][0]]." of ".$npc_info[$n][0]."s";

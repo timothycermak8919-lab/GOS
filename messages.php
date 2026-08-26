@@ -129,7 +129,7 @@ if ($csrf_valid && $_REQUEST['trashallout'] )
   $x=0;
   while ($x < $out_num)
   {
-    mysqli_query($db,"UPDATE Notes SET del_from='1' WHERE id='".$outbox[$x][id]."'");
+    mysqli_query($db,"UPDATE Notes SET del_from='1' WHERE id='".$outbox[$x]['id']."'");
     $x++;
   }
 }
@@ -299,35 +299,35 @@ else
 
 
 // SEND INVITE
-if ($_GET['join'] != '' && $char[society])
+if ($_GET['join'] != '' && $char['society'])
 {
   // Send Invite
   $societyo = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Soc WHERE name='$char[society]' "));
 
-  if ($societyo[invite] == 1 || ($societyo[invite] == 2 && strtolower($societyo[leader]) == strtolower($char[name]) && strtolower($societyo[leaderlast]) == strtolower($char[lastname])))
+  if ($societyo['invite'] == 1 || ($societyo['invite'] == 2 && strtolower($societyo['leader']) == strtolower($char['name']) && strtolower($societyo['leaderlast']) == strtolower($char['lastname'])))
   {
     $message = "Invitation Sent";
-    $noteto = $_GET[name]." ".$_GET[last];
-    $socname2 = str_replace(" ","+",$char[society]);
+    $noteto = $_GET['name']." ".$_GET['last'];
+    $socname2 = str_replace(" ","+",$char['society']);
     $notesub="Clan Invitation";
     $link="<a href=joinclan.php?invite=1&name=$socname2>Accept Invitation</a>";
     $note="<b>Invitation to join $char[society]</b><br/><br/> $link";
-    $note_extra=$char[society];
+    $note_extra=$char['society'];
 
     $recipient = explode(" ", $noteto);
     $target = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Users WHERE name = '$recipient[0]' AND lastname = '$recipient[1]'"));
     $mytime=time();
     if ($target)
     {
-      $cid = $target[id];
+      $cid = $target['id'];
       $result = mysqli_query($db,"INSERT INTO Notes (from_id,to_id, del_from,del_to,type,root,sent,        cc,subject,   body,   special) 
                                         VALUES ('$id',  '$cid','0',     '0',   '0', '0', '".$mytime."','','$notesub','$note','$note_extra')");
 
       // Update the message's body with the message's own id
-      $request = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Notes WHERE sent='".$mytime."' AND from_id='".$char[id]."'"));
-      $link="<a href=joinclan.php?invite=1&name=$socname2&note=".$request[id]."&invite=".floor($mytime/400).">Accept Invitation</a>";
-      $request[body] = "<b>Invitation to join $char[society]</b><br/><br/> $link";
-      mysqli_query($db,"UPDATE Notes SET body='".$request[body]."' WHERE id='".$request[id]."'");
+      $request = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Notes WHERE sent='".$mytime."' AND from_id='".$char['id']."'"));
+      $link="<a href=joinclan.php?invite=1&name=$socname2&note=".$request['id']."&invite=".floor($mytime/400).">Accept Invitation</a>";
+      $request['body'] = "<b>Invitation to join $char[society]</b><br/><br/> $link";
+      mysqli_query($db,"UPDATE Notes SET body='".$request['body']."' WHERE id='".$request['id']."'");
 
       mysqli_query($db,"UPDATE Users SET newmsg=newmsg+1 WHERE id='$cid'");
     }

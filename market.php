@@ -436,7 +436,7 @@ if ($is_town)
 } // !isDestroyed
 else
 {
-  $message = "The remains of the Market in ".$location[name];
+  $message = "The remains of the Market in ".$location['name'];
   if ($mode == 1) { include('header2.htm'); }
   else 
   {

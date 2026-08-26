@@ -361,7 +361,10 @@ function getAlts ($ips)
 			mysqli_stmt_execute($stmt);
 			$result = mysqli_stmt_get_result($stmt);
 			$ip_log = mysqli_fetch_assoc($result);
-			$users= unserialize($ip_log['users']);
+			// bio.php is the only writer of IP_logs.users and stores it with
+			// json_encode(), so unserialize() never returned an array here and
+			// alt detection silently found nothing.
+			$users= json_decode($ip_log['users'] ?? '', true);
 			if(is_array($users)){
 				for ($j=0; $j < count($users); $j++)
 				{
@@ -372,7 +375,7 @@ function getAlts ($ips)
 	  }
   }
 
-  $email = $_COOKIE['email'];
+  $email = $_COOKIE['email'] ?? '';
   $stmt = mysqli_prepare($db, "SELECT * FROM Users WHERE email=?");
   mysqli_stmt_bind_param($stmt, "s", $email);
   mysqli_stmt_execute($stmt);

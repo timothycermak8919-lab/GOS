@@ -56,7 +56,7 @@ function delete_blank(array $array): array
  * @param array $ips IP addresses to check
  * @return array Array of alternate character names
  */
-function getAlts(array $ips): array
+function getAvatarAlts(array $ips): array
 {
     global $db;
     $alts = [];
@@ -434,7 +434,7 @@ function deleteCharacter(string $confirmEmail, string $confirmPass): void
             }
             
             $noteBody .= 'Alts:<br/>';
-            $alts = getAlts($charIps);
+            $alts = getAvatarAlts($charIps);
             foreach ($alts as $altName) {
                 $noteBody .= htmlspecialchars($altName) . '<br/>';
             }

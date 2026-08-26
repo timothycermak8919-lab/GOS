@@ -16,8 +16,8 @@ $society = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Soc WHERE name='$s
 $message = $soc_name;
 $blocked = unserialize($society['blocked']);
 
-$resultf = mysqli_fetch_assoc(mysqli_query($db,"SELECT COUNT(*) FROM Users"));
-$numchar = $resultf[0];
+$resultf = mysqli_fetch_assoc(mysqli_query($db,"SELECT COUNT(*) AS num FROM Users"));
+$numchar = $resultf['num'];
 $soclimit = floor($numchar/10);
 if ($soclimit < 10) $soclimit=10;
 
@@ -285,7 +285,7 @@ if ($doit == 1)
 
       if ($socalts < $maxsocalts)
       {
-        $alignnum = getAlignment($char);
+        $alignnum = getAlignment($char['align']);
         if ($society['invite'] < 3 || ($society['invite'] == 3 && $alignnum >= 0) || ($society['invite'] == 4 && $alignnum <= 0) || ($society['invite'] == 5 && $alignnum == 0))
         {
           $reqnote = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Notes WHERE id='$noter'"));
@@ -377,7 +377,7 @@ if ($char['society'] != '')
   else echo "<p class='text-info'>You are already in this clan</p>";
 }
 
-$alignnum = getAlignment($char);
+$alignnum = getAlignment($char['align']);
 $inCB = inClanBattle($society['id']);
 
 if ($society['invite'] < 3 || ($society['invite'] == 3 && $alignnum >= 0) || ($society['invite'] == 4 && $alignnum <= 0) || ($society['invite'] == 5 && $alignnum == 0))

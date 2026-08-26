@@ -14,19 +14,19 @@ $wD=0;
 
 while ($donor = mysqli_fetch_assoc($result))
 {
-  if ($donor[amount] >= 10)
+  if ($donor['amount'] >= 10)
   {
-    $stillDonor[$sD++] = $donor[email];
+    $stillDonor[$sD++] = $donor['email'];
   // mysqli_query($db,"UPDATE donate SET amount=amount-5 WHERE id='$donor[id]'");
   }
-  else if ($donor[amount] >= 5)
+  else if ($donor['amount'] >= 5)
   {
-    $testDonor[$tD++] = $donor[email];
+    $testDonor[$tD++] = $donor['email'];
   //  mysqli_query($db,"UPDATE donate SET amount=amount-5 WHERE id='$donor[id]'");
   }
   else
   {
-    $wasDonor[$wD++] = $donor[email];
+    $wasDonor[$wD++] = $donor['email'];
   }
   mysqli_query($db,"UPDATE donate SET amount=amount+5 WHERE id='$donor[id]'");
 }

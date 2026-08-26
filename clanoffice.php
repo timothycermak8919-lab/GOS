@@ -697,7 +697,7 @@ include('header.php');
 } // !isDestroyed
 else
 {
-  $message = "No Clan Offices remain in ".$location[name];
+  $message = "No Clan Offices remain in ".$location['name'];
   if ($mode == 1) { include('header2.htm'); }
   else 
   {

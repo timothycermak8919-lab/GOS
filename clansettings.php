@@ -32,7 +32,7 @@ $delsub=mysqli_real_escape_string($db,$_POST['delsub']);
 $support=mysqli_real_escape_string($db,$_POST['support']);
 $supportloc=mysqli_real_escape_string($db,$_POST['supportloc']);
 $id=$char['id'];
-$soc_name = $char[society];
+$soc_name = $char['society'];
 
 // KICK OFF PAGE IF NOT CLAN LEADER
 
@@ -41,7 +41,7 @@ $subleaders = unserialize($society['subleaders']);
 $subs = $society['subs'];
 
 $b = 0; 
-if (strtolower($name) == strtolower($society[leader]) && strtolower($lastname) == strtolower($society[leaderlast]) ) 
+if (strtolower($name) == strtolower($society['leader']) && strtolower($lastname) == strtolower($society['leaderlast']) ) 
 {
   $b=1;
 }
@@ -68,7 +68,7 @@ $block_num = $society['block_num'];
 // Leader title
 if ($leadtit) 
 {
-    $society[leadertitle]=$leadtit;
+    $society['leadertitle']=$leadtit;
     $query = "UPDATE Soc SET leadertitle='$leadtit' WHERE name='$soc_name'";
     $result = mysqli_query($db,$query);
     $message="Title updated";
@@ -76,7 +76,7 @@ if ($leadtit)
 // Subleader title
 if ($subtit) 
 {
-    $society[subtitle]=$subtit;
+    $society['subtitle']=$subtit;
     $query = "UPDATE Soc SET subtitle='$subtit' WHERE name='$soc_name'";
     $result = mysqli_query($db,$query);
     $message="Title updated";
@@ -86,7 +86,7 @@ if ($addsub)
 {
   $result = mysqli_query($db,"SELECT * FROM Users WHERE id='$addsub'");
   $char_sub = mysqli_fetch_assoc($result);
-  $subleaders[$addsub]= array($char_sub[name],$char_sub[lastname]);
+  $subleaders[$addsub]= array($char_sub['name'],$char_sub['lastname']);
   $subleaders_str = serialize($subleaders);
   ++$subs;
   if ($subs < 3)
@@ -132,8 +132,8 @@ $result = mysqli_query($db,$query);
 $result = mysqli_query($db,"SELECT * FROM Users WHERE id='$kick'");
 $char_kick = mysqli_fetch_assoc($result);
 // UPDATE NUMBER OF CLAN MEMBERS AND BLOCK
-$memnumb = $society[members] - 1;
-$blocked[$kick]=array($char_kick[name],$char_kick[lastname]);
+$memnumb = $society['members'] - 1;
+$blocked[$kick]=array($char_kick['name'],$char_kick['lastname']);
 $blocked_str=serialize($blocked);
 ++$block_num;
 if (strlen($blocked_str)<5000)
@@ -172,7 +172,7 @@ if ($allow)
 {
 $allow--;
 $query = "UPDATE Soc SET allow='$allow' WHERE name='$soc_name' ";
-$society[allow]=$allow;
+$society['allow']=$allow;
 $result = mysqli_query($db,$query);
 $message="Member requirements updated";
 }
@@ -197,7 +197,7 @@ if (strlen($newtext) < 501 && preg_match('/^[-a-z0-9+.,!@*_&#:\/%;?\s]*$/i',$new
 $message = "Clan Info updated successfully";
 $query = "UPDATE Soc SET about='$newtext' WHERE name='$soc_name' ";
 $result = mysqli_query($db,$query);
-$society[about]=$newtext;
+$society['about']=$newtext;
 }
 else {$message="What strange characters you used. Officials refuse to post your note";}
 
@@ -207,7 +207,7 @@ if (strlen($newpriv) < 501 && preg_match('/^[-a-z0-9+.,!@*_&#:\/%;?\s]*$/i',$new
 $message = "Clan Info updated successfully";
 $query = "UPDATE Soc SET private_info='$newpriv' WHERE name='$soc_name' ";
 $result = mysqli_query($db,$query);
-$society[private_info]=$newpriv;
+$society['private_info']=$newpriv;
 }
 else {$message="What strange characters you used. Officials refuse to post your note";}
 
@@ -216,16 +216,16 @@ else {$message="What strange characters you used. Officials refuse to post your 
 $upgrades = unserialize($society['upgrades']);
 
 // skill levels
-if ($_POST[skill] != "")
+if ($_POST['skill'] != "")
 {
-  $upgrade= mysqli_real_escape_string($db,$_POST[skill]);
+  $upgrade= mysqli_real_escape_string($db,$_POST['skill']);
   $uplvl = $upgrades[$upgrade];
   $cost = pow(10,$uplvl)*10000;
 
-  if ($society[bank] >= $cost)
+  if ($society['bank'] >= $cost)
   {
-    $society[bank] = $society[bank] - $cost;
-    $gold = $society[bank];
+    $society['bank'] = $society['bank'] - $cost;
+    $gold = $society['bank'];
     $upgrades[$upgrade] = $upgrades[$upgrade] + 1;
     $upgrades_str= serialize($upgrades);
     mysqli_query($db,"UPDATE Soc SET upgrades='$upgrades_str', bank='$gold' WHERE name='$soc_name'");
@@ -245,7 +245,7 @@ $message = "Clan Requirements Updated";
 $newtype--;
 $query = "UPDATE Soc SET invite='$newtype' WHERE name='$soc_name' ";
 $result = mysqli_query($db,$query);
-$society[invite]=$newtype;
+$society['invite']=$newtype;
 }
 
 if ($messages == '') $messages = "$soc_name settings";
@@ -271,7 +271,7 @@ $numpeople = mysqli_num_rows($result);
         <input type='hidden' name='skill' value='-1'>
         <tr>
           <td><font class="littletext"><b>Clan Bank:<b></td>
-          <td><font class="littletext"><?php echo displayGold($society[bank]); ?></td>
+          <td><font class="littletext"><?php echo displayGold($society['bank']); ?></td>
         </tr>
         <tr>
           <td><font class="littletext"><b>Hourly Upkeep:<b></td>
@@ -314,7 +314,7 @@ $numpeople = mysqli_num_rows($result);
       </table>
       <br><hr width='90%' align=left><br>
       <?php
-        if ($numpeople - $subs> 1 && $subs < 3 && ($name == $society[leader] && $lastname == $society[leaderlast] ))
+        if ($numpeople - $subs> 1 && $subs < 3 && ($name == $society['leader'] && $lastname == $society['leaderlast'] ))
         {
       ?>
 <!-- Add Subleader -->
@@ -327,12 +327,12 @@ $numpeople = mysqli_num_rows($result);
             while ($x < $numpeople)
             { 
               $charnew = mysqli_fetch_assoc($result);
-              if ( strtolower($charnew[name]) != strtolower($char[name]) || strtolower($charnew[lastname]) != strtolower($char[lastname]) )
+              if ( strtolower($charnew['name']) != strtolower($char['name']) || strtolower($charnew['lastname']) != strtolower($char['lastname']) )
               {
                 $b=1;
                 foreach ($subleaders as $c_n => $c_s)
                 {
-                  if (strtolower($charnew[name]) == strtolower($c_s[0]) && strtolower($charnew[lastname]) == strtolower($c_s[1]) )
+                  if (strtolower($charnew['name']) == strtolower($c_s[0]) && strtolower($charnew['lastname']) == strtolower($c_s[1]) )
                   {
                     $b=0;
                   }
@@ -341,7 +341,7 @@ $numpeople = mysqli_num_rows($result);
               if ($b ==1)
               {
           ?>
-          <option value="<?php echo $charnew[id]; ?>"><?php echo $charnew[name]." ".$charnew[lastname]; ?></option>
+          <option value="<?php echo $charnew['id']; ?>"><?php echo $charnew['name']." ".$charnew['lastname']; ?></option>
           <?php
               }
               $x++;
@@ -354,7 +354,7 @@ $numpeople = mysqli_num_rows($result);
       </form>
       <?php
         }
-        if ($subs > 0 && ($name == $society[leader] && $lastname == $society[leaderlast] ))
+        if ($subs > 0 && ($name == $society['leader'] && $lastname == $society['leaderlast'] ))
         {
       ?>
 <!-- Remove Subleader -->
@@ -376,7 +376,7 @@ $numpeople = mysqli_num_rows($result);
       </form>
       <?php
         }
-        if (($numpeople > 1 && ($name == $society[leader] && $lastname == $society[leaderlast] )) || $numpeople > 2) 
+        if (($numpeople > 1 && ($name == $society['leader'] && $lastname == $society['leaderlast'] )) || $numpeople > 2) 
         {
           $query = "SELECT id, name, lastname FROM Users WHERE society='$soc_name' ORDER BY lastname, name";
           $result = mysqli_query($db,$query);
@@ -390,11 +390,11 @@ $numpeople = mysqli_num_rows($result);
             while ($y < $numpeople)
             {
               $charnew = mysqli_fetch_assoc($result);
-              if (( strtolower($charnew[name]) != strtolower($char[name]) || strtolower($charnew[lastname]) != strtolower($char[lastname]) ) && 
-                (strtolower($charnew[name]) != strtolower($society[leader]) && strtolower($charnew[lastname]) != strtolower($society[leaderlast]) ))
+              if (( strtolower($charnew['name']) != strtolower($char['name']) || strtolower($charnew['lastname']) != strtolower($char['lastname']) ) && 
+                (strtolower($charnew['name']) != strtolower($society['leader']) && strtolower($charnew['lastname']) != strtolower($society['leaderlast']) ))
               {
           ?>
-          <option value="<?php echo $charnew[id]; ?>"><?php echo $charnew[name]." ".$charnew[lastname]; ?></option>
+          <option value="<?php echo $charnew['id']; ?>"><?php echo $charnew['name']." ".$charnew['lastname']; ?></option>
           <?php
               }
               $y++;
@@ -442,10 +442,10 @@ $numpeople = mysqli_num_rows($result);
             $stance = unserialize($society['stance']);
             while ( $listchar = mysqli_fetch_assoc( $result2 ) )
             {
-              if ($stance[str_replace(" ","_",$listchar[name])] == 1)
+              if ($stance[str_replace(" ","_",$listchar['name'])] == 1)
               {
           ?>
-          <option value="<?php echo $listchar[id]; ?>"><?php echo str_replace('-ap-','&#39;',$listchar[name]); ?></option>
+          <option value="<?php echo $listchar['id']; ?>"><?php echo str_replace('-ap-','&#39;',$listchar['name']); ?></option>
           <?php
               }
             }
@@ -460,7 +460,7 @@ $numpeople = mysqli_num_rows($result);
             while ( $listchar = mysqli_fetch_assoc( $result2 ) )
             {
           ?>
-          <option value="<?php echo $listchar[id]; ?>"><?php echo str_replace('-ap-','&#39;',$listchar[name]); ?></option>
+          <option value="<?php echo $listchar['id']; ?>"><?php echo str_replace('-ap-','&#39;',$listchar['name']); ?></option>
           <?php
             }
           ?>
@@ -492,9 +492,9 @@ $numpeople = mysqli_num_rows($result);
 <!-- CLAN INFO -->
       <form action="clansettings.php" method="post">
         <font class="littletext"><b>Leader Title:</b>
-        <input type='text' class='form' name="leadtit" size="12" id="leadtit" value='<?php echo $society[leadertitle];?>' maxlength='12' /><br>
+        <input type='text' class='form' name="leadtit" size="12" id="leadtit" value='<?php echo $society['leadertitle'];?>' maxlength='12' /><br>
         <font class="littletext"><b>Subleader Title:</b>
-        <input type='text' class='form' name="subtit" size="12" id="subtit" value='<?php echo $society[subtitle];?>' maxlength='12' /><br>
+        <input type='text' class='form' name="subtit" size="12" id="subtit" value='<?php echo $society['subtitle'];?>' maxlength='12' /><br>
         <font class="littletext"><b>New members:</b> 
         <select name="type" size="1" class="form">
           <option value="0">[keep current]</option>

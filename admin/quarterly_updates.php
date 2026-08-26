@@ -177,8 +177,8 @@ while ($char = mysqli_fetch_assoc($charq))
       }
       if ($pro_stats['cV']) 
       {
-        $resultf = mysqli_fetch_assoc(mysqli_query($db,"SELECT COUNT(*) FROM Users WHERE location='$char[location]' "));
-        $numchar = $resultf[0];
+        $resultf = mysqli_fetch_assoc(mysqli_query($db,"SELECT COUNT(*) AS num FROM Users WHERE location='$char[location]' "));
+        $numchar = $resultf['num'];
         $char['gold'] += $hourspast*$jobs[3]*$numchar*10;
       }
 	  

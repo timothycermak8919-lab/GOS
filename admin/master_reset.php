@@ -21,8 +21,10 @@ if(!$debug_mode && (strtolower($name) != "the" || strtolower($lastname) != "crea
 } else {
 echo "Running reset...<br>";
 $head = 1;
+// Order matters on a fresh install. resetloc.php and generate_connections.php
+// pull in userdata.php/locFuncs.php, which run queries against Locations, Hordes
+// and Soc at include time, so every plain table-creating reset has to run first.
 include("reset.php");
-include("generate_connections.php");
 include("resetsoc.php");
 include("resetquests.php");
 include("resethordes.php");
@@ -30,8 +32,15 @@ include("resetestates.php");
 include("resetips.php");
 include("resetprofs.php");
 include("resetcontests.php");
-include("resetloc.php");
 include("resetnotes.php");
+include("resetmarket.php");
+include("resetloc.php");
+// resettrade.php seeds one row per location, so it runs after resetloc.php.
+// It only rebuilds the Trade table when asked (r=1); a master reset wants that.
+$_GET['r'] = 1;
+include("resettrade.php");
+unset($_GET['r']);
+include("generate_connections.php");
   
 if (mysqli_num_rows(mysqli_query($db,"SELECT id FROM Quests WHERE 1")) ==0)
 {

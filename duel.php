@@ -466,19 +466,24 @@ if ($score1 && $alts[$username]!=1 && $ally != 1)
         }
       }
     }    
-    if ($soc_name != "" && $sQuest == 0)
+    // Area/location scoring only applies when this town has a Locations row;
+    // otherwise the loc_ji<N> column name is invalid and the query fatals.
+    if ($loc_query && isset($loc_query['id']) && ctype_digit((string)$loc_query['id']))
     {
-      $clan_id = $society['id'];
-      $area_score = unserialize($society['area_score']);    
-      $area_score[$loc_query['id']] = $area_score[$loc_query['id']]+$areascoreup;
-      $area_score[$loc_query['id']] = number_format($area_score[$loc_query['id']],2,'.','');
-      $a_s_str = serialize($area_score);
-      mysqli_query($db,"UPDATE Soc SET area_score='$a_s_str', score=score+$areascoreup WHERE id='$clan_id' ");  
+      if ($soc_name != "" && $sQuest == 0)
+      {
+        $clan_id = $society['id'];
+        $area_score = unserialize($society['area_score']);    
+        $area_score[$loc_query['id']] = $area_score[$loc_query['id']]+$areascoreup;
+        $area_score[$loc_query['id']] = number_format($area_score[$loc_query['id']],2,'.','');
+        $a_s_str = serialize($area_score);
+        mysqli_query($db,"UPDATE Soc SET area_score='$a_s_str', score=score+$areascoreup WHERE id='$clan_id' ");  
+      }
+
+      $stats['loc_ji'.$loc_query['id']]+=$areascoreup;
+      $stats['loc_ji'.$loc_query['id']]=number_format($stats['loc_ji'.$loc_query['id']],2,'.','');
+      $result = mysqli_query($db,"UPDATE Users_stats SET `loc_ji{$loc_query['id']}`='{$stats['loc_ji'.$loc_query['id']]}' WHERE id='$id'");
     }
-    
-    $stats['loc_ji'.$loc_query['id']]+=$areascoreup;
-    $stats['loc_ji'.$loc_query['id']]=number_format($stats['loc_ji'.$loc_query['id']],2,'.','');
-    $result = mysqli_query($db,"UPDATE Users_stats SET `loc_ji{$loc_query['id']}`='{$stats['loc_ji'.$loc_query['id']]}' WHERE id='$id'");
   }
   else
   {   
@@ -491,6 +496,9 @@ if ($score1 && $alts[$username]!=1 && $ally != 1)
       $loc = $surrounding_area[$x];        
       $loc_query = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM `Locations` WHERE name = '$loc'"));
 
+      // Map edges/wilderness have no Locations row; without an id the loc_ji<N>
+      // column name below becomes a bare "loc_ji" and the query fatals.
+      if (!$loc_query || !isset($loc_query['id']) || !ctype_digit((string)$loc_query['id'])) { continue; }
       $atWar=1;
       if ($soc_name != "" && $loc_query['last_war'])
       { 

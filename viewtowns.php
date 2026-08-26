@@ -69,8 +69,8 @@ include('header.php');
         <td align='center'><?php echo $loc['myOrder']; ?></td>
         <td align='center' class='hidden-xs'><?php echo $loc['army']; ?></td>  
         <?php
-          $resultf = mysqli_fetch_assoc(mysqli_query($db,"SELECT COUNT(*) FROM Users WHERE location='$loc[name]' "));
-          $numchar = $resultf[0];    
+          $resultf = mysqli_fetch_assoc(mysqli_query($db,"SELECT COUNT(*) AS num FROM Users WHERE location='$loc[name]' "));
+          $numchar = $resultf['num'];    
         ?>
         <td align='center' class='hidden-xs'><?php echo number_format($numchar); ?></td>          
         <?php

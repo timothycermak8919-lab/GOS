@@ -1,6 +1,13 @@
 	<?php
+		// This file is a fragment: forest.php, mine.php and timber_yard.php define
+		// $event_list and then include it. Requested directly there is no list to
+		// roll against, so send the visitor to the town map instead of fataling.
+		if (!isset($event_list) || !is_array($event_list)) {
+			if (!headers_sent()) { header("Location: ../town.php"); }
+			exit;
+		}
 		$event=rand(0,count($event_list)-1);
-		
+
 		// UPDATE WHEN STARTED TO PREVENT CHEATING
 		include('info.php');
 		$no_query=1;

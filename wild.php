@@ -1,3 +1,12 @@
+<?php
+// This file is a fragment: world.php includes it (and town.php includes bank.php),
+// so $db/$char come from the including page. Requested directly it has no database
+// handle and used to fatal, so send the visitor to the page that includes it.
+if (!isset($db) || !$db) {
+    if (!headers_sent()) { header("Location: world.php"); }
+    exit;
+}
+?>
 <script type="text/javascript">
 
   var rowIndex = 0;
@@ -76,8 +85,8 @@ $surrounding_area=$map_data[$char['location']];
 $location = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Locations WHERE name='$loc_query'"));
 
 // UPDATE NUMBER OF MEMEBERS
-$resultf = mysqli_fetch_assoc(mysqli_query($db,"SELECT COUNT(*) FROM Users WHERE location='$loc_query' "));
-$numchar = $resultf[0];
+$resultf = mysqli_fetch_assoc(mysqli_query($db,"SELECT COUNT(*) AS num FROM Users WHERE location='$loc_query' "));
+$numchar = $resultf['num'];
 $myHorde=0;
 ?>
   <div class='row'>

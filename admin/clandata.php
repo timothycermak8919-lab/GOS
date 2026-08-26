@@ -44,12 +44,12 @@ while ( $listsoc = mysqli_fetch_assoc( $result ) )
     }
     
     // Update number of members
-    $resultf = mysqli_fetch_assoc(mysqli_query($db,"SELECT COUNT(*) FROM Users WHERE society='".$listsoc['name']."'"));
-    $numchar = $resultf[0];
+    $resultf = mysqli_fetch_assoc(mysqli_query($db,"SELECT COUNT(*) AS num FROM Users WHERE society='".$listsoc['name']."'"));
+    $numchar = $resultf['num'];
     if ($numchar!=$listsoc['members']) 
     {
-      $listsoc[members] = $numchar;
-      $cresult = mysqli_query($db,"UPDATE Soc SET members='$numchar' WHERE id='".$listsoc[id]."'");
+      $listsoc['members'] = $numchar;
+      $cresult = mysqli_query($db,"UPDATE Soc SET members='$numchar' WHERE id='".$listsoc['id']."'");
     }
     $numpeople = $listsoc['members'];    
     $upgrades = unserialize($listsoc['upgrades']);
@@ -66,7 +66,7 @@ while ( $listsoc = mysqli_fetch_assoc( $result ) )
     if ($upkeep && ($listsoc['bank'] < $upkeep)) 
     {
       $upgrades[$max]--;
-      $listsoc[bank] += intval((pow(10,$upgrades[$max])*10000)/3);
+      $listsoc['bank'] += intval((pow(10,$upgrades[$max])*10000)/3);
     }
     $listsoc['bank'] = $listsoc['bank']-$upkeep;
     $upgrades_str= serialize($upgrades);

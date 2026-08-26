@@ -208,8 +208,8 @@
 	// VARIABLES
 	$map_width = 6;
 	$map_height = 6;
-	if (intval($_REQUEST[w])) $map_width = abs(intval($_REQUEST[w]));
-	if (intval($_REQUEST[h])) $map_height = abs(intval($_REQUEST[h]));
+	if (intval($_REQUEST['w'])) $map_width = abs(intval($_REQUEST['w']));
+	if (intval($_REQUEST['h'])) $map_height = abs(intval($_REQUEST['h']));
 	if ($map_width>12) $map_width=12;
 	if ($map_height>12) $map_height=12;
 	$default_tile="grass";

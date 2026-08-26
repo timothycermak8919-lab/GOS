@@ -428,6 +428,10 @@ if ($g_steal>95) $g_steal=95;
     {
       $loc = $surrounding_area[$x];
       $loc_query = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM `Locations` WHERE name = '$loc'"));
+      // Surrounding areas can include spots with no Locations row (map edges,
+      // wilderness). Without an id the loc_ji<N> column name below is built as a
+      // bare "loc_ji", which is not a real column and fataled the battle.
+      if (!$loc_query || !isset($loc_query['id']) || !ctype_digit((string)$loc_query['id'])) { continue; }
       $atWar=1;
       if ($soc_name != "" && $loc_query['last_war'])
       { 
@@ -952,7 +956,7 @@ while ($testate = mysqli_fetch_assoc( $result10 ) )
     $ecount = mysqli_num_rows(mysqli_query($db,"SELECT * FROM Items WHERE owner='".$eid."' AND type<15"));
     $chance=rand(1,100);
 
-    if ($finditem && ($item_base[$base][1] > 0) && ($test_stats[eT]>=$chance) && ($ecount<($test_stats['zS']+3)))
+    if ($finditem && ($item_base[$base][1] > 0) && ($test_stats['eT']>=$chance) && ($ecount<($test_stats['zS']+3)))
     {
       $base= $finditem;
       $itype=$item_base[$base][1];

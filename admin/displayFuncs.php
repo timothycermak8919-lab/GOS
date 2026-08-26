@@ -101,8 +101,10 @@ array( "-pop", "Lowest Population","Ghost Town",),
 
 
 
-function getUpgradeBonuses(array $upgrades, array $bonuses, int $num): string
+function getUpgradeBonuses($upgrades, array $bonuses, int $num): string
 {
+  // unserialize() hands this false for a clan with no upgrades stored yet.
+  if (!is_array($upgrades)) $upgrades = [];
   $upbonus = "";
   for ($i = 0; $i < $num; $i++)
   {
@@ -112,8 +114,10 @@ function getUpgradeBonuses(array $upgrades, array $bonuses, int $num): string
   return $upbonus;
 }
 
-function getUpgradeBonus(array $upgrades, array $bonuses, int $i, int $up = 0): string
+function getUpgradeBonus($upgrades, array $bonuses, int $i, int $up = 0): string
 {
+  // unserialize() hands this false for a clan with no upgrades stored yet.
+  if (!is_array($upgrades)) $upgrades = [];
   $upbonus = "";
   if(is_numeric($upgrades[$i]+$up)  && is_numeric($bonuses[$i][2]) ){
 	if ($upgrades[$i]+$up) $upbonus.= $bonuses[$i][1].($bonuses[$i][2]*($upgrades[$i]+$up))." "; 
@@ -139,8 +143,10 @@ function sortItems(int $sortBy): string
   return $sort_str;
 }
 
-function displayGold(int|float $money, int $text = 0): string
+function displayGold(int|float|null $money, int $text = 0): string
 {
+  // Legacy callers pass a missing column (no clan, no bank row) straight through.
+  $money = $money ?? 0;
   $neg = false;
   $rval = "";
 
@@ -489,15 +495,15 @@ function getAllJobBonuses(array $prolvls): string
   $jobon = "A0";
   for ($i=0; $i<13; $i++)
   {
-    $jobon .= " ".getJobBonuses($i,$prolvls[$i]);
+    $jobon .= " ".getJobBonuses($i,$prolvls[$i] ?? 0);
   }
   
   return $jobon;
 }
 
-function getTownPop(array $upgrades, int $town_pop, array $build_pop): int
+function getTownPop(array $upgrades, ?int $town_pop, array $build_pop): int
 {
-  $pop=10+$town_pop;
+  $pop=10+($town_pop ?? 0);
   for ($i=0; $i < 6; $i++)
   {
     $pop += $build_pop[$upgrades[$i]];
@@ -564,8 +570,9 @@ return $stats;
 }
 
 // PARSER FUNCTION
-function cparse(string $string, int $resolve = 0): array
+function cparse(?string $string, int $resolve = 0): array
 {
+  $string = $string ?? '';
   // RESOLVE all common terms and place in array
   if(!is_array($string)){
   $resolve = explode(" ",$string);
@@ -977,8 +984,9 @@ function pruneMsgs(array $msgs, int $max): array
 }
 
 
-function getAlignment(int $align): int
+function getAlignment(?int $align): int
 {
+  $align = $align ?? 0;
   $rval = 0;
   
 
@@ -992,8 +1000,11 @@ function getAlignment(int $align): int
   return $rval;
 }
 
-function getClanAlignment(int $align, int $members): int
+function getClanAlignment(?int $align, ?int $members): int
 {
+  // Reached with a missing Soc row when the character has no clan.
+  $align = $align ?? 0;
+  $members = $members ?? 0;
   $rval = 0;
   
   if ($align <= -1250-(250*$members)) $rval = -2;
@@ -1014,8 +1025,9 @@ function getAlignmentText(int $alignnum): string
   return $lalign;
 }
 
-function inClanBattle(int $clan_id): int
+function inClanBattle(?int $clan_id): int
 {
+  if ($clan_id === null) return 0;
   $inBattle = 0;
   $hour = time()/3600;
   if(!empty($db)){
@@ -1034,6 +1046,9 @@ function inClanBattle(int $clan_id): int
 
 function isClanLeader(array $achar, string $soc_name, int $officer, int $loc_id): bool
 {
+  // $db is a global; without importing it the guard below was always false, so
+  // the function fell through without returning and raised a TypeError.
+  global $db;
   if(!empty($db)){
 	  $society = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, subleaders, subs, offices, area_score, leader, leaderlast FROM Soc WHERE name='$soc_name' "));
 	  $subleaders = unserialize($society['subleaders']);
@@ -1068,6 +1083,8 @@ function isClanLeader(array $achar, string $soc_name, int $officer, int $loc_id)
 	  
 	  return $b;
   }
+
+  return false;
 }
 
 ?>

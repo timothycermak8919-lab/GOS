@@ -7,8 +7,10 @@ $clan = trim(mysqli_real_escape_string($db, $_POST['clan']));
 $flagStyle = mysqli_real_escape_string($db, $_POST['style']);
 $flagColor = mysqli_real_escape_string($db, $_POST['color']);
 $flagSigil = mysqli_real_escape_string($db, $_POST['sigil']);
-$declared = mysqli_real_escape_string($db, $_POST['declared']);
-$founded = mysqli_real_escape_string($db, $_POST['found']);
+// Both are numeric (declared is an INT column; founded is used as an array index),
+// so coerce them - an empty value was rejected outright by MySQL strict mode.
+$declared = intval($_POST['declared'] ?? 0);
+$founded = intval($_POST['found'] ?? 0);
 $id = $char['id'];
 $message = "Form a new Clan";
 

@@ -11,7 +11,13 @@ $result = mysqli_stmt_get_result($stmt);
 $char = mysqli_fetch_assoc($result);
 $curtime=time();
 $jobs_data = $char['jobs'] ?? null; // Use null coalescing operator to handle potential non-existence
-$jobs = $jobs_data ? json_decode($jobs_data, true) : []; // json_decode instead of unserialize
+// The jobs column is written with serialize() (adduser.php, professions.php, ...)
+// and read with unserialize() everywhere else, so decode it the same way here.
+// json_decode() returned null for these rows and fataled getAllJobBonuses().
+$jobs = $jobs_data ? @unserialize($jobs_data) : [];
+if (!is_array($jobs)) $jobs = [];
+$jobs = $jobs + array_fill(0, 13, 0);
+ksort($jobs);
 $pro_stats=cparse(getAllJobBonuses($jobs));
 $check=intval(time()/3600);
 
@@ -26,7 +32,10 @@ mysqli_stmt_execute($stmt);
 
 // Darkfriends cannot have a positive alignment.
 $types_data = $char['type'] ?? null;
-$types = $types_data ? json_decode($types_data, true) : [];
+// Like jobs, the type column is written with serialize(); json_decode() returned
+// null here, so the Darkfriend alignment rule below never fired.
+$types = $types_data ? @unserialize($types_data) : [];
+if (!is_array($types)) $types = [];
 
 if (!empty($types) && $types[0] == 5 && $char['align'] > 0) 
 {

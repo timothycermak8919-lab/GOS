@@ -15,7 +15,10 @@ if ($location_array[$char['location']][2]) $is_town=1;
 else $is_town=0;
 
 $message = mysqli_real_escape_string($db,$_GET['message']);
-$shop = mysqli_real_escape_string($db,$_GET['shop']);
+// $shop is used as an array index and in arithmetic below, and the range clamp
+// further down runs too late to help, so normalise it to an int here.
+$shop = intval($_GET['shop'] ?? 0);
+if ($shop < 1 || $shop > 4) { $shop = 1; }
 $room = mysqli_real_escape_string($db,$_GET['room']);
 $new_pouch = mysqli_real_escape_string($db,$_GET['pouch']);
 $outfit = mysqli_real_escape_string($db,$_POST['outfit']);

@@ -9,7 +9,7 @@ if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-$itmlist="";
+$itmlist=array();
 $listsize=0;
 $iresult=mysqli_query($db,"SELECT * FROM Items WHERE owner='$id' AND type<15 AND type>0");
 while ($qitem = mysqli_fetch_assoc($iresult))
@@ -25,7 +25,7 @@ else {include('header.php');}
 <?php
   for ($i=0; $i<$listsize; ++$i)
   {
-    echo "  inv[".$itmlist[$i][id]."] = '".str_replace(" ","",$itmlist[$i][base])."';";
+    echo "  inv[".$itmlist[$i]['id']."] = '".str_replace(" ","",$itmlist[$i]['base'])."';";
   }
 ?>  
 
@@ -81,11 +81,11 @@ else
         <?php
           $have_item = 0;
           for ($x=0; $x<$listsize; $x++) {
-            if (($itmlist[$x][istatus] == 0 || $itmlist[$x][istatus] == -2) && $itmlist[$x][society] == 0) 
+            if (($itmlist[$x]['istatus'] == 0 || $itmlist[$x]['istatus'] == -2) && $itmlist[$x]['society'] == 0) 
             {
-              echo "<option value='".$itmlist[$x][id]."'>".iname($itmlist[$x])."</option>\n";
+              echo "<option value='".$itmlist[$x]['id']."'>".iname($itmlist[$x])."</option>\n";
               $have_item=1; 
-              if (!$f_item) $f_item=strtolower(str_replace(" ","",$itmlist[$x][base]));
+              if (!$f_item) $f_item=strtolower(str_replace(" ","",$itmlist[$x]['base']));
             }
           }
           if (!$have_item) echo "<option value=''>No items</option>";

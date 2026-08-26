@@ -822,7 +822,7 @@ elseif ($submitted != '') // Non-Item Quests
             }
             if ($town_bonuses['eJ'])
             {
-              $ustats[ji] += $town_bonuses[eJ];
+              $ustats['ji'] += $town_bonuses['eJ'];
             }
            
             $ustats['npc_quests_done']++;
@@ -847,7 +847,7 @@ elseif ($submitted != '') // Non-Item Quests
             }
             if ($town_bonuses['fJ'])
             {
-              $ustats[ji] += $town_bonuses[fJ];
+              $ustats['ji'] += $town_bonuses['fJ'];
             }
             
             $ustats['find_quests_done']++;

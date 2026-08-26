@@ -749,8 +749,11 @@ $tali_list = array (
 );
 
 // COMPUTE WEAVE STATS
-function weaveStats(string $sname, string $skills): string
+function weaveStats(?string $sname, ?string $skills): string
 {
+  // An absent weave/skill set is a normal state for these callers.
+  $sname = $sname ?? '';
+  $skills = $skills ?? '';
   $c_skills = cparse($skills,0);
   
   if (!$c_skills['fP']) $c_skills['fP']=0;
@@ -972,8 +975,10 @@ function iname_list(int $item, array $itmlist): string
   return $name;
 }
 
-function getConditionMod(int $type, int $cond): string
+function getConditionMod(?int $type, ?int $cond): string
 {
+  $type = $type ?? 0;
+  $cond = $cond ?? 100;
   $string = "";
   if ($type >= 7)
     $string .= " N-".floor((100-$cond)/3);
@@ -983,8 +988,9 @@ function getConditionMod(int $type, int $cond): string
   return $string;
 }
 
-function getTerMod(array $ter_bonuses, int $type, string $prefix, string $suffix, string $base = ""): string
+function getTerMod(array $ter_bonuses, int $type, string $prefix, string $suffix, ?string $base = ""): string
 {
+  $base = $base ?? '';
   $string = '';
   if ($type < 12)
   {
@@ -1014,8 +1020,12 @@ function iparse(array $itm, array $item_base, array $item_ix, array $ter_bonuses
 }
 
 // ITEM STRING REDUCER FUNCTION
-function itp(string $string, int $type, int $cond = 100): string
+function itp(?string $string, ?int $type, ?int $cond = 100): string
 {
+  // Item lookups for an unknown/absent base arrive here as null.
+  $string = $string ?? '';
+  $type = $type ?? 0;
+  $cond = $cond ?? 100;
   $string .= getConditionMod($type, $cond);
   
   // Handle item parsing
@@ -1042,8 +1052,10 @@ function item_val(string $string): int
   return $worth;
 }
 
-function lvl_req(string $string, int $mod): int 
+function lvl_req(?string $string, ?int $mod): int 
 {
+  $string = $string ?? '';
+  $mod = $mod ?? 0;
 	if(!empty($string)){
 		
   $char_stat = cparse($string,0);
@@ -1060,10 +1072,12 @@ function lvl_req(string $string, int $mod): int
 	}
 }
 
-function getIstats(array $myitm, string $skills): string
+function getIstats(?array $myitm, string $skills): string
 {
 
-  $estats=[];
+  // An unequipped slot legitimately arrives as null/empty here, and the declared
+  // return type is string, so the empty case must not fall through as an array.
+  $estats='';
   if (!empty($myitm))
   {
     if ($myitm['type'] == 8)
@@ -1075,7 +1089,7 @@ function getIstats(array $myitm, string $skills): string
   return $estats;
 }
 
-function getstats(array $myitm1, array $myitm2, array $myitm3, array $myitm4, array $myitm5, string $skills = ''): array
+function getstats(?array $myitm1, ?array $myitm2, ?array $myitm3, ?array $myitm4, ?array $myitm5, string $skills = ''): array
 {
   $estats = [];
   $estats[0] = [];

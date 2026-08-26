@@ -1,4 +1,11 @@
 <?php
+// The live copy of this page is history/hornSnapshot.php (fetched by
+// admin/saveAge.php); the ../ include paths below only resolve from there, so a
+// direct request to this copy has no database handle and used to fatal.
+if (!file_exists(__DIR__ . "/../admin/connect.php")) {
+    if (!headers_sent()) { header("Location: horn.php"); }
+    exit;
+}
 
 /* establish a connection with the database */
 include("../admin/connect.php");

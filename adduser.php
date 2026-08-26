@@ -11,10 +11,16 @@ include_once("admin/skills.php");
 include_once("admin/charFuncs.php");
 include_once("admin/itemFuncs.php");
 
-//Make sure they have a valid login
-$query = "SELECT * FROM Accounts WHERE email = '$email' AND password = '$password'";
-$result = mysqli_query($db,$query);
-if (mysqli_num_rows($result) <= 0) {
+//Make sure they have a valid login. The session token (validated in connect.php)
+//is what proves identity now; $password only exists during the login POST.
+$result = false;
+if (!empty($email)) {
+  $stmt = mysqli_prepare($db, "SELECT email FROM Accounts WHERE email = ?");
+  mysqli_stmt_bind_param($stmt, "s", $email);
+  mysqli_stmt_execute($stmt);
+  $result = mysqli_stmt_get_result($stmt);
+}
+if (!$result || mysqli_num_rows($result) <= 0) {
   $time = time();
   header("Location: $server_name/index2.php?time=$time");
   exit;

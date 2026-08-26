@@ -56,7 +56,7 @@ function displayGold ($money, $text=0)
         }
         else $message="You need a stronger animal to pull a ".$travel_mode[$_GET['buy']];
       }
-      if ($message) echo "window.onLoad=parent.UpdateTop('$message',".$char[gold].");";
+      if ($message) echo "window.onLoad=parent.UpdateTop('$message',".$char['gold'].");";
     ?>
   </SCRIPT>
   </head>

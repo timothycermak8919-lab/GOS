@@ -1,4 +1,9 @@
 <?php
+  // This file is a fragment included by world.php, which supplies $db and $char.
+  if (!isset($db) || !$db) {
+      if (!headers_sent()) { header("Location: ../../world.php"); }
+      exit;
+  }
   $loc_query=$char['location'];
   $bd = $town_bonuses['bD'];
   $max_deposit=($bd+80)/100;

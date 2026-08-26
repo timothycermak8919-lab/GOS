@@ -7,12 +7,12 @@ $cbs = (mysqli_query($db,"SELECT id, starts, contestants, results, participation
 while ($cb = mysqli_fetch_assoc($cbs))
 {
   echo "Updating hourly participation for CB $cb[id]...";
-  $bhour = $check-$cb[starts];
+  $bhour = $check-$cb['starts'];
   if ($bhour > 0)
   {
-    $cb_clans = unserialize($cb[contestants]);
-    $cb_results = unserialize($cb[results]);
-    $cpart = unserialize($cb[participation]);
+    $cb_clans = unserialize($cb['contestants']);
+    $cb_results = unserialize($cb['results']);
+    $cpart = unserialize($cb['participation']);
     // Loop over all the clans in the battles
     foreach ($cb_clans as $cid => $cdata)
     {

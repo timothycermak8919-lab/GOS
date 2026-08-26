@@ -1,4 +1,11 @@
  <?php
+// This file is a fragment included by world.php, which supplies $db and $char.
+// Requested directly it has no database handle and used to fatal.
+if (!isset($db) || !$db) {
+    if (!headers_sent()) { header("Location: world.php"); }
+    exit;
+}
+
 $message=mysqli_real_escape_string($db,$_GET['message']);
 $note=mysqli_real_escape_string($db,$_POST['note']);
 $submitted=mysqli_real_escape_string($db,$_REQUEST['submitted']);
@@ -17,14 +24,14 @@ $location = mysqli_fetch_assoc(mysqli_query($db,"SELECT * FROM Locations WHERE n
 $upgrades = unserialize($location['upgrades']);
 
 // UPDATE NUMBER OF MEMEBERS
-$query = "SELECT COUNT(*) FROM Users WHERE location='$loc_query' ";
+$query = "SELECT COUNT(*) AS num FROM Users WHERE location='$loc_query' ";
 $resultf = mysqli_fetch_assoc(mysqli_query($db,$query));
-$numchar = $resultf['0'];
+$numchar = $resultf['num'];
 
 // CHECK FOR LOCAL BUSINESSES
   $myLocBiz['999'] = '';
-  $query1 = "SELECT COUNT(*) FROM Profs WHERE owner='$id' AND location='$loc_query'";
-  $resultf1 = mysqli_fetch_assoc(mysqli_query($db,$query));
+  $query1 = "SELECT COUNT(*) AS num FROM Profs WHERE owner='$id' AND location='$loc_query'";
+  $resultf1 = mysqli_fetch_assoc(mysqli_query($db,$query1));
   if ($resultf1)
   {
     $result = mysqli_query($db,"SELECT id, type FROM Profs WHERE owner='$id' AND location='$loc_query'");  

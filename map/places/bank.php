@@ -1,5 +1,13 @@
 <?php
-$bd = $town_bonuses[bD];
+// map/town.php loads this file directly in an iframe, so it has to bootstrap the
+// same context the including pages provide ($db, $char, $town_bonuses, displayGold).
+if (!isset($db) || !$db) {
+    include('info.php');
+    include('connect_info.php');
+    include_once(dirname(__FILE__).'/../../admin/userdata.php');
+    include_once(dirname(__FILE__).'/../../admin/locFuncs.php');
+}
+$bd = $town_bonuses['bD'] ?? 0;
 $max_deposit=($bd+80)/100;
       $tot_dep = floor(($char['gold']+$char['bankgold'])*$max_deposit)-$char['bankgold'];
       $gold_dep = floor($tot_dep/10000);

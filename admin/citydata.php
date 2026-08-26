@@ -353,8 +353,8 @@ while ( $listloc = mysqli_fetch_assoc( $result_loc ) )
       // Determine rulers
       echo "</br>\n Determine rulers. | ";
       $halfhour = time()-1800;    
-      $resultf = mysqli_fetch_assoc(mysqli_query($db,"SELECT COUNT(*) FROM Users WHERE location='$listloc[name]' AND depart<='$halfhour' "));
-      $numchar = $resultf[0];
+      $resultf = mysqli_fetch_assoc(mysqli_query($db,"SELECT COUNT(*) AS num FROM Users WHERE location='$listloc[name]' AND depart<='$halfhour' "));
+      $numchar = $resultf['num'];
       $listloc['pop']=getTownPop($upgrades,$numchar,$build_pop);
       $newruler= "No One";
       $topscore= "100";

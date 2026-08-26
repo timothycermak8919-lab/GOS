@@ -63,7 +63,7 @@ if ( $_REQUEST['trashall'] )
   $x=0;
   while ($x < $in_num)
   {
-    mysqli_query($db,"UPDATE Notes SET del_to='1' WHERE id='".$inbox[$x][id]."'");
+    mysqli_query($db,"UPDATE Notes SET del_to='1' WHERE id='".$inbox[$x]['id']."'");
     $x++;
   }
   $message = "All defense logs deleted";
@@ -91,7 +91,7 @@ if ( $_REQUEST['trashallout'] )
   $x=0;
   while ($x < $out_num)
   {
-    mysqli_query($db,"UPDATE Notes SET del_from='1' WHERE id='".$outbox[$x][id]."'");
+    mysqli_query($db,"UPDATE Notes SET del_from='1' WHERE id='".$outbox[$x]['id']."'");
     $x++;
   }
   $message = "All offense logs deleted";

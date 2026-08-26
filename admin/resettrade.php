@@ -16,28 +16,28 @@ if (strtolower($name) != "the" && strtolower($lastname) != "creator"  && !$debug
 else
 {
 // Drop Old Table
-$query1  = 'DROP TABLE Trade';
+$query1  = 'DROP TABLE IF EXISTS Trade';
 
 // Create New Table
 $query = 'CREATE TABLE Trade( '.
 'id int NOT NULL AUTO_INCREMENT, '.
 'location char(50) UNIQUE, '.
-'f1 bigint NOT NULL, '.
-'f2 bigint NOT NULL, '.
-'f3 bigint NOT NULL, '.
-'f4 bigint NOT NULL, '.
-'m1 bigint NOT NULL, '.
-'m2 bigint NOT NULL, '.
-'m3 bigint NOT NULL, '.
-'m4 bigint NOT NULL, '.
-'l1 bigint NOT NULL, '.
-'l2 bigint NOT NULL, '.
-'l3 bigint NOT NULL, '.
-'l4 bigint NOT NULL, '.
+'f1 bigint NOT NULL DEFAULT 0, '.
+'f2 bigint NOT NULL DEFAULT 0, '.
+'f3 bigint NOT NULL DEFAULT 0, '.
+'f4 bigint NOT NULL DEFAULT 0, '.
+'m1 bigint NOT NULL DEFAULT 0, '.
+'m2 bigint NOT NULL DEFAULT 0, '.
+'m3 bigint NOT NULL DEFAULT 0, '.
+'m4 bigint NOT NULL DEFAULT 0, '.
+'l1 bigint NOT NULL DEFAULT 0, '.
+'l2 bigint NOT NULL DEFAULT 0, '.
+'l3 bigint NOT NULL DEFAULT 0, '.
+'l4 bigint NOT NULL DEFAULT 0, '.
 'own char(50), '.
 'war char(50), '.
 'PRIMARY KEY (id))';
-if ($_GET['r']==1)
+if (($_GET['r'] ?? 0)==1)
 {
   $result1 = mysqli_query($db,$query1);
   echo "<b>Results</b><br><br>Drop Old Table: $result1";
@@ -48,7 +48,7 @@ else echo "THIS <u>ONLY</u> CREATES NEW ENTRIES FOR <u>NEW</u> LOCATIONS<br><i>t
 
 echo "<br><br><u>Location data inserts</u>";
 // ADD FOR ALL LOCATIONS
-include($server_name.'/map/mapdata/coordinates.inc');
+include_once('coordinates.inc');
 echo "<table border='0'>";
 foreach ($location_array as $loc => $coor)
 {

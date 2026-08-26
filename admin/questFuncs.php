@@ -29,8 +29,11 @@ function show_quest_reqs(array $reqs_stats): string
   return str_replace(" ", "&nbsp;", $reqs);
 }
 
-function check_quest_reqs(array $reqs_stats, array $char): int
+function check_quest_reqs($reqs_stats, array $char): int
 {
+  // A quest with no requirements stores an empty reqs blob, so unserialize()
+  // hands this function false rather than an array.
+  if (!is_array($reqs_stats)) $reqs_stats = [];
   $reqs_met = 1;
   $myquests= unserialize($char['quests']);
   if ($reqs_stats['L'] && $reqs_stats['L'] > $char['level'])
