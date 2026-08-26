@@ -462,7 +462,10 @@ function generate_random_quest(string $loc, string $qalign = ""): string
   if ($qalign != "") $align = $qalign;
   if ($align==3) $align=0;
   
-  $quest['name']=$qname;
+  // Quests.name is char(50); generated titles combine an NPC name, a location
+  // and an item type, which can run past that and made the INSERT in
+  // citydata.php fail outright with "Data too long for column 'name'".
+  $quest['name']=mb_substr($qname, 0, 50);
   $quest['type']=$type;
   $quest['location']= $loc;
   $quest['offerer'] = $special[3]." ".$special[0]." ".$special[4];

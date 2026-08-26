@@ -105,7 +105,11 @@ while ($char = mysqli_fetch_assoc($charq))
         //If we are less than the level cap
         if($char['level'] < $levelCap){
 
-          mysqli_query($db,"LOCK TABLES Soc WRITE, Users WRITE;");
+          // LOCK TABLES replaces any locks already held, so this narrower lock
+          // dropped the Users_data lock taken at the top of the file - and the
+          // find_battle reset further down still writes Users_data. It has to
+          // name every table used up to the matching UNLOCK.
+          mysqli_query($db,"LOCK TABLES Soc WRITE, Users WRITE, Users_data WRITE;");
           $query = "SELECT * FROM Soc WHERE name = '$societyValue'";
           $societyRows = mysqli_query($db, $query);
           $society = mysqli_fetch_assoc($societyRows);
