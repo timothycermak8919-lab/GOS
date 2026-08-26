@@ -583,8 +583,11 @@ if ($numBroken >= 7) // if all seals are broken
           // If not the same city we just defeated.   
           if ($loc != $myHorde['target'])
           {         
-            $htown = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, name, myOrder, army,  FROM Locations WHERE name='" . $loc . "'"));
-            if ($htown['isDestroyed'] == 0) // If not a destroyed city.
+            // The trailing comma after "army" made this a syntax error, and the
+            // guard below reads isDestroyed, which was never selected (null == 0
+            // is true in PHP, so destroyed cities would have passed the check).
+            $htown = mysqli_fetch_assoc(mysqli_query($db,"SELECT id, name, myOrder, army, isDestroyed FROM Locations WHERE name='" . $loc . "'"));
+            if ($htown && $htown['isDestroyed'] == 0) // If not a destroyed city.
             {
               $inSameTown = mysqli_num_rows(mysqli_query($db,"SELECT id FROM Hordes WHERE type='3' AND target='" . $htown['name'] . "' AND done<2"));
               if (!$inSameTown)
